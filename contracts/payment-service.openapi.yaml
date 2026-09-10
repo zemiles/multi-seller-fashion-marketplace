@@ -1,0 +1,267 @@
+openapi: 3.1.0
+info:
+  title: Payment Service API
+  version: 0.1.0-draft
+  description: |
+    Draft contract for payment attempts, approvals, cancellations, refunds and PG webhooks.
+    Authentication, provider credentials and the final public gateway policy remain TODO.
+servers:
+  - url: http://localhost:8082
+    description: Local development
+security:
+  - bearerAuth: []
+tags:
+  - name: Payment attempts
+  - name: Payments
+  - name: Refunds
+  - name: PG webhooks
+paths:
+  /api/v1/payment-attempts:
+    post:
+      tags: [Payment attempts]
+      summary: Prepare a payment attempt
+      operationId: preparePaymentAttempt
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PreparePaymentRequest' }
+      responses:
+        '201':
+          description: Created or previously created idempotent attempt
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaymentAttempt' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /api/v1/payment-attempts/{paymentAttemptId}/approve:
+    post:
+      tags: [Payment attempts]
+      summary: Approve an attempt through the configured PG
+      operationId: approvePaymentAttempt
+      parameters:
+        - $ref: '#/components/parameters/PaymentAttemptId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Approved payment
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Payment' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '502': { $ref: '#/components/responses/ProviderError' }
+  /api/v1/payments/{paymentId}:
+    get:
+      tags: [Payments]
+      summary: Get a payment
+      operationId: getPayment
+      parameters:
+        - $ref: '#/components/parameters/PaymentId'
+      responses:
+        '200':
+          description: Payment
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Payment' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/v1/payments/{paymentId}/cancel:
+    post:
+      tags: [Payments]
+      summary: Cancel or void an approved payment when the provider allows it
+      operationId: cancelPayment
+      parameters:
+        - $ref: '#/components/parameters/PaymentId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Cancelled payment
+          content: { application/json: { schema: { $ref: '#/components/schemas/Payment' } } }
+        '202':
+          description: Cancellation accepted with an unknown provider result
+          content: { application/json: { schema: { $ref: '#/components/schemas/OperationPending' } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '502': { $ref: '#/components/responses/ProviderError' }
+  /api/v1/payments/{paymentId}/refunds:
+    post:
+      tags: [Refunds]
+      summary: Request a full or partial refund
+      operationId: requestRefund
+      parameters:
+        - $ref: '#/components/parameters/PaymentId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RefundRequest' }
+      responses:
+        '201':
+          description: Refund completed or previously completed idempotent refund
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Refund' }
+        '202':
+          description: Refund accepted but provider result is pending or unknown
+          content: { application/json: { schema: { $ref: '#/components/schemas/Refund' } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '502': { $ref: '#/components/responses/ProviderError' }
+  /api/v1/payment-webhooks/{provider}:
+    post:
+      tags: [PG webhooks]
+      summary: Receive and deduplicate a PG webhook
+      operationId: receivePaymentWebhook
+      security: []
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema: { type: string, minLength: 1 }
+        - name: X-Provider-Event-Id
+          in: header
+          required: true
+          schema: { type: string, minLength: 1 }
+        - name: X-Signature
+          in: header
+          required: true
+          schema: { type: string, minLength: 1 }
+        - name: X-Provider-Timestamp
+          in: header
+          required: false
+          description: Required when the selected provider signs a timestamped payload.
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema: { type: string, format: binary, description: Raw provider payload; verify signature before parsing. }
+      responses:
+        '202': { description: Accepted for idempotent processing }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Invalid provider signature }
+        '409': { $ref: '#/components/responses/Conflict' }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: TODO Confirm gateway authentication and service-to-service credentials.
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 200 }
+    PaymentAttemptId:
+      name: paymentAttemptId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    PaymentId:
+      name: paymentId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+  schemas:
+    Money:
+      type: object
+      required: [currency, amount]
+      properties:
+        currency: { type: string, pattern: '^[A-Z]{3}$', example: KRW }
+        amount: { type: integer, format: int64, minimum: 1, example: 10000 }
+    PreparePaymentRequest:
+      type: object
+      required: [checkoutId, orderId, provider, merchantTxId, paymentMethod, amount]
+      properties:
+        checkoutId: { type: string, format: uuid }
+        orderId: { type: string, format: uuid }
+        provider: { type: string, minLength: 1 }
+        merchantTxId: { type: string, minLength: 1 }
+        paymentMethod: { type: string, minLength: 1 }
+        amount: { $ref: '#/components/schemas/Money' }
+    PaymentAttempt:
+      allOf:
+        - $ref: '#/components/schemas/PreparePaymentRequest'
+        - type: object
+          required: [id, status]
+          properties:
+            id: { type: string, format: uuid }
+            status:
+              type: string
+              enum: [CREATED, REQUESTED, PENDING, SUCCEEDED, FAILED, UNKNOWN, CANCELLED]
+    Payment:
+      type: object
+      required: [id, paymentAttemptId, orderId, provider, providerPaymentKey, amount, refundedAmount, status, approvedAt]
+      properties:
+        id: { type: string, format: uuid }
+        paymentAttemptId: { type: string, format: uuid }
+        orderId: { type: string, format: uuid }
+        provider: { type: string }
+        providerPaymentKey: { type: string }
+        paymentMethod: { type: string }
+        amount: { $ref: '#/components/schemas/Money' }
+        refundedAmount:
+          type: object
+          required: [currency, amount]
+          properties:
+            currency: { type: string, pattern: '^[A-Z]{3}$' }
+            amount: { type: integer, format: int64, minimum: 0 }
+        status: { type: string, enum: [APPROVED, PARTIALLY_REFUNDED, REFUNDED, VOIDED, CHARGEBACK] }
+        approvedAt: { type: string, format: date-time }
+    RefundRequest:
+      type: object
+      required: [amount, reasonCode, requestedByType]
+      properties:
+        claimId: { type: string, format: uuid, nullable: true }
+        amount: { $ref: '#/components/schemas/Money' }
+        reasonCode: { type: string, minLength: 1 }
+        requestedByType: { type: string, enum: [MEMBER, SELLER_MEMBER, ADMIN, SYSTEM] }
+        requestedById: { type: string, format: uuid, nullable: true }
+    Refund:
+      allOf:
+        - $ref: '#/components/schemas/RefundRequest'
+        - type: object
+          required: [id, paymentId, status, actualRefundedAmount]
+          properties:
+            id: { type: string, format: uuid }
+            paymentId: { type: string, format: uuid }
+            status: { type: string, enum: [REQUESTED, PROCESSING, SUCCEEDED, FAILED, UNKNOWN, CANCELLED] }
+            actualRefundedAmount:
+              type: object
+              required: [currency, amount]
+              properties:
+                currency: { type: string, pattern: '^[A-Z]{3}$' }
+                amount: { type: integer, format: int64, minimum: 0 }
+    OperationPending:
+      type: object
+      required: [operationId, status]
+      properties:
+        operationId: { type: string, format: uuid }
+        status: { type: string, enum: [PENDING, UNKNOWN] }
+    ErrorResponse:
+      type: object
+      required: [code, message, traceId]
+      properties:
+        code: { type: string, example: REFUND_EXCEEDS_REMAINING }
+        message: { type: string }
+        traceId: { type: string }
+        details: { type: object, additionalProperties: true }
+  responses:
+    NotFound:
+      description: Resource not found
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+    Conflict:
+      description: Idempotency or state conflict
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+    ValidationError:
+      description: Invalid request
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+    ProviderError:
+      description: Provider timeout or unknown provider result
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }

@@ -1,0 +1,231 @@
+name: multi-seller-marketplace
+
+services:
+  commerce-postgres:
+    image: postgres:17.11-alpine
+    environment:
+      POSTGRES_DB: commerce
+      POSTGRES_USER: ${POSTGRES_USER:-marketplace}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
+    ports:
+      - '${COMMERCE_POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - commerce-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  payment-postgres:
+    image: postgres:17.11-alpine
+    environment:
+      POSTGRES_DB: payment
+      POSTGRES_USER: ${POSTGRES_USER:-marketplace}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
+    ports:
+      - '${PAYMENT_POSTGRES_PORT:-5433}:5432'
+    volumes:
+      - payment-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  settlement-postgres:
+    image: postgres:17.11-alpine
+    environment:
+      POSTGRES_DB: settlement
+      POSTGRES_USER: ${POSTGRES_USER:-marketplace}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
+    ports:
+      - '${SETTLEMENT_POSTGRES_PORT:-5434}:5432'
+    volumes:
+      - settlement-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  discovery-postgres:
+    image: postgres:17.11-alpine
+    environment:
+      POSTGRES_DB: discovery
+      POSTGRES_USER: ${POSTGRES_USER:-marketplace}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
+    ports:
+      - '${DISCOVERY_POSTGRES_PORT:-5435}:5432'
+    volumes:
+      - discovery-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7.4.11-alpine
+    command: ['redis-server', '--appendonly', 'yes']
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  kafka:
+    image: apache/kafka:4.1.2
+    hostname: kafka
+    ports:
+      - '${KAFKA_PORT:-9092}:9092'
+    environment:
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    volumes:
+      - kafka-data:/tmp/kraft-combined-logs
+    healthcheck:
+      test: ['CMD-SHELL', '/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1']
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 20s
+
+  commerce-service:
+    build:
+      context: .
+      args:
+        SERVICE: commerce-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://commerce-postgres:5432/commerce
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-marketplace}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - '8081:8081'
+    depends_on:
+      commerce-postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  payment-service:
+    build:
+      context: .
+      args:
+        SERVICE: payment-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://payment-postgres:5432/payment
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-marketplace}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - '8082:8082'
+    depends_on:
+      payment-postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  pg-simulator:
+    build:
+      context: .
+      args:
+        SERVICE: pg-simulator
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pg-simulator-postgres:5432/pgsim
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-marketplace}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
+    ports:
+      - '8090:8090'
+    depends_on:
+      pg-simulator-postgres:
+        condition: service_healthy
+
+  pg-simulator-postgres:
+    image: postgres:17.11-alpine
+    environment:
+      POSTGRES_DB: pgsim
+      POSTGRES_USER: ${POSTGRES_USER:-marketplace}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
+    ports:
+      - '${PG_SIMULATOR_POSTGRES_PORT:-5436}:5432'
+    volumes:
+      - pg-simulator-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  settlement-service:
+    build:
+      context: .
+      args:
+        SERVICE: settlement-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://settlement-postgres:5432/settlement
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-marketplace}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - '8083:8083'
+    depends_on:
+      settlement-postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  discovery-data-service:
+    build:
+      context: .
+      args:
+        SERVICE: discovery-data-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://discovery-postgres:5432/discovery
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-marketplace}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - '8084:8084'
+    depends_on:
+      discovery-postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+volumes:
+  commerce-postgres-data:
+  payment-postgres-data:
+  settlement-postgres-data:
+  discovery-postgres-data:
+  redis-data:
+  kafka-data:
+  pg-simulator-postgres-data:
