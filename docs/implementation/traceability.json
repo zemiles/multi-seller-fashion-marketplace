@@ -1,0 +1,6207 @@
+{
+  "asOf": "2026-09-22",
+  "meaning": "Requirement status is manually classified from current implementation; no test pass is inferred from a document or schema.",
+  "requirements": [
+    {
+      "id": "SEC-01",
+      "title": "고객·판매자 인증",
+      "source": "docs/requirements/01-security-api.md",
+      "owner": "Commerce",
+      "wave": "M1",
+      "workflow": "UC-01",
+      "tables": [
+        "commerce.member",
+        "commerce.member_auth_identity",
+        "commerce.member_profile",
+        "commerce.verification_token",
+        "commerce.command_idempotency"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "registerMember",
+          "method": "POST",
+          "path": "/api/v1/members",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "login",
+          "method": "POST",
+          "path": "/api/v1/sessions",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getSession",
+          "method": "GET",
+          "path": "/api/v1/session",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "logout",
+          "method": "DELETE",
+          "path": "/api/v1/session",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "verifyEmail",
+          "method": "POST",
+          "path": "/api/v1/auth/verifications",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "resetPassword",
+          "method": "POST",
+          "path": "/api/v1/auth/password-resets",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "requestVerification",
+          "method": "POST",
+          "path": "/api/v1/auth/verification-requests",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "requestPasswordReset",
+          "method": "POST",
+          "path": "/api/v1/auth/password-reset-requests",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [
+        "AT-01",
+        "AT-02"
+      ],
+      "additionalTest": {
+        "id": "DT-SEC-01",
+        "assertion": "같은 token 두 번 소비 효과1회, 비밀번호 변경 후 모든 이전 sessionVersion 거부",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "SEC-02",
+      "title": "관리자·판매자 권한",
+      "source": "docs/requirements/01-security-api.md",
+      "owner": "Commerce",
+      "wave": "M1/M4",
+      "workflow": "UC-01",
+      "tables": [
+        "commerce.seller_member",
+        "commerce.admin_user",
+        "commerce.admin_role",
+        "commerce.admin_user_role",
+        "commerce.admin_permission",
+        "commerce.admin_role_permission",
+        "commerce.admin_approval_request",
+        "commerce.admin_approval_step",
+        "commerce.admin_audit_log",
+        "commerce.admin_recovery_code",
+        "commerce.approval_execution"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "adminLogin",
+          "method": "POST",
+          "path": "/api/v1/admin/sessions",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "adminSession",
+          "method": "GET",
+          "path": "/api/v1/admin/session",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "adminLogout",
+          "method": "DELETE",
+          "path": "/api/v1/admin/session",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listAdministrators",
+          "method": "GET",
+          "path": "/api/v1/admin/administrators",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getAdministrator",
+          "method": "GET",
+          "path": "/api/v1/admin/administrators/{adminId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "requestAdminRoleChange",
+          "method": "POST",
+          "path": "/api/v1/admin/administrators/{adminId}/role-change-requests",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "executeAdminRoleChange",
+          "method": "POST",
+          "path": "/api/v1/admin/administrators/{adminId}/role-change-requests/{requestId}/execute",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "requestAdminMfaRecovery",
+          "method": "POST",
+          "path": "/api/v1/admin/administrators/{adminId}/mfa-recovery-requests",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "executeAdminMfaRecovery",
+          "method": "POST",
+          "path": "/api/v1/admin/administrators/{adminId}/mfa-recovery-requests/{requestId}/execute",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getApproval",
+          "method": "GET",
+          "path": "/api/v1/admin/approval-requests/{approvalId}",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [
+        "AT-01"
+      ],
+      "additionalTest": {
+        "id": "DT-SEC-02",
+        "assertion": "마지막 OWNER 제거·자기승인·권한회수 후 실행 거부, SUPPORT 예외승인 분리",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [
+        "X-06",
+        "X-09"
+      ],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "SEC-03",
+      "title": "서비스 간 인증",
+      "source": "docs/requirements/01-security-api.md",
+      "owner": "각 호출 owner",
+      "wave": "M1",
+      "workflow": "공통",
+      "tables": [],
+      "apis": [],
+      "events": [],
+      "acceptanceTests": [
+        "AT-02"
+      ],
+      "additionalTest": {
+        "id": "DT-SEC-03",
+        "assertion": "서비스별 iss/sub/aud/kid/scope/expiry allowlist와 actorContext 위조를 거부",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "API-01",
+      "title": "외부 진입과 직렬화",
+      "source": "docs/requirements/01-security-api.md",
+      "owner": "Commerce/각 owner",
+      "wave": "M1",
+      "workflow": "공통",
+      "tables": [],
+      "apis": [],
+      "events": [],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-API-01",
+        "assertion": "금액 문자열·소수·safe integer 초과 및 임의 타임존·미지정필드를 계약대로 거부",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "API-02",
+      "title": "멱등성과 경합",
+      "source": "docs/requirements/01-security-api.md",
+      "owner": "각 writer",
+      "wave": "M1/M2",
+      "workflow": "공통",
+      "tables": [
+        "commerce.consumer_inbox",
+        "payment.consumer_inbox",
+        "settlement.consumer_inbox",
+        "discovery.consumer_inbox",
+        "commerce.command_idempotency",
+        "payment.order_payment_guard",
+        "payment.payment_operation"
+      ],
+      "apis": [],
+      "events": [],
+      "acceptanceTests": [
+        "AT-06"
+      ],
+      "additionalTest": {
+        "id": "DT-API-02",
+        "assertion": "동일 key/hash replay 같은resource, 변경payload409, rollback후 다른transaction 재조회",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "API-03",
+      "title": "고객 진입 계약 목록",
+      "source": "docs/requirements/01-security-api.md",
+      "owner": "Commerce",
+      "wave": "M1~M5",
+      "workflow": "전체",
+      "tables": [],
+      "apis": [],
+      "events": [],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-API-03",
+        "assertion": "공개 route가 internal/PG 주소·서비스credential을 노출하지 않고 소유권 검사",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [
+        "X-01",
+        "X-02",
+        "X-03",
+        "X-04",
+        "X-05",
+        "X-06",
+        "X-07",
+        "X-08",
+        "X-09",
+        "X-10",
+        "X-11"
+      ],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "SEC-04",
+      "title": "파일과 감사",
+      "source": "docs/requirements/01-security-api.md",
+      "owner": "Commerce",
+      "wave": "M1",
+      "workflow": "UC-01",
+      "tables": [
+        "commerce.seller_document",
+        "commerce.claim_evidence",
+        "commerce.admin_audit_log",
+        "commerce.upload_asset"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createUpload",
+          "method": "POST",
+          "path": "/api/v1/uploads",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "putUploadContent",
+          "method": "PUT",
+          "path": "/api/v1/uploads/{uploadId}/content",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "completeUpload",
+          "method": "POST",
+          "path": "/api/v1/uploads/{uploadId}/complete",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getDownloadUrl",
+          "method": "GET",
+          "path": "/api/v1/uploads/{uploadId}/download",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getSellerSettlementAccount",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/settlement-account",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getUploadStatus",
+          "method": "GET",
+          "path": "/api/v1/uploads/{uploadId}",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-SEC-04",
+        "assertion": "검역중 파일 연결 거부, 타인 private 다운로드 거부, 로그 secret0",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [
+        "X-05"
+      ],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "COM-01",
+      "title": "회원·주소",
+      "source": "docs/requirements/02-commerce.md",
+      "owner": "Commerce",
+      "wave": "M1",
+      "workflow": "UC-01",
+      "tables": [
+        "commerce.member",
+        "commerce.member_auth_identity",
+        "commerce.member_profile",
+        "commerce.shipping_address"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getMe",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "updateMe",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "withdrawMember",
+          "method": "DELETE",
+          "path": "/api/v1/me",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listAddresses",
+          "method": "GET",
+          "path": "/api/v1/me/addresses",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createAddress",
+          "method": "POST",
+          "path": "/api/v1/me/addresses",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "updateAddress",
+          "method": "PATCH",
+          "path": "/api/v1/me/addresses/{addressId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "deleteAddress",
+          "method": "DELETE",
+          "path": "/api/v1/me/addresses/{addressId}",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-COM-01",
+        "assertion": "배송지20개·기본주소1개·진행거래 탈퇴거부, 과거 주소snapshot 불변",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "COM-02",
+      "title": "판매자·브랜드·카테고리",
+      "source": "docs/requirements/02-commerce.md",
+      "owner": "Commerce",
+      "wave": "M1/M4",
+      "workflow": "UC-01",
+      "tables": [
+        "commerce.seller",
+        "commerce.seller_member",
+        "commerce.seller_document",
+        "commerce.seller_verification",
+        "commerce.seller_settlement_account",
+        "commerce.brand",
+        "commerce.seller_brand_relation",
+        "commerce.brand_registration_request",
+        "commerce.category",
+        "commerce.seller_review_reply",
+        "commerce.admin_approval_request",
+        "commerce.admin_approval_step",
+        "commerce.seller_incident",
+        "commerce.seller_penalty",
+        "commerce.seller_health_metric",
+        "commerce.seller_appeal",
+        "commerce.seller_compliance_task",
+        "commerce.seller_compliance_task_item",
+        "commerce.seller_invitation",
+        "commerce.seller_financial_state"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createSeller",
+          "method": "POST",
+          "path": "/api/v1/sellers",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getSeller",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "updateSeller",
+          "method": "PATCH",
+          "path": "/api/v1/sellers/{sellerId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createSellerDocument",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/documents",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createSellerVerification",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/verifications",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createAccountChange",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/settlement-account-change-requests",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createInvitation",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/team-invitations",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "acceptSellerInvitation",
+          "method": "POST",
+          "path": "/api/v1/seller-invitations/accept",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listSellerMembers",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/members",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "updateSellerMember",
+          "method": "PATCH",
+          "path": "/api/v1/sellers/{sellerId}/members/{memberId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "removeSellerMember",
+          "method": "DELETE",
+          "path": "/api/v1/sellers/{sellerId}/members/{memberId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "decideSellerVerification",
+          "method": "POST",
+          "path": "/api/v1/admin/sellers/{sellerId}/verifications/{verificationId}/decisions",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "decideAccountChange",
+          "method": "POST",
+          "path": "/api/v1/admin/sellers/{sellerId}/settlement-account-change-requests/{requestId}/decisions",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listSellerVerificationReviews",
+          "method": "GET",
+          "path": "/api/v1/admin/seller-verifications",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listAccountChangeReviews",
+          "method": "GET",
+          "path": "/api/v1/admin/settlement-account-change-requests",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getSellerSettlementAccount",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/settlement-account",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [
+        "AT-32"
+      ],
+      "additionalTest": {
+        "id": "DT-COM-02",
+        "assertion": "초대1회/24시간·최종OWNER·계좌version·정지seller 신규구매와 기존처리 분리",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [
+        "X-04",
+        "X-05"
+      ],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "CAT-01",
+      "title": "상품 revision·SKU",
+      "source": "docs/requirements/02-commerce.md",
+      "owner": "Commerce",
+      "wave": "M3",
+      "workflow": "UC-01",
+      "tables": [
+        "commerce.brand",
+        "commerce.brand_registration_request",
+        "commerce.category",
+        "commerce.product",
+        "commerce.product_revision",
+        "commerce.product_image",
+        "commerce.product_feature",
+        "commerce.option_group",
+        "commerce.option_value",
+        "commerce.sku",
+        "commerce.sku_option_value",
+        "commerce.product_compliance_finding"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listCategories",
+          "method": "GET",
+          "path": "/api/v1/categories",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listBrands",
+          "method": "GET",
+          "path": "/api/v1/brands",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listProducts",
+          "method": "GET",
+          "path": "/api/v1/products",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getProduct",
+          "method": "GET",
+          "path": "/api/v1/products/{productId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listSellerProducts",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/products",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createProduct",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/products",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getSellerProduct",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/products/{productId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "editProduct",
+          "method": "PATCH",
+          "path": "/api/v1/sellers/{sellerId}/products/{productId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createProductRevision",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/products/{productId}/revisions",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "submitProductReview",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/products/{productId}/submit-review",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "publishProduct",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/products/{productId}/publish",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "pauseProduct",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/products/{productId}/pause",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listProductSkus",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/products/{productId}/skus",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "updateProductSkus",
+          "method": "PUT",
+          "path": "/api/v1/sellers/{sellerId}/products/{productId}/skus",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "decideProductReview",
+          "method": "POST",
+          "path": "/api/v1/admin/products/{productId}/review-decisions",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listProductReviewRequests",
+          "method": "GET",
+          "path": "/api/v1/admin/product-review-requests",
+          "implementation": "planned"
+        }
+      ],
+      "events": [
+        "ProductRevisionPublished",
+        "ProductAvailabilityChanged"
+      ],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-CAT-01",
+        "assertion": "검수중 기존게시본 유지, 옵션조합 중복/미검증이미지/비활성카테고리 게시거부",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [
+        "X-04"
+      ],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "INV-01",
+      "title": "재고 원장과 예약",
+      "source": "docs/requirements/02-commerce.md",
+      "owner": "Commerce",
+      "wave": "M3",
+      "workflow": "UC-02/06",
+      "tables": [
+        "commerce.inventory",
+        "commerce.inventory_ledger",
+        "commerce.inventory_reservation",
+        "commerce.inventory_reservation_item",
+        "commerce.order_item_unit"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createCheckout",
+          "method": "POST",
+          "path": "/api/v1/checkouts",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listInventory",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/inventory",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "adjustInventory",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/inventory/{skuId}/adjustments",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [
+        "AT-04"
+      ],
+      "additionalTest": {
+        "id": "DT-INV-01",
+        "assertion": "예약합계=reserved, 승인시 소비1회, 출고시 재차감0, 검수 입고1회",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "MONEY-01",
+      "title": "가격·배송비와 배분",
+      "source": "docs/requirements/02-commerce.md",
+      "owner": "Commerce/Payment",
+      "wave": "M2/M3",
+      "workflow": "UC-02/05",
+      "tables": [
+        "commerce.checkout_item",
+        "commerce.order_item",
+        "commerce.order_charge",
+        "payment.payment_item",
+        "commerce.order_item_unit",
+        "payment.refund_unit_allocation"
+      ],
+      "apis": [],
+      "events": [],
+      "acceptanceTests": [
+        "AT-03"
+      ],
+      "additionalTest": {
+        "id": "DT-MONEY-01",
+        "assertion": "10001원·3단위 및 fee1000 배분의 부분/일괄 합계가 동일",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "ORD-01",
+      "title": "장바구니",
+      "source": "docs/requirements/02-commerce.md",
+      "owner": "Commerce",
+      "wave": "M3",
+      "workflow": "UC-02",
+      "tables": [
+        "commerce.cart",
+        "commerce.cart_item"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getCart",
+          "method": "GET",
+          "path": "/api/v1/cart",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "putCartItem",
+          "method": "PUT",
+          "path": "/api/v1/cart/items/{skuId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "deleteCartItem",
+          "method": "DELETE",
+          "path": "/api/v1/cart/items/{skuId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "discovery-internal.openapi.json",
+          "operationId": "ingestServerBehavior",
+          "method": "POST",
+          "path": "/internal/v1/server-behavior-events",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-ORD-01",
+        "assertion": "주문생성 사이 추가한 cart 수량을 보존하고 stale version을 거부",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "ORD-02",
+      "title": "불변 checkout",
+      "source": "docs/requirements/02-commerce.md",
+      "owner": "Commerce",
+      "wave": "M3",
+      "workflow": "UC-02",
+      "tables": [
+        "commerce.checkout",
+        "commerce.checkout_shipping_group",
+        "commerce.checkout_item",
+        "commerce.inventory_reservation",
+        "commerce.inventory_reservation_item"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createCheckout",
+          "method": "POST",
+          "path": "/api/v1/checkouts",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getCheckout",
+          "method": "GET",
+          "path": "/api/v1/checkouts/{checkoutId}",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [
+        "AT-04"
+      ],
+      "additionalTest": {
+        "id": "DT-ORD-02",
+        "assertion": "최대3개 quote, 실패 전체rollback, 15분 가격존중·긴급판매금지 우선",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "ORD-03",
+      "title": "주문 생성과 결제 시작",
+      "source": "docs/requirements/02-commerce.md",
+      "owner": "Commerce/Payment",
+      "wave": "M2/M3",
+      "workflow": "UC-02",
+      "tables": [
+        "commerce.orders",
+        "commerce.order_shipping_group",
+        "commerce.order_item",
+        "commerce.order_charge",
+        "commerce.order_state_event",
+        "payment.payment_attempt",
+        "commerce.payment_dispatch_intent",
+        "commerce.order_item_unit",
+        "payment.order_payment_guard"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createOrder",
+          "method": "POST",
+          "path": "/api/v1/orders",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "startOrderPayment",
+          "method": "POST",
+          "path": "/api/v1/orders/{orderId}/payment",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [
+        "AT-05"
+      ],
+      "additionalTest": {
+        "id": "DT-ORD-03",
+        "assertion": "C2/C3/P2/P3/C4 각commit후 crash 시 같은주문·결제·예약효과1회",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "ORD-04",
+      "title": "주문 상태와 읽기 모델",
+      "source": "docs/requirements/02-commerce.md",
+      "owner": "Commerce",
+      "wave": "M3",
+      "workflow": "UC-02/04",
+      "tables": [
+        "commerce.inventory_reservation",
+        "commerce.inventory_reservation_item",
+        "commerce.orders",
+        "commerce.order_shipping_group",
+        "commerce.order_item",
+        "commerce.order_charge",
+        "commerce.order_state_event",
+        "commerce.claim",
+        "commerce.claim_item",
+        "commerce.claim_item_source_allocation",
+        "commerce.claim_evidence",
+        "commerce.claim_reason_change",
+        "commerce.claim_review",
+        "commerce.claim_event",
+        "commerce.claim_quote",
+        "commerce.order_item_unit",
+        "commerce.claim_item_unit"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listOrders",
+          "method": "GET",
+          "path": "/api/v1/orders",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getOrder",
+          "method": "GET",
+          "path": "/api/v1/orders/{orderId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getOrderPaymentStatus",
+          "method": "GET",
+          "path": "/api/v1/orders/{orderId}/payment-status",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getOrderForSupport",
+          "method": "GET",
+          "path": "/api/v1/admin/orders/{orderId}",
+          "implementation": "planned"
+        }
+      ],
+      "events": [
+        "OrderPaid",
+        "ShipmentDelivered",
+        "ClaimStatusChanged",
+        "PaymentApproved",
+        "PaymentFailed",
+        "PaymentUnknown",
+        "PaymentVoided",
+        "RefundSucceeded",
+        "RefundFailed"
+      ],
+      "acceptanceTests": [
+        "AT-16"
+      ],
+      "additionalTest": {
+        "id": "DT-ORD-04",
+        "assertion": "일부배송/환불/확정에서 order/payment/recovery/claim 상태를 각각 반환",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "ORD-05",
+      "title": "만료·취소와 dispatch 경합",
+      "source": "docs/requirements/02-commerce.md",
+      "owner": "Commerce/Payment",
+      "wave": "M2/M3",
+      "workflow": "UC-03",
+      "tables": [
+        "commerce.inventory_reservation",
+        "commerce.inventory_reservation_item",
+        "commerce.orders",
+        "commerce.payment_dispatch_intent",
+        "payment.order_payment_guard"
+      ],
+      "apis": [],
+      "events": [],
+      "acceptanceTests": [
+        "AT-07",
+        "AT-08"
+      ],
+      "additionalTest": {
+        "id": "DT-ORD-05",
+        "assertion": "close-before-prepare 및 P2-after-expiry 거부, UNKNOWN예약보호",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "PG-01",
+      "title": "연결 대상과 실제 지원 범위",
+      "source": "docs/requirements/03-payment-pg.md",
+      "owner": "PG1/PG2/Payment",
+      "wave": "M2",
+      "workflow": "UC-02/05",
+      "tables": [
+        "pg1.pg_payment",
+        "pg1.pg_transaction",
+        "pg2.pg_payment",
+        "pg2.pg_transaction",
+        "pg1.pg_webhook_outbox",
+        "pg1.pg_fault_scenario",
+        "pg2.pg_webhook_outbox",
+        "pg2.pg_fault_scenario"
+      ],
+      "apis": [
+        {
+          "contract": "pg-current.openapi.json",
+          "operationId": "pgApprove",
+          "method": "POST",
+          "path": "/pg/v1/payments/approve",
+          "implementation": "implemented"
+        },
+        {
+          "contract": "pg-current.openapi.json",
+          "operationId": "pgCancel",
+          "method": "POST",
+          "path": "/pg/v1/payments/{paymentId}/cancel",
+          "implementation": "implemented"
+        },
+        {
+          "contract": "pg-current.openapi.json",
+          "operationId": "pgRefund",
+          "method": "POST",
+          "path": "/pg/v1/payments/{paymentId}/refund",
+          "implementation": "implemented"
+        },
+        {
+          "contract": "pg-current.openapi.json",
+          "operationId": "pgGetPayment",
+          "method": "GET",
+          "path": "/pg/v1/payments/{paymentId}",
+          "implementation": "implemented"
+        },
+        {
+          "contract": "pg-target.openapi.json",
+          "operationId": "pgApprove",
+          "method": "POST",
+          "path": "/pg/v1/payments/approve",
+          "implementation": "planned-upgrade"
+        },
+        {
+          "contract": "pg-target.openapi.json",
+          "operationId": "pgCancel",
+          "method": "POST",
+          "path": "/pg/v1/payments/{paymentId}/cancel",
+          "implementation": "planned-upgrade"
+        },
+        {
+          "contract": "pg-target.openapi.json",
+          "operationId": "pgRefund",
+          "method": "POST",
+          "path": "/pg/v1/payments/{paymentId}/refund",
+          "implementation": "planned-upgrade"
+        },
+        {
+          "contract": "pg-target.openapi.json",
+          "operationId": "pgGetPayment",
+          "method": "GET",
+          "path": "/pg/v1/payments/{paymentId}",
+          "implementation": "planned-upgrade"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [
+        "AT-10"
+      ],
+      "additionalTest": {
+        "id": "DT-PG-01",
+        "assertion": "두 PG 독립 DB와 기존4경로 replay·환불·전액VOID 검증, 실금융효과0",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "CURRENT_PG_ROUTES_ONLY",
+      "contractStatus": "SPECIFIED",
+      "evidence": [
+        "pg-kakao-simulator/src/main/java",
+        "pg-naver-simulator/src/main/java"
+      ]
+    },
+    {
+      "id": "PAY-01",
+      "title": "prepare와 주문 guard",
+      "source": "docs/requirements/03-payment-pg.md",
+      "owner": "Payment",
+      "wave": "M2",
+      "workflow": "UC-02",
+      "tables": [
+        "payment.payment_attempt",
+        "payment.order_payment_guard",
+        "payment.payment_operation",
+        "payment.payment_operation_result"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "startOrderPayment",
+          "method": "POST",
+          "path": "/api/v1/orders/{orderId}/payment",
+          "implementation": "planned"
+        },
+        {
+          "contract": "payment-service.openapi.json",
+          "operationId": "preparePaymentAttempt",
+          "method": "POST",
+          "path": "/internal/v1/payment-attempts",
+          "implementation": "planned"
+        },
+        {
+          "contract": "payment-service.openapi.json",
+          "operationId": "getPaymentAttempt",
+          "method": "GET",
+          "path": "/internal/v1/payment-attempts/{paymentAttemptId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "payment-service.openapi.json",
+          "operationId": "getPayment",
+          "method": "GET",
+          "path": "/internal/v1/payments/{paymentId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "payment-service.openapi.json",
+          "operationId": "cancelPayment",
+          "method": "POST",
+          "path": "/internal/v1/payments/{paymentId}/cancel",
+          "implementation": "planned"
+        },
+        {
+          "contract": "payment-service.openapi.json",
+          "operationId": "getPaymentOperation",
+          "method": "GET",
+          "path": "/internal/v1/payment-operations/{operationId}",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [
+        "AT-05"
+      ],
+      "additionalTest": {
+        "id": "DT-PAY-01",
+        "assertion": "provider 변경으로 order guard 우회 불가, 성공후환불도 재승인 불가",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "IN_MEMORY_PROTOTYPE_ONLY",
+      "contractStatus": "SPECIFIED",
+      "evidence": [
+        "payment-service/src/main/java/multi/com/marketplace/payment/transaction/application/PaymentLifecycleService.java"
+      ]
+    },
+    {
+      "id": "PAY-02",
+      "title": "승인 실행과 상태 전이",
+      "source": "docs/requirements/03-payment-pg.md",
+      "owner": "Payment",
+      "wave": "M2",
+      "workflow": "UC-02/04",
+      "tables": [
+        "payment.payment_attempt",
+        "payment.payment",
+        "payment.payment_item",
+        "payment.payment_charge_allocation",
+        "payment.payment_transaction",
+        "payment.payment_transaction_allocation",
+        "payment.outbox_event",
+        "payment.order_payment_guard",
+        "payment.payment_operation",
+        "payment.payment_operation_result"
+      ],
+      "apis": [
+        {
+          "contract": "payment-service.openapi.json",
+          "operationId": "approvePaymentAttempt",
+          "method": "POST",
+          "path": "/internal/v1/payment-attempts/{paymentAttemptId}/approve",
+          "implementation": "planned"
+        }
+      ],
+      "events": [
+        "PaymentApproved",
+        "PaymentFailed",
+        "PaymentUnknown",
+        "PaymentVoided",
+        "RefundSucceeded",
+        "RefundFailed"
+      ],
+      "acceptanceTests": [
+        "AT-09"
+      ],
+      "additionalTest": {
+        "id": "DT-PAY-02",
+        "assertion": "immutable resultVersion 동기/event 일치, 최신 환불snapshot을 신규승인으로 오인하지 않음",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "IN_MEMORY_PROTOTYPE_ONLY",
+      "contractStatus": "SPECIFIED",
+      "evidence": [
+        "payment-service/src/main/java/multi/com/marketplace/payment/transaction/application/PaymentLifecycleService.java"
+      ]
+    },
+    {
+      "id": "PAY-03",
+      "title": "close-order handshake",
+      "source": "docs/requirements/03-payment-pg.md",
+      "owner": "Payment/Commerce",
+      "wave": "M2/M3",
+      "workflow": "UC-03",
+      "tables": [
+        "payment.payment_attempt",
+        "payment.order_payment_guard",
+        "payment.payment_operation",
+        "payment.payment_operation_result"
+      ],
+      "apis": [
+        {
+          "contract": "payment-service.openapi.json",
+          "operationId": "closeOrderPaymentGuard",
+          "method": "POST",
+          "path": "/internal/v1/order-payment-guards/{orderId}/close",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-PAY-03",
+        "assertion": "CLOSED tombstone 부재행에도생성, IN_FLIGHT와NO_EFFECT 증거구분",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "PAY-04",
+      "title": "취소·환불과 배분",
+      "source": "docs/requirements/03-payment-pg.md",
+      "owner": "Payment/Commerce",
+      "wave": "M2/M3",
+      "workflow": "UC-05",
+      "tables": [
+        "payment.payment_attempt",
+        "payment.payment",
+        "payment.payment_item",
+        "payment.payment_charge_allocation",
+        "payment.payment_transaction",
+        "payment.payment_transaction_allocation",
+        "payment.refund",
+        "payment.refund_item",
+        "payment.refund_charge_adjustment",
+        "payment.order_payment_guard",
+        "payment.payment_operation",
+        "payment.payment_operation_result",
+        "payment.refund_unit_allocation"
+      ],
+      "apis": [
+        {
+          "contract": "payment-service.openapi.json",
+          "operationId": "getRefund",
+          "method": "GET",
+          "path": "/internal/v1/refunds/{refundId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "payment-service.openapi.json",
+          "operationId": "requestRefund",
+          "method": "POST",
+          "path": "/internal/v1/payments/{paymentId}/refunds",
+          "implementation": "planned"
+        }
+      ],
+      "events": [
+        "PaymentApproved",
+        "PaymentFailed",
+        "PaymentUnknown",
+        "PaymentVoided",
+        "RefundSucceeded",
+        "RefundFailed"
+      ],
+      "acceptanceTests": [
+        "AT-11",
+        "AT-12",
+        "AT-13"
+      ],
+      "additionalTest": {
+        "id": "DT-PAY-04",
+        "assertion": "VOID/REFUND 산식·unit/charge 배분·단일dispatch·금액예약 한도",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "IN_MEMORY_PROTOTYPE_ONLY",
+      "contractStatus": "SPECIFIED",
+      "evidence": [
+        "payment-service/src/main/java/multi/com/marketplace/payment/transaction/application/PaymentLifecycleService.java"
+      ]
+    },
+    {
+      "id": "PAY-05",
+      "title": "UNKNOWN 복구",
+      "source": "docs/requirements/03-payment-pg.md",
+      "owner": "Payment",
+      "wave": "M2",
+      "workflow": "UC-04/05",
+      "tables": [
+        "payment.payment_attempt",
+        "payment.refund",
+        "payment.refund_item",
+        "payment.refund_charge_adjustment",
+        "payment.pg_webhook_inbox",
+        "payment.payment_operation",
+        "payment.payment_operation_result",
+        "payment.refund_unit_allocation"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getOrderPaymentStatus",
+          "method": "GET",
+          "path": "/api/v1/orders/{orderId}/payment-status",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "recoverPaymentOperation",
+          "method": "POST",
+          "path": "/api/v1/admin/payment-operations/{operationId}/recover",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listPaymentOperations",
+          "method": "GET",
+          "path": "/api/v1/admin/payment-operations",
+          "implementation": "planned"
+        }
+      ],
+      "events": [
+        "PaymentApproved",
+        "PaymentFailed",
+        "PaymentUnknown",
+        "PaymentVoided",
+        "RefundSucceeded",
+        "RefundFailed"
+      ],
+      "acceptanceTests": [
+        "AT-08",
+        "AT-09",
+        "AT-12"
+      ],
+      "additionalTest": {
+        "id": "DT-PAY-05",
+        "assertion": "24h write재시도중지/read조회유지, no-effect증거없는404는UNKNOWN",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "PG-02",
+      "title": "기존 두 PG에 추가할 v1 완성 요구",
+      "source": "docs/requirements/03-payment-pg.md",
+      "owner": "PG1/PG2",
+      "wave": "M2",
+      "workflow": "UC-02/04",
+      "tables": [
+        "pg1.pg_payment",
+        "pg1.pg_transaction",
+        "pg2.pg_payment",
+        "pg2.pg_transaction",
+        "pg1.pg_webhook_outbox",
+        "pg1.pg_fault_scenario",
+        "pg2.pg_webhook_outbox",
+        "pg2.pg_fault_scenario"
+      ],
+      "apis": [
+        {
+          "contract": "pg-target.openapi.json",
+          "operationId": "pgGetByMerchant",
+          "method": "GET",
+          "path": "/pg/v1/payments/by-merchant/{merchantTxId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "pg-target.openapi.json",
+          "operationId": "pgGetPaymentTransactions",
+          "method": "GET",
+          "path": "/pg/v1/payments/{paymentId}/transactions",
+          "implementation": "planned"
+        },
+        {
+          "contract": "pg-target.openapi.json",
+          "operationId": "pgListTransactions",
+          "method": "GET",
+          "path": "/pg/v1/transactions",
+          "implementation": "planned"
+        },
+        {
+          "contract": "pg-target.openapi.json",
+          "operationId": "pgSetFaultScenario",
+          "method": "POST",
+          "path": "/pg/internal/v1/fault-scenarios",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-PG-02",
+        "assertion": "fixed asOf receipt cursor 완전성, commit-then-timeout·prod fault거부",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "PG-03",
+      "title": "webhook 서명·재전송",
+      "source": "docs/requirements/03-payment-pg.md",
+      "owner": "PG1/PG2/Payment",
+      "wave": "M2",
+      "workflow": "UC-04",
+      "tables": [
+        "payment.pg_webhook_inbox",
+        "payment.payment_operation",
+        "payment.payment_operation_result",
+        "pg1.pg_webhook_outbox",
+        "pg2.pg_webhook_outbox"
+      ],
+      "apis": [
+        {
+          "contract": "payment-service.openapi.json",
+          "operationId": "receivePaymentWebhook",
+          "method": "POST",
+          "path": "/internal/v1/payment-webhooks/{provider}",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [
+        "AT-14"
+      ],
+      "additionalTest": {
+        "id": "DT-PG-03",
+        "assertion": "rawbody/key/timestamp 서명, 같은event 다른body409, poll경합효과1회",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "PAY-06",
+      "title": "PG 대사",
+      "source": "docs/requirements/03-payment-pg.md",
+      "owner": "Payment",
+      "wave": "M2",
+      "workflow": "UC-04",
+      "tables": [
+        "payment.payment_transaction",
+        "payment.payment_transaction_allocation",
+        "payment.payment_operation",
+        "payment.payment_operation_result",
+        "payment.pg_reconciliation_run",
+        "payment.pg_reconciliation_receipt",
+        "payment.pg_reconciliation_discrepancy"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "resolveDiscrepancy",
+          "method": "POST",
+          "path": "/api/v1/admin/reconciliation-discrepancies/{discrepancyId}/resolutions",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listDiscrepancies",
+          "method": "GET",
+          "path": "/api/v1/admin/reconciliation-discrepancies",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [
+        "AT-26"
+      ],
+      "additionalTest": {
+        "id": "DT-PAY-06",
+        "assertion": "전일+3일 비교, provider/transaction identity, 불일치 write차단·중복보정0",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "FUL-01",
+      "title": "배송과 수량",
+      "source": "docs/requirements/04-fulfillment-claims.md",
+      "owner": "Commerce",
+      "wave": "M3",
+      "workflow": "UC-06",
+      "tables": [
+        "commerce.inventory",
+        "commerce.inventory_ledger",
+        "commerce.inventory_reservation",
+        "commerce.inventory_reservation_item",
+        "commerce.shipment",
+        "commerce.shipment_item",
+        "commerce.shipment_event",
+        "commerce.order_item_unit",
+        "commerce.shipment_item_unit"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listSellerOrders",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/orders",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listSellerShipments",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/shipments",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createShipment",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/shipments",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "handoverShipment",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/shipments/{shipmentId}/handover",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "recordTrackingEvent",
+          "method": "POST",
+          "path": "/api/v1/admin/shipments/{shipmentId}/tracking-events",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "recordReturnTracking",
+          "method": "POST",
+          "path": "/api/v1/admin/claims/{claimId}/return-tracking-events",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "correctShipment",
+          "method": "POST",
+          "path": "/api/v1/admin/shipments/{shipmentId}/corrections",
+          "implementation": "planned"
+        }
+      ],
+      "events": [
+        "OrderPaid",
+        "ShipmentDelivered",
+        "ClaimStatusChanged"
+      ],
+      "acceptanceTests": [
+        "AT-17"
+      ],
+      "additionalTest": {
+        "id": "DT-FUL-01",
+        "assertion": "인계/취소 경합·carrier sequence 역행·교환generation 중복출고0",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [
+        "X-03"
+      ],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "FUL-02",
+      "title": "수량별 구매확정",
+      "source": "docs/requirements/04-fulfillment-claims.md",
+      "owner": "Commerce/Settlement",
+      "wave": "M3/M4",
+      "workflow": "UC-06/07",
+      "tables": [
+        "commerce.purchase_confirmation_state",
+        "commerce.purchase_confirmation_event",
+        "commerce.purchase_confirmation_hold",
+        "commerce.claim",
+        "commerce.claim_item",
+        "commerce.claim_item_source_allocation",
+        "commerce.claim_evidence",
+        "commerce.claim_reason_change",
+        "commerce.claim_review",
+        "commerce.claim_event",
+        "commerce.claim_quote",
+        "commerce.order_item_unit",
+        "commerce.claim_item_unit",
+        "commerce.purchase_confirmation_unit"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "confirmPurchase",
+          "method": "POST",
+          "path": "/api/v1/shipment-items/{shipmentItemId}/confirmations",
+          "implementation": "planned"
+        }
+      ],
+      "events": [
+        "PurchaseConfirmed",
+        "SellerShippingRevenueRecognized",
+        "SellerFinancialAdjusted",
+        "SellerSettlementHoldChanged",
+        "SellerPenaltyApplied"
+      ],
+      "acceptanceTests": [
+        "AT-18",
+        "AT-19"
+      ],
+      "additionalTest": {
+        "id": "DT-FUL-02",
+        "assertion": "+191:59:59 미확정/+192h 대상, held unit만 제외·완료수량중복0",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "CLM-01",
+      "title": "공통 Claim 규칙",
+      "source": "docs/requirements/04-fulfillment-claims.md",
+      "owner": "Commerce",
+      "wave": "M3",
+      "workflow": "UC-05/06",
+      "tables": [
+        "commerce.purchase_confirmation_hold",
+        "commerce.claim",
+        "commerce.claim_item",
+        "commerce.claim_item_source_allocation",
+        "commerce.claim_evidence",
+        "commerce.claim_reason_change",
+        "commerce.claim_review",
+        "commerce.claim_event",
+        "commerce.claim_quote",
+        "commerce.claim_item_unit",
+        "commerce.active_unit_claim_guard"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createClaim",
+          "method": "POST",
+          "path": "/api/v1/orders/{orderId}/claims",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getClaim",
+          "method": "GET",
+          "path": "/api/v1/claims/{claimId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "withdrawClaim",
+          "method": "POST",
+          "path": "/api/v1/claims/{claimId}/withdraw",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listSellerClaims",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/claims",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "decideSellerClaim",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/claims/{claimId}/decisions",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "quoteClaim",
+          "method": "POST",
+          "path": "/api/v1/orders/{orderId}/claim-quotes",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "requestClaimReasonChange",
+          "method": "POST",
+          "path": "/api/v1/claims/{claimId}/reason-change-requests",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listMyClaimReasonChanges",
+          "method": "GET",
+          "path": "/api/v1/claims/{claimId}/reason-change-requests",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getSellerClaim",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/claims/{claimId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listSellerClaimReasonChanges",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/claims/{claimId}/reason-change-requests",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "decideClaimReasonChange",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/claims/{claimId}/reason-change-requests/{requestId}/decisions",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "recordReturnTracking",
+          "method": "POST",
+          "path": "/api/v1/admin/claims/{claimId}/return-tracking-events",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getOrderForSupport",
+          "method": "GET",
+          "path": "/api/v1/admin/orders/{orderId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getClaimForSupport",
+          "method": "GET",
+          "path": "/api/v1/admin/claims/{claimId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createClaimException",
+          "method": "POST",
+          "path": "/api/v1/admin/orders/{orderId}/claim-exceptions",
+          "implementation": "planned"
+        }
+      ],
+      "events": [
+        "OrderPaid",
+        "ShipmentDelivered",
+        "ClaimStatusChanged"
+      ],
+      "acceptanceTests": [
+        "AT-17"
+      ],
+      "additionalTest": {
+        "id": "DT-CLM-01",
+        "assertion": "168h 경계·동일unit 열린claim1개, effects후철회금지·예외2인승인",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [
+        "X-01",
+        "X-02",
+        "X-09"
+      ],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "CLM-02",
+      "title": "환불액·배송비",
+      "source": "docs/requirements/04-fulfillment-claims.md",
+      "owner": "Commerce/Payment",
+      "wave": "M2/M3",
+      "workflow": "UC-05",
+      "tables": [
+        "commerce.order_charge",
+        "commerce.claim",
+        "commerce.claim_item",
+        "commerce.claim_item_source_allocation",
+        "commerce.claim_evidence",
+        "commerce.claim_reason_change",
+        "commerce.claim_review",
+        "commerce.claim_event",
+        "payment.refund",
+        "payment.refund_item",
+        "payment.refund_charge_adjustment",
+        "commerce.claim_quote",
+        "commerce.order_item_unit",
+        "commerce.claim_item_unit",
+        "payment.refund_unit_allocation"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "inspectClaim",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/claims/{claimId}/inspections",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "quoteClaim",
+          "method": "POST",
+          "path": "/api/v1/orders/{orderId}/claim-quotes",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [
+        "AT-20"
+      ],
+      "additionalTest": {
+        "id": "DT-CLM-02",
+        "assertion": "복수claim 합계전량의 배송비1회, 구매자/혼합귀책은 배송비유지",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "CLM-03",
+      "title": "교환",
+      "source": "docs/requirements/04-fulfillment-claims.md",
+      "owner": "Commerce",
+      "wave": "M3",
+      "workflow": "UC-06",
+      "tables": [
+        "commerce.inventory_reservation",
+        "commerce.inventory_reservation_item",
+        "commerce.claim",
+        "commerce.claim_item",
+        "commerce.claim_item_source_allocation",
+        "commerce.claim_evidence",
+        "commerce.claim_reason_change",
+        "commerce.claim_review",
+        "commerce.claim_event",
+        "commerce.exchange_line",
+        "commerce.claim_quote",
+        "commerce.shipment_item_unit",
+        "commerce.claim_item_unit"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "convertExchange",
+          "method": "POST",
+          "path": "/api/v1/claims/{claimId}/exchange-conversions",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [
+        "AT-21"
+      ],
+      "additionalTest": {
+        "id": "DT-CLM-03",
+        "assertion": "동일상품/실단가·1회교환, 7일미출고만료와 대체품 인계 경합",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [
+        "X-08"
+      ],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "EXP-01",
+      "title": "찜",
+      "source": "docs/requirements/04-fulfillment-claims.md",
+      "owner": "Commerce/Discovery",
+      "wave": "M3/M5",
+      "workflow": "UC-08",
+      "tables": [
+        "commerce.wishlist_item"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listWishlist",
+          "method": "GET",
+          "path": "/api/v1/me/wishlist",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "putWishlist",
+          "method": "PUT",
+          "path": "/api/v1/me/wishlist/{productId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "deleteWishlist",
+          "method": "DELETE",
+          "path": "/api/v1/me/wishlist/{productId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "discovery-internal.openapi.json",
+          "operationId": "ingestServerBehavior",
+          "method": "POST",
+          "path": "/internal/v1/server-behavior-events",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-EXP-01",
+        "assertion": "PUT/DELETE멱등·품절tombstone·서버만 행동변환 발행",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "EXP-02",
+      "title": "리뷰·답글",
+      "source": "docs/requirements/04-fulfillment-claims.md",
+      "owner": "Commerce",
+      "wave": "M3",
+      "workflow": "UC-08",
+      "tables": [
+        "commerce.purchase_confirmation_state",
+        "commerce.purchase_confirmation_event",
+        "commerce.purchase_confirmation_hold",
+        "commerce.review_eligibility",
+        "commerce.review",
+        "commerce.review_revision",
+        "commerce.review_image",
+        "commerce.seller_review_reply",
+        "commerce.purchase_confirmation_unit"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listReviewEligibility",
+          "method": "GET",
+          "path": "/api/v1/me/review-eligibilities",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createReview",
+          "method": "POST",
+          "path": "/api/v1/reviews",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "updateReview",
+          "method": "PATCH",
+          "path": "/api/v1/reviews/{reviewId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "deleteReview",
+          "method": "DELETE",
+          "path": "/api/v1/reviews/{reviewId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listProductReviews",
+          "method": "GET",
+          "path": "/api/v1/products/{productId}/reviews",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createSellerReviewReply",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/reviews/{reviewId}/reply",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "updateSellerReviewReply",
+          "method": "PATCH",
+          "path": "/api/v1/sellers/{sellerId}/reviews/{reviewId}/reply",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "moderateReview",
+          "method": "POST",
+          "path": "/api/v1/admin/reviews/{reviewId}/moderation",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listReviewModerationRequests",
+          "method": "GET",
+          "path": "/api/v1/admin/review-moderation-requests",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [
+        "AT-28"
+      ],
+      "additionalTest": {
+        "id": "DT-EXP-02",
+        "assertion": "orderItem당리뷰1, 수정revision검수, 반품후기 자동삭제0",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [
+        "X-04"
+      ],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "EXP-03",
+      "title": "알림",
+      "source": "docs/requirements/04-fulfillment-claims.md",
+      "owner": "Commerce",
+      "wave": "M1/M3",
+      "workflow": "UC-08",
+      "tables": [
+        "commerce.notification",
+        "commerce.notification_preference",
+        "commerce.notification_delivery"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listNotifications",
+          "method": "GET",
+          "path": "/api/v1/notifications",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "readNotification",
+          "method": "POST",
+          "path": "/api/v1/notifications/{notificationId}/read",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getNotificationPreferences",
+          "method": "GET",
+          "path": "/api/v1/notification-preferences",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "updateNotificationPreferences",
+          "method": "PATCH",
+          "path": "/api/v1/notification-preferences",
+          "implementation": "planned"
+        }
+      ],
+      "events": [
+        "OrderPaid",
+        "ShipmentDelivered",
+        "ClaimStatusChanged",
+        "SettlementPaid",
+        "PayoutUnknown"
+      ],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-EXP-03",
+        "assertion": "수신자/event/template1회, opt-out과거래알림분리, delivery실패 거래rollback0",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "SET-01",
+      "title": "금융 사실과 원장",
+      "source": "docs/requirements/05-settlement-operations.md",
+      "owner": "Settlement/Commerce",
+      "wave": "M4",
+      "workflow": "UC-07",
+      "tables": [
+        "settlement.seller_ledger_entry",
+        "settlement.consumer_inbox",
+        "settlement.consumer_stream_checkpoint",
+        "settlement.seller_recognition_unit"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listSellerLedger",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/ledger",
+          "implementation": "planned"
+        },
+        {
+          "contract": "settlement-internal.openapi.json",
+          "operationId": "queryLedger",
+          "method": "GET",
+          "path": "/internal/v1/sellers/{sellerId}/ledger",
+          "implementation": "planned"
+        }
+      ],
+      "events": [
+        "PurchaseConfirmed",
+        "SellerShippingRevenueRecognized",
+        "SellerFinancialAdjusted",
+        "SellerSettlementHoldChanged",
+        "SellerPenaltyApplied"
+      ],
+      "acceptanceTests": [
+        "AT-22"
+      ],
+      "additionalTest": {
+        "id": "DT-SET-01",
+        "assertion": "확정unit원장만, fee0행없음, rawrefund와financialadjustment중복차감0",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "SET-02",
+      "title": "정산 계산",
+      "source": "docs/requirements/05-settlement-operations.md",
+      "owner": "Settlement",
+      "wave": "M4",
+      "workflow": "UC-07",
+      "tables": [
+        "settlement.seller_ledger_entry",
+        "settlement.settlement",
+        "settlement.settlement_allocation",
+        "settlement.settlement_hold",
+        "settlement.settlement_payout_attempt",
+        "settlement.seller_carry_forward"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listSellerSettlements",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/settlements",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getSellerSettlement",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/settlements/{settlementId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "calculateSettlement",
+          "method": "POST",
+          "path": "/api/v1/admin/settlements/{settlementId}/calculate",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listAdminSettlements",
+          "method": "GET",
+          "path": "/api/v1/admin/settlements",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getAdminSettlement",
+          "method": "GET",
+          "path": "/api/v1/admin/settlements/{settlementId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "settlement-internal.openapi.json",
+          "operationId": "querySettlements",
+          "method": "GET",
+          "path": "/internal/v1/settlements",
+          "implementation": "planned"
+        },
+        {
+          "contract": "settlement-internal.openapi.json",
+          "operationId": "querySettlement",
+          "method": "GET",
+          "path": "/internal/v1/settlements/{settlementId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "settlement-internal.openapi.json",
+          "operationId": "runSettlementCalculation",
+          "method": "POST",
+          "path": "/internal/v1/settlements/{settlementId}/calculate",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [
+        "AT-23",
+        "AT-24"
+      ],
+      "additionalTest": {
+        "id": "DT-SET-02",
+        "assertion": "cutoff/늦은원장·소액/음수이월·hold 전후net 의미·중복배분0",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "SET-03",
+      "title": "지급 승인·모의 은행",
+      "source": "docs/requirements/05-settlement-operations.md",
+      "owner": "Settlement/Commerce",
+      "wave": "M4",
+      "workflow": "UC-07",
+      "tables": [
+        "settlement.settlement_payout_attempt",
+        "commerce.seller_financial_state",
+        "commerce.payout_fence",
+        "commerce.approval_execution",
+        "settlement.simulated_bank_receipt"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-internal.openapi.json",
+          "operationId": "getFinancialBarrier",
+          "method": "GET",
+          "path": "/internal/v1/sellers/{sellerId}/financial-barrier",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-internal.openapi.json",
+          "operationId": "createPayoutFence",
+          "method": "POST",
+          "path": "/internal/v1/sellers/{sellerId}/payout-fences",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-internal.openapi.json",
+          "operationId": "consumePayoutFence",
+          "method": "POST",
+          "path": "/internal/v1/payout-fences/{fenceId}/consume",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "requestSettlementApproval",
+          "method": "POST",
+          "path": "/api/v1/admin/settlements/{settlementId}/approval-requests",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "requestPayout",
+          "method": "POST",
+          "path": "/api/v1/admin/settlements/{settlementId}/payout",
+          "implementation": "planned"
+        },
+        {
+          "contract": "settlement-internal.openapi.json",
+          "operationId": "dispatchSimulatedPayout",
+          "method": "POST",
+          "path": "/internal/v1/settlements/{settlementId}/payout",
+          "implementation": "planned"
+        },
+        {
+          "contract": "settlement-internal.openapi.json",
+          "operationId": "queryPayout",
+          "method": "GET",
+          "path": "/internal/v1/payouts/{payoutId}",
+          "implementation": "planned"
+        }
+      ],
+      "events": [
+        "PurchaseConfirmed",
+        "SellerShippingRevenueRecognized",
+        "SellerFinancialAdjusted",
+        "SellerSettlementHoldChanged",
+        "SellerPenaltyApplied",
+        "SettlementPaid",
+        "PayoutUnknown"
+      ],
+      "acceptanceTests": [
+        "AT-24",
+        "AT-25"
+      ],
+      "additionalTest": {
+        "id": "DT-SET-03",
+        "assertion": "fence30초/permit replay/2인승인·bank commit후timeout 같은receipt복구",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "SET-04",
+      "title": "지급 후 환불·대사",
+      "source": "docs/requirements/05-settlement-operations.md",
+      "owner": "Settlement",
+      "wave": "M4",
+      "workflow": "UC-07",
+      "tables": [
+        "settlement.reconciliation_file",
+        "settlement.reconciliation_raw_row",
+        "settlement.reconciliation_run",
+        "settlement.reconciliation_match",
+        "settlement.reconciliation_discrepancy",
+        "settlement.bank_deposit_match",
+        "settlement.seller_carry_forward",
+        "settlement.simulated_bank_receipt",
+        "settlement.bank_reconciliation_run",
+        "settlement.bank_reconciliation_receipt",
+        "settlement.bank_reconciliation_discrepancy"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "resolveDiscrepancy",
+          "method": "POST",
+          "path": "/api/v1/admin/reconciliation-discrepancies/{discrepancyId}/resolutions",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listDiscrepancies",
+          "method": "GET",
+          "path": "/api/v1/admin/reconciliation-discrepancies",
+          "implementation": "planned"
+        },
+        {
+          "contract": "settlement-internal.openapi.json",
+          "operationId": "queryBankDiscrepancies",
+          "method": "GET",
+          "path": "/internal/v1/reconciliation-discrepancies",
+          "implementation": "planned"
+        },
+        {
+          "contract": "settlement-internal.openapi.json",
+          "operationId": "resolveBankDiscrepancy",
+          "method": "POST",
+          "path": "/internal/v1/reconciliation-discrepancies/{discrepancyId}/resolutions",
+          "implementation": "planned"
+        }
+      ],
+      "events": [
+        "SettlementPaid",
+        "PayoutUnknown"
+      ],
+      "acceptanceTests": [
+        "AT-25",
+        "AT-26"
+      ],
+      "additionalTest": {
+        "id": "DT-SET-04",
+        "assertion": "지급후refund 음수채무보존, legacy PG대사를 bank대사로 오인하지 않음",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "OPS-01",
+      "title": "운영·승인·감사",
+      "source": "docs/requirements/05-settlement-operations.md",
+      "owner": "Commerce",
+      "wave": "M4",
+      "workflow": "UC-01/07",
+      "tables": [
+        "commerce.admin_user",
+        "commerce.admin_role",
+        "commerce.admin_user_role",
+        "commerce.admin_permission",
+        "commerce.admin_role_permission",
+        "commerce.admin_approval_request",
+        "commerce.admin_approval_step",
+        "commerce.admin_audit_log",
+        "commerce.seller_incident",
+        "commerce.seller_penalty",
+        "commerce.seller_appeal",
+        "commerce.compliance_rule",
+        "commerce.compliance_rule_version",
+        "commerce.seller_compliance_task",
+        "commerce.seller_compliance_task_item",
+        "commerce.admin_recovery_code",
+        "commerce.approval_execution"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-internal.openapi.json",
+          "operationId": "getApprovalForExecution",
+          "method": "GET",
+          "path": "/internal/v1/admin-approval-requests/{approvalId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-internal.openapi.json",
+          "operationId": "consumeApproval",
+          "method": "POST",
+          "path": "/internal/v1/admin-approval-requests/{approvalId}/consume",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createSellerAppeal",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/appeals",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listSellerAppeals",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/appeals",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createApproval",
+          "method": "POST",
+          "path": "/api/v1/admin/approval-requests",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listApprovals",
+          "method": "GET",
+          "path": "/api/v1/admin/approval-requests",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "decideApproval",
+          "method": "POST",
+          "path": "/api/v1/admin/approval-requests/{approvalId}/decisions",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createIncident",
+          "method": "POST",
+          "path": "/api/v1/admin/incidents",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listIncidents",
+          "method": "GET",
+          "path": "/api/v1/admin/incidents",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createPenalty",
+          "method": "POST",
+          "path": "/api/v1/admin/seller-penalties",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listPenalties",
+          "method": "GET",
+          "path": "/api/v1/admin/seller-penalties",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createComplianceRule",
+          "method": "POST",
+          "path": "/api/v1/admin/compliance-rules",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listComplianceRules",
+          "method": "GET",
+          "path": "/api/v1/admin/compliance-rules",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "decideAppeal",
+          "method": "POST",
+          "path": "/api/v1/admin/appeals/{appealId}/decisions",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listAuditLogs",
+          "method": "GET",
+          "path": "/api/v1/admin/audit-logs",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "updateIncident",
+          "method": "PATCH",
+          "path": "/api/v1/admin/incidents/{incidentId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "correctShipment",
+          "method": "POST",
+          "path": "/api/v1/admin/shipments/{shipmentId}/corrections",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getSellerAppeal",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/appeals/{appealId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "requestAdminRoleChange",
+          "method": "POST",
+          "path": "/api/v1/admin/administrators/{adminId}/role-change-requests",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "executeAdminRoleChange",
+          "method": "POST",
+          "path": "/api/v1/admin/administrators/{adminId}/role-change-requests/{requestId}/execute",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "requestAdminMfaRecovery",
+          "method": "POST",
+          "path": "/api/v1/admin/administrators/{adminId}/mfa-recovery-requests",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "executeAdminMfaRecovery",
+          "method": "POST",
+          "path": "/api/v1/admin/administrators/{adminId}/mfa-recovery-requests/{requestId}/execute",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getApproval",
+          "method": "GET",
+          "path": "/api/v1/admin/approval-requests/{approvalId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "replayEventQueue",
+          "method": "POST",
+          "path": "/api/v1/admin/event-queues/{entryId}/replays",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createClaimException",
+          "method": "POST",
+          "path": "/api/v1/admin/orders/{orderId}/claim-exceptions",
+          "implementation": "planned"
+        },
+        {
+          "contract": "operations-internal.openapi.json",
+          "operationId": "queryLocalEventQueues",
+          "method": "GET",
+          "path": "/internal/v1/event-queues",
+          "implementation": "planned"
+        },
+        {
+          "contract": "operations-internal.openapi.json",
+          "operationId": "replayLocalEventQueue",
+          "method": "POST",
+          "path": "/internal/v1/event-queues/{entryId}/replays",
+          "implementation": "planned"
+        },
+        {
+          "contract": "operations-internal.openapi.json",
+          "operationId": "queryLocalRecoveryJob",
+          "method": "GET",
+          "path": "/internal/v1/recovery-jobs/{jobId}",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [
+        "AT-32"
+      ],
+      "additionalTest": {
+        "id": "DT-OPS-01",
+        "assertion": "동일actor 승인금지·action/hash고정·재실행같은action 효과1회",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [
+        "X-06",
+        "X-07",
+        "X-09"
+      ],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "OPS-02",
+      "title": "API 작업 목록",
+      "source": "docs/requirements/05-settlement-operations.md",
+      "owner": "Commerce/각 owner",
+      "wave": "M1/M4",
+      "workflow": "UC-07",
+      "tables": [
+        "commerce.outbox_event",
+        "payment.outbox_event",
+        "settlement.outbox_event",
+        "discovery.outbox_event",
+        "commerce.consumer_inbox",
+        "commerce.event_recovery_job",
+        "payment.consumer_inbox",
+        "payment.event_recovery_job",
+        "settlement.consumer_inbox",
+        "settlement.event_recovery_job",
+        "discovery.consumer_inbox",
+        "discovery.event_recovery_job"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listEventQueues",
+          "method": "GET",
+          "path": "/api/v1/admin/event-queues",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getRecoveryJob",
+          "method": "GET",
+          "path": "/api/v1/admin/recovery-jobs/{jobId}",
+          "implementation": "planned"
+        }
+      ],
+      "events": [],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-OPS-02",
+        "assertion": "운영목록과조치가 역할·owner·evidence·version·approval에 연결",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [
+        "X-04",
+        "X-05",
+        "X-07"
+      ],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "DIS-01",
+      "title": "검색과 상품 projection",
+      "source": "docs/requirements/06-discovery-frontend.md",
+      "owner": "Discovery/Commerce",
+      "wave": "M5",
+      "workflow": "UC-08",
+      "tables": [
+        "discovery.search_request",
+        "discovery.search_impression",
+        "discovery.consumer_inbox",
+        "discovery.consumer_stream_checkpoint",
+        "discovery.search_projection_generation",
+        "discovery.search_product_projection"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-internal.openapi.json",
+          "operationId": "getCatalogSnapshot",
+          "method": "GET",
+          "path": "/internal/v1/catalog/snapshot",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listProducts",
+          "method": "GET",
+          "path": "/api/v1/products",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "searchProducts",
+          "method": "GET",
+          "path": "/api/v1/search",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createSearchRebuild",
+          "method": "POST",
+          "path": "/api/v1/admin/search-rebuilds",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getSearchRebuild",
+          "method": "GET",
+          "path": "/api/v1/admin/search-rebuilds/{generationId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "discovery-internal.openapi.json",
+          "operationId": "querySearchProducts",
+          "method": "GET",
+          "path": "/internal/v1/search/products",
+          "implementation": "planned"
+        },
+        {
+          "contract": "discovery-internal.openapi.json",
+          "operationId": "rebuildProjection",
+          "method": "POST",
+          "path": "/internal/v1/search/rebuilds",
+          "implementation": "planned"
+        },
+        {
+          "contract": "discovery-internal.openapi.json",
+          "operationId": "queryProjectionRebuild",
+          "method": "GET",
+          "path": "/internal/v1/search/rebuilds/{generationId}",
+          "implementation": "planned"
+        }
+      ],
+      "events": [
+        "ProductRevisionPublished",
+        "ProductAvailabilityChanged"
+      ],
+      "acceptanceTests": [
+        "AT-31"
+      ],
+      "additionalTest": {
+        "id": "DT-DIS-01",
+        "assertion": "generation snapshot/catch-up/atomic switch, tombstone·sourceVersion 보존",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [
+        "X-11"
+      ],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "DIS-02",
+      "title": "concept·분석",
+      "source": "docs/requirements/06-discovery-frontend.md",
+      "owner": "Discovery",
+      "wave": "M5",
+      "workflow": "UC-08",
+      "tables": [
+        "discovery.concept_taxonomy_version",
+        "discovery.concept",
+        "discovery.concept_alias",
+        "discovery.product_analysis_run",
+        "discovery.product_concept",
+        "discovery.product_concept_evidence"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createProductAnalysis",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/products/{productId}/analysis-runs",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getProductAnalysis",
+          "method": "GET",
+          "path": "/api/v1/sellers/{sellerId}/products/{productId}/analysis-runs/{runId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "reviewProductConcept",
+          "method": "POST",
+          "path": "/api/v1/sellers/{sellerId}/products/{productId}/concept-reviews",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "createTaxonomy",
+          "method": "POST",
+          "path": "/api/v1/admin/concept-taxonomies",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listConceptTaxonomies",
+          "method": "GET",
+          "path": "/api/v1/admin/concept-taxonomies",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "publishTaxonomy",
+          "method": "POST",
+          "path": "/api/v1/admin/concept-taxonomies/{taxonomyId}/publish",
+          "implementation": "planned"
+        },
+        {
+          "contract": "discovery-internal.openapi.json",
+          "operationId": "queueAnalysis",
+          "method": "POST",
+          "path": "/internal/v1/products/{productId}/analysis-runs",
+          "implementation": "planned"
+        },
+        {
+          "contract": "discovery-internal.openapi.json",
+          "operationId": "queryAnalysis",
+          "method": "GET",
+          "path": "/internal/v1/analysis-runs/{runId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "discovery-internal.openapi.json",
+          "operationId": "applyConceptReview",
+          "method": "POST",
+          "path": "/internal/v1/products/{productId}/concept-reviews",
+          "implementation": "planned"
+        },
+        {
+          "contract": "discovery-internal.openapi.json",
+          "operationId": "addTaxonomy",
+          "method": "POST",
+          "path": "/internal/v1/concept-taxonomies",
+          "implementation": "planned"
+        },
+        {
+          "contract": "discovery-internal.openapi.json",
+          "operationId": "queryTaxonomies",
+          "method": "GET",
+          "path": "/internal/v1/concept-taxonomies",
+          "implementation": "planned"
+        },
+        {
+          "contract": "discovery-internal.openapi.json",
+          "operationId": "activateTaxonomy",
+          "method": "POST",
+          "path": "/internal/v1/concept-taxonomies/{taxonomyId}/publish",
+          "implementation": "planned"
+        }
+      ],
+      "events": [
+        "ProductAnalysisCompleted"
+      ],
+      "acceptanceTests": [
+        "AT-28"
+      ],
+      "additionalTest": {
+        "id": "DT-DIS-02",
+        "assertion": "같은 입력 결정적결과, 근거·버전추적, stale revision 무효",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [
+        "X-04"
+      ],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "DIS-03",
+      "title": "행동 데이터",
+      "source": "docs/requirements/06-discovery-frontend.md",
+      "owner": "Discovery/Commerce",
+      "wave": "M5",
+      "workflow": "UC-08",
+      "tables": [
+        "discovery.search_request",
+        "discovery.search_impression",
+        "discovery.user_behavior_event"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getNotificationPreferences",
+          "method": "GET",
+          "path": "/api/v1/notification-preferences",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "updateNotificationPreferences",
+          "method": "PATCH",
+          "path": "/api/v1/notification-preferences",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "recordBehavior",
+          "method": "POST",
+          "path": "/api/v1/behavior-events",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "recordBehaviorBatch",
+          "method": "POST",
+          "path": "/api/v1/behavior-events/batch",
+          "implementation": "planned"
+        },
+        {
+          "contract": "discovery-internal.openapi.json",
+          "operationId": "ingestBehavior",
+          "method": "POST",
+          "path": "/internal/v1/behavior-events/batch",
+          "implementation": "planned"
+        },
+        {
+          "contract": "discovery-internal.openapi.json",
+          "operationId": "ingestServerBehavior",
+          "method": "POST",
+          "path": "/internal/v1/server-behavior-events",
+          "implementation": "planned"
+        }
+      ],
+      "events": [
+        "OrderPaid",
+        "ShipmentDelivered",
+        "ClaimStatusChanged"
+      ],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-DIS-03",
+        "assertion": "동의없음 지속개인추적0, 브라우저 PURCHASE/WISHLIST/CART_ADD 위조거부",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [
+        "X-10"
+      ],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "FE-01",
+      "title": "프론트 경계와 인증",
+      "source": "docs/requirements/06-discovery-frontend.md",
+      "owner": "Frontend/Commerce",
+      "wave": "M1~M5",
+      "workflow": "전체",
+      "tables": [],
+      "apis": [],
+      "events": [],
+      "acceptanceTests": [
+        "AT-31"
+      ],
+      "additionalTest": {
+        "id": "DT-FE-01",
+        "assertion": "3개area 경계 및 최종3artifact 독립rollout/rollback, 쿠키/CSRF",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "FE-02",
+      "title": "화면 요구사항",
+      "source": "docs/requirements/06-discovery-frontend.md",
+      "owner": "Frontend",
+      "wave": "M1~M5",
+      "workflow": "전체",
+      "tables": [],
+      "apis": [],
+      "events": [],
+      "acceptanceTests": [
+        "AT-29"
+      ],
+      "additionalTest": {
+        "id": "DT-FE-02",
+        "assertion": "SF/SE/AD 화면 loading/empty/error/권한·UNKNOWN·360px·keyboard",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [
+        "X-01",
+        "X-02",
+        "X-03",
+        "X-04",
+        "X-05",
+        "X-06",
+        "X-07",
+        "X-08",
+        "X-09",
+        "X-10",
+        "X-11"
+      ],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "FE-03",
+      "title": "계약과 테스트",
+      "source": "docs/requirements/06-discovery-frontend.md",
+      "owner": "Frontend/각API owner",
+      "wave": "M1~M5",
+      "workflow": "전체",
+      "tables": [],
+      "apis": [],
+      "events": [],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-FE-03",
+        "assertion": "OpenAPI DTO/runtime검증·mock버전·실제 PG1/PG2 E2E 구분",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "EVT-01",
+      "title": "envelope·토픽·순서",
+      "source": "docs/requirements/07-events-reliability.md",
+      "owner": "각 producer",
+      "wave": "M1",
+      "workflow": "공통/UC-08",
+      "tables": [
+        "commerce.outbox_event",
+        "payment.outbox_event",
+        "settlement.outbox_event",
+        "discovery.outbox_event",
+        "commerce.event_stream_sequence",
+        "payment.event_stream_sequence",
+        "settlement.event_stream_sequence",
+        "discovery.event_stream_sequence"
+      ],
+      "apis": [],
+      "events": [
+        "ProductRevisionPublished",
+        "ProductAvailabilityChanged",
+        "OrderPaid",
+        "ShipmentDelivered",
+        "ClaimStatusChanged",
+        "PurchaseConfirmed",
+        "SellerShippingRevenueRecognized",
+        "SellerFinancialAdjusted",
+        "SellerSettlementHoldChanged",
+        "SellerPenaltyApplied",
+        "PaymentApproved",
+        "PaymentFailed",
+        "PaymentUnknown",
+        "PaymentVoided",
+        "RefundSucceeded",
+        "RefundFailed",
+        "SettlementPaid",
+        "PayoutUnknown",
+        "ProductAnalysisCompleted"
+      ],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-EVT-01",
+        "assertion": "19종 envelope/producer/topic/key/version/hash의 정합과 발행순서",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "EVT-02",
+      "title": "사건별 payload registry",
+      "source": "docs/requirements/07-events-reliability.md",
+      "owner": "각 producer/consumer",
+      "wave": "M1",
+      "workflow": "전체",
+      "tables": [
+        "commerce.outbox_event",
+        "payment.outbox_event",
+        "settlement.outbox_event",
+        "discovery.outbox_event",
+        "commerce.consumer_inbox",
+        "commerce.consumer_stream_checkpoint",
+        "payment.consumer_inbox",
+        "payment.consumer_stream_checkpoint",
+        "settlement.consumer_inbox",
+        "settlement.consumer_stream_checkpoint",
+        "discovery.consumer_inbox",
+        "discovery.consumer_stream_checkpoint"
+      ],
+      "apis": [],
+      "events": [
+        "ProductRevisionPublished",
+        "ProductAvailabilityChanged",
+        "OrderPaid",
+        "ShipmentDelivered",
+        "ClaimStatusChanged",
+        "PurchaseConfirmed",
+        "SellerShippingRevenueRecognized",
+        "SellerFinancialAdjusted",
+        "SellerSettlementHoldChanged",
+        "SellerPenaltyApplied",
+        "PaymentApproved",
+        "PaymentFailed",
+        "PaymentUnknown",
+        "PaymentVoided",
+        "RefundSucceeded",
+        "RefundFailed",
+        "SettlementPaid",
+        "PayoutUnknown",
+        "ProductAnalysisCompleted"
+      ],
+      "acceptanceTests": [
+        "AT-27"
+      ],
+      "additionalTest": {
+        "id": "DT-EVT-02",
+        "assertion": "19종 payload schema·산술·known ignored type checkpoint·unknown quarantine",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "EVT-03",
+      "title": "outbox/inbox·재시도",
+      "source": "docs/requirements/07-events-reliability.md",
+      "owner": "각 producer/consumer",
+      "wave": "M1",
+      "workflow": "공통",
+      "tables": [
+        "commerce.outbox_event",
+        "payment.outbox_event",
+        "settlement.outbox_event",
+        "discovery.outbox_event",
+        "commerce.consumer_inbox",
+        "commerce.consumer_stream_checkpoint",
+        "commerce.event_recovery_job",
+        "payment.consumer_inbox",
+        "payment.consumer_stream_checkpoint",
+        "payment.event_recovery_job",
+        "settlement.consumer_inbox",
+        "settlement.consumer_stream_checkpoint",
+        "settlement.event_recovery_job",
+        "discovery.consumer_inbox",
+        "discovery.consumer_stream_checkpoint",
+        "discovery.event_recovery_job"
+      ],
+      "apis": [
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "listEventQueues",
+          "method": "GET",
+          "path": "/api/v1/admin/event-queues",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "replayEventQueue",
+          "method": "POST",
+          "path": "/api/v1/admin/event-queues/{entryId}/replays",
+          "implementation": "planned"
+        },
+        {
+          "contract": "commerce-public.openapi.json",
+          "operationId": "getRecoveryJob",
+          "method": "GET",
+          "path": "/api/v1/admin/recovery-jobs/{jobId}",
+          "implementation": "planned"
+        },
+        {
+          "contract": "operations-internal.openapi.json",
+          "operationId": "queryLocalEventQueues",
+          "method": "GET",
+          "path": "/internal/v1/event-queues",
+          "implementation": "planned"
+        },
+        {
+          "contract": "operations-internal.openapi.json",
+          "operationId": "replayLocalEventQueue",
+          "method": "POST",
+          "path": "/internal/v1/event-queues/{entryId}/replays",
+          "implementation": "planned"
+        },
+        {
+          "contract": "operations-internal.openapi.json",
+          "operationId": "queryLocalRecoveryJob",
+          "method": "GET",
+          "path": "/internal/v1/recovery-jobs/{jobId}",
+          "implementation": "planned"
+        }
+      ],
+      "events": [
+        "ProductRevisionPublished",
+        "ProductAvailabilityChanged",
+        "OrderPaid",
+        "ShipmentDelivered",
+        "ClaimStatusChanged",
+        "PurchaseConfirmed",
+        "SellerShippingRevenueRecognized",
+        "SellerFinancialAdjusted",
+        "SellerSettlementHoldChanged",
+        "SellerPenaltyApplied",
+        "PaymentApproved",
+        "PaymentFailed",
+        "PaymentUnknown",
+        "PaymentVoided",
+        "RefundSucceeded",
+        "RefundFailed",
+        "SettlementPaid",
+        "PayoutUnknown",
+        "ProductAnalysisCompleted"
+      ],
+      "acceptanceTests": [
+        "AT-15",
+        "AT-27"
+      ],
+      "additionalTest": {
+        "id": "DT-EVT-03",
+        "assertion": "ACK/DB commit 사이 crash·lease회수·gap/DLQ불변replay 효과1회",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [
+        "X-07"
+      ],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "OPS-03",
+      "title": "SLO·관측·스케줄",
+      "source": "docs/requirements/07-events-reliability.md",
+      "owner": "각 owner/운영",
+      "wave": "M1~M5",
+      "workflow": "전체",
+      "tables": [],
+      "apis": [],
+      "events": [],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-OPS-03",
+        "assertion": "고정부하p95/p99·unknown age·queue경보·clock주입·민감로그0",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "OPS-04",
+      "title": "보존·배포·복구",
+      "source": "docs/requirements/07-events-reliability.md",
+      "owner": "운영/각 owner",
+      "wave": "M0~M7",
+      "workflow": "전체",
+      "tables": [],
+      "apis": [],
+      "events": [],
+      "acceptanceTests": [
+        "AT-30"
+      ],
+      "additionalTest": {
+        "id": "DT-OPS-04",
+        "assertion": "서로다른시점DB복원+dedup/receipt대사, RPO/RTO 실제측정·보존정책",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "DATA-01",
+      "title": "필요한 서비스-local 데이터 확장",
+      "source": "docs/requirements/08-delivery-acceptance.md",
+      "owner": "각DB owner",
+      "wave": "M0~M7",
+      "workflow": "전체",
+      "tables": [
+        "commerce.member",
+        "commerce.member_auth_identity",
+        "commerce.member_profile",
+        "commerce.shipping_address",
+        "commerce.seller",
+        "commerce.seller_member",
+        "commerce.seller_document",
+        "commerce.seller_verification",
+        "commerce.seller_settlement_account",
+        "commerce.brand",
+        "commerce.seller_brand_relation",
+        "commerce.brand_registration_request",
+        "commerce.category",
+        "commerce.product",
+        "commerce.product_revision",
+        "commerce.product_image",
+        "commerce.product_feature",
+        "commerce.option_group",
+        "commerce.option_value",
+        "commerce.sku",
+        "commerce.sku_option_value",
+        "commerce.inventory",
+        "commerce.inventory_ledger",
+        "commerce.cart",
+        "commerce.cart_item",
+        "commerce.checkout",
+        "commerce.checkout_shipping_group",
+        "commerce.checkout_item",
+        "commerce.inventory_reservation",
+        "commerce.inventory_reservation_item",
+        "commerce.orders",
+        "commerce.order_shipping_group",
+        "commerce.order_item",
+        "commerce.order_charge",
+        "commerce.order_state_event",
+        "commerce.shipment",
+        "commerce.shipment_item",
+        "commerce.shipment_event",
+        "commerce.purchase_confirmation_state",
+        "commerce.purchase_confirmation_event",
+        "commerce.purchase_confirmation_hold",
+        "commerce.claim",
+        "commerce.claim_item",
+        "commerce.claim_item_source_allocation",
+        "commerce.claim_evidence",
+        "commerce.claim_reason_change",
+        "commerce.claim_review",
+        "commerce.claim_event",
+        "commerce.exchange_line",
+        "commerce.review_eligibility",
+        "commerce.review",
+        "commerce.review_revision",
+        "commerce.review_image",
+        "commerce.seller_review_reply",
+        "commerce.wishlist_item",
+        "commerce.notification",
+        "commerce.notification_preference",
+        "commerce.notification_delivery",
+        "commerce.admin_user",
+        "commerce.admin_role",
+        "commerce.admin_user_role",
+        "commerce.admin_permission",
+        "commerce.admin_role_permission",
+        "commerce.admin_approval_request",
+        "commerce.admin_approval_step",
+        "commerce.admin_audit_log",
+        "commerce.seller_incident",
+        "commerce.seller_penalty",
+        "commerce.seller_health_metric",
+        "commerce.seller_appeal",
+        "commerce.compliance_rule",
+        "commerce.compliance_rule_version",
+        "commerce.product_compliance_finding",
+        "commerce.seller_compliance_task",
+        "commerce.seller_compliance_task_item",
+        "commerce.outbox_event",
+        "payment.payment_attempt",
+        "payment.payment",
+        "payment.payment_item",
+        "payment.payment_charge_allocation",
+        "payment.payment_transaction",
+        "payment.payment_transaction_allocation",
+        "payment.refund",
+        "payment.refund_item",
+        "payment.refund_charge_adjustment",
+        "payment.pg_webhook_inbox",
+        "payment.outbox_event",
+        "settlement.seller_ledger_entry",
+        "settlement.settlement",
+        "settlement.settlement_allocation",
+        "settlement.settlement_hold",
+        "settlement.settlement_payout_attempt",
+        "settlement.reconciliation_file",
+        "settlement.reconciliation_raw_row",
+        "settlement.reconciliation_run",
+        "settlement.reconciliation_match",
+        "settlement.reconciliation_discrepancy",
+        "settlement.bank_deposit_match",
+        "settlement.outbox_event",
+        "discovery.concept_taxonomy_version",
+        "discovery.concept",
+        "discovery.concept_alias",
+        "discovery.product_analysis_run",
+        "discovery.product_concept",
+        "discovery.product_concept_evidence",
+        "discovery.search_request",
+        "discovery.search_impression",
+        "discovery.user_behavior_event",
+        "discovery.outbox_event",
+        "pg1.pg_payment",
+        "pg1.pg_transaction",
+        "pg2.pg_payment",
+        "pg2.pg_transaction",
+        "commerce.consumer_inbox",
+        "commerce.consumer_stream_checkpoint",
+        "commerce.event_stream_sequence",
+        "commerce.event_recovery_job",
+        "payment.consumer_inbox",
+        "payment.consumer_stream_checkpoint",
+        "payment.event_stream_sequence",
+        "payment.event_recovery_job",
+        "settlement.consumer_inbox",
+        "settlement.consumer_stream_checkpoint",
+        "settlement.event_stream_sequence",
+        "settlement.event_recovery_job",
+        "discovery.consumer_inbox",
+        "discovery.consumer_stream_checkpoint",
+        "discovery.event_stream_sequence",
+        "discovery.event_recovery_job",
+        "commerce.admin_recovery_code",
+        "commerce.verification_token",
+        "commerce.seller_invitation",
+        "commerce.command_idempotency",
+        "commerce.claim_quote",
+        "commerce.payment_dispatch_intent",
+        "commerce.order_item_unit",
+        "commerce.shipment_item_unit",
+        "commerce.claim_item_unit",
+        "commerce.active_unit_claim_guard",
+        "commerce.purchase_confirmation_unit",
+        "commerce.seller_financial_state",
+        "commerce.payout_fence",
+        "commerce.approval_execution",
+        "commerce.upload_asset",
+        "payment.order_payment_guard",
+        "payment.payment_operation",
+        "payment.payment_operation_result",
+        "payment.refund_unit_allocation",
+        "payment.pg_reconciliation_run",
+        "payment.pg_reconciliation_receipt",
+        "payment.pg_reconciliation_discrepancy",
+        "settlement.seller_recognition_unit",
+        "settlement.seller_carry_forward",
+        "settlement.simulated_bank_receipt",
+        "settlement.bank_reconciliation_run",
+        "settlement.bank_reconciliation_receipt",
+        "settlement.bank_reconciliation_discrepancy",
+        "pg1.pg_webhook_outbox",
+        "pg1.pg_fault_scenario",
+        "pg2.pg_webhook_outbox",
+        "pg2.pg_fault_scenario",
+        "discovery.search_projection_generation",
+        "discovery.search_product_projection"
+      ],
+      "apis": [],
+      "events": [],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-DATA-01",
+        "assertion": "빈DB/기존DB upgrade·backfill중단재개·누락FK0·불변합계·schema의미차이",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "DEV-01",
+      "title": "착수 순서와 gate",
+      "source": "docs/requirements/08-delivery-acceptance.md",
+      "owner": "구현담당",
+      "wave": "M0~M7",
+      "workflow": "전체",
+      "tables": [],
+      "apis": [],
+      "events": [],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-DEV-01",
+        "assertion": "A~H 단계gate 증거와 선행영속guard/인증을 먼저 충족",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "TEST-01",
+      "title": "필수 수용 시나리오",
+      "source": "docs/requirements/08-delivery-acceptance.md",
+      "owner": "각기능담당",
+      "wave": "M0~M7",
+      "workflow": "전체",
+      "tables": [],
+      "apis": [],
+      "events": [],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-TEST-01",
+        "assertion": "AT-01~32 실제PostgreSQL/복수인스턴스·fault위치·합계증거",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    },
+    {
+      "id": "TEST-02",
+      "title": "완료 산출물",
+      "source": "docs/requirements/08-delivery-acceptance.md",
+      "owner": "검토담당",
+      "wave": "M0~M7",
+      "workflow": "전체",
+      "tables": [],
+      "apis": [],
+      "events": [],
+      "acceptanceTests": [],
+      "additionalTest": {
+        "id": "DT-TEST-02",
+        "assertion": "완료기능마다 code/DB/계약/UI/운영 증거, 미실행 시험 별도표시",
+        "status": "NOT_RUN"
+      },
+      "contractExtensions": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "contractStatus": "SPECIFIED",
+      "evidence": []
+    }
+  ],
+  "operations": [
+    {
+      "contract": "commerce-internal.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/sellers/{sellerId}/financial-barrier",
+      "operationId": "getFinancialBarrier",
+      "requirements": [
+        "SET-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-internal.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/sellers/{sellerId}/payout-fences",
+      "operationId": "createPayoutFence",
+      "requirements": [
+        "SET-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-internal.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/payout-fences/{fenceId}/consume",
+      "operationId": "consumePayoutFence",
+      "requirements": [
+        "SET-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-internal.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/admin-approval-requests/{approvalId}",
+      "operationId": "getApprovalForExecution",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-internal.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/admin-approval-requests/{approvalId}/consume",
+      "operationId": "consumeApproval",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-internal.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/catalog/snapshot",
+      "operationId": "getCatalogSnapshot",
+      "requirements": [
+        "DIS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/members",
+      "operationId": "registerMember",
+      "requirements": [
+        "SEC-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sessions",
+      "operationId": "login",
+      "requirements": [
+        "SEC-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/session",
+      "operationId": "getSession",
+      "requirements": [
+        "SEC-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "DELETE",
+      "path": "/api/v1/session",
+      "operationId": "logout",
+      "requirements": [
+        "SEC-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/auth/verifications",
+      "operationId": "verifyEmail",
+      "requirements": [
+        "SEC-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/auth/password-resets",
+      "operationId": "resetPassword",
+      "requirements": [
+        "SEC-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/auth/verification-requests",
+      "operationId": "requestVerification",
+      "requirements": [
+        "SEC-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/auth/password-reset-requests",
+      "operationId": "requestPasswordReset",
+      "requirements": [
+        "SEC-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/me",
+      "operationId": "getMe",
+      "requirements": [
+        "COM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "PATCH",
+      "path": "/api/v1/me",
+      "operationId": "updateMe",
+      "requirements": [
+        "COM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "DELETE",
+      "path": "/api/v1/me",
+      "operationId": "withdrawMember",
+      "requirements": [
+        "COM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/me/addresses",
+      "operationId": "listAddresses",
+      "requirements": [
+        "COM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/me/addresses",
+      "operationId": "createAddress",
+      "requirements": [
+        "COM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "PATCH",
+      "path": "/api/v1/me/addresses/{addressId}",
+      "operationId": "updateAddress",
+      "requirements": [
+        "COM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "DELETE",
+      "path": "/api/v1/me/addresses/{addressId}",
+      "operationId": "deleteAddress",
+      "requirements": [
+        "COM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/categories",
+      "operationId": "listCategories",
+      "requirements": [
+        "CAT-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/brands",
+      "operationId": "listBrands",
+      "requirements": [
+        "CAT-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/products",
+      "operationId": "listProducts",
+      "requirements": [
+        "CAT-01",
+        "DIS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/products/{productId}",
+      "operationId": "getProduct",
+      "requirements": [
+        "CAT-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/search",
+      "operationId": "searchProducts",
+      "requirements": [
+        "DIS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/me/wishlist",
+      "operationId": "listWishlist",
+      "requirements": [
+        "EXP-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "PUT",
+      "path": "/api/v1/me/wishlist/{productId}",
+      "operationId": "putWishlist",
+      "requirements": [
+        "EXP-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "DELETE",
+      "path": "/api/v1/me/wishlist/{productId}",
+      "operationId": "deleteWishlist",
+      "requirements": [
+        "EXP-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/cart",
+      "operationId": "getCart",
+      "requirements": [
+        "ORD-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "PUT",
+      "path": "/api/v1/cart/items/{skuId}",
+      "operationId": "putCartItem",
+      "requirements": [
+        "ORD-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "DELETE",
+      "path": "/api/v1/cart/items/{skuId}",
+      "operationId": "deleteCartItem",
+      "requirements": [
+        "ORD-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/checkouts",
+      "operationId": "createCheckout",
+      "requirements": [
+        "ORD-02",
+        "INV-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/checkouts/{checkoutId}",
+      "operationId": "getCheckout",
+      "requirements": [
+        "ORD-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "operationId": "createOrder",
+      "requirements": [
+        "ORD-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/orders",
+      "operationId": "listOrders",
+      "requirements": [
+        "ORD-04"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/orders/{orderId}/payment",
+      "operationId": "startOrderPayment",
+      "requirements": [
+        "PAY-01",
+        "ORD-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/orders/{orderId}",
+      "operationId": "getOrder",
+      "requirements": [
+        "ORD-04"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/orders/{orderId}/payment-status",
+      "operationId": "getOrderPaymentStatus",
+      "requirements": [
+        "ORD-04",
+        "PAY-05"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/orders/{orderId}/claims",
+      "operationId": "createClaim",
+      "requirements": [
+        "CLM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/claims/{claimId}",
+      "operationId": "getClaim",
+      "requirements": [
+        "CLM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/claims/{claimId}/withdraw",
+      "operationId": "withdrawClaim",
+      "requirements": [
+        "CLM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/shipment-items/{shipmentItemId}/confirmations",
+      "operationId": "confirmPurchase",
+      "requirements": [
+        "FUL-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/me/review-eligibilities",
+      "operationId": "listReviewEligibility",
+      "requirements": [
+        "EXP-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/reviews",
+      "operationId": "createReview",
+      "requirements": [
+        "EXP-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "PATCH",
+      "path": "/api/v1/reviews/{reviewId}",
+      "operationId": "updateReview",
+      "requirements": [
+        "EXP-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "DELETE",
+      "path": "/api/v1/reviews/{reviewId}",
+      "operationId": "deleteReview",
+      "requirements": [
+        "EXP-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/products/{productId}/reviews",
+      "operationId": "listProductReviews",
+      "requirements": [
+        "EXP-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/notifications",
+      "operationId": "listNotifications",
+      "requirements": [
+        "EXP-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/notifications/{notificationId}/read",
+      "operationId": "readNotification",
+      "requirements": [
+        "EXP-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/notification-preferences",
+      "operationId": "getNotificationPreferences",
+      "requirements": [
+        "EXP-03",
+        "DIS-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "PATCH",
+      "path": "/api/v1/notification-preferences",
+      "operationId": "updateNotificationPreferences",
+      "requirements": [
+        "EXP-03",
+        "DIS-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/uploads",
+      "operationId": "createUpload",
+      "requirements": [
+        "SEC-04"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "PUT",
+      "path": "/api/v1/uploads/{uploadId}/content",
+      "operationId": "putUploadContent",
+      "requirements": [
+        "SEC-04"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/uploads/{uploadId}/complete",
+      "operationId": "completeUpload",
+      "requirements": [
+        "SEC-04"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/uploads/{uploadId}/download",
+      "operationId": "getDownloadUrl",
+      "requirements": [
+        "SEC-04"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/behavior-events",
+      "operationId": "recordBehavior",
+      "requirements": [
+        "DIS-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/behavior-events/batch",
+      "operationId": "recordBehaviorBatch",
+      "requirements": [
+        "DIS-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers",
+      "operationId": "createSeller",
+      "requirements": [
+        "COM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}",
+      "operationId": "getSeller",
+      "requirements": [
+        "COM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "PATCH",
+      "path": "/api/v1/sellers/{sellerId}",
+      "operationId": "updateSeller",
+      "requirements": [
+        "COM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/documents",
+      "operationId": "createSellerDocument",
+      "requirements": [
+        "COM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/verifications",
+      "operationId": "createSellerVerification",
+      "requirements": [
+        "COM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/settlement-account-change-requests",
+      "operationId": "createAccountChange",
+      "requirements": [
+        "COM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/team-invitations",
+      "operationId": "createInvitation",
+      "requirements": [
+        "COM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/seller-invitations/accept",
+      "operationId": "acceptSellerInvitation",
+      "requirements": [
+        "COM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/members",
+      "operationId": "listSellerMembers",
+      "requirements": [
+        "COM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "PATCH",
+      "path": "/api/v1/sellers/{sellerId}/members/{memberId}",
+      "operationId": "updateSellerMember",
+      "requirements": [
+        "COM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "DELETE",
+      "path": "/api/v1/sellers/{sellerId}/members/{memberId}",
+      "operationId": "removeSellerMember",
+      "requirements": [
+        "COM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/products",
+      "operationId": "listSellerProducts",
+      "requirements": [
+        "CAT-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/products",
+      "operationId": "createProduct",
+      "requirements": [
+        "CAT-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/products/{productId}",
+      "operationId": "getSellerProduct",
+      "requirements": [
+        "CAT-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "PATCH",
+      "path": "/api/v1/sellers/{sellerId}/products/{productId}",
+      "operationId": "editProduct",
+      "requirements": [
+        "CAT-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/products/{productId}/revisions",
+      "operationId": "createProductRevision",
+      "requirements": [
+        "CAT-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/products/{productId}/submit-review",
+      "operationId": "submitProductReview",
+      "requirements": [
+        "CAT-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/products/{productId}/publish",
+      "operationId": "publishProduct",
+      "requirements": [
+        "CAT-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/products/{productId}/pause",
+      "operationId": "pauseProduct",
+      "requirements": [
+        "CAT-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/products/{productId}/skus",
+      "operationId": "listProductSkus",
+      "requirements": [
+        "CAT-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "PUT",
+      "path": "/api/v1/sellers/{sellerId}/products/{productId}/skus",
+      "operationId": "updateProductSkus",
+      "requirements": [
+        "CAT-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/inventory",
+      "operationId": "listInventory",
+      "requirements": [
+        "INV-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/inventory/{skuId}/adjustments",
+      "operationId": "adjustInventory",
+      "requirements": [
+        "INV-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/orders",
+      "operationId": "listSellerOrders",
+      "requirements": [
+        "FUL-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/shipments",
+      "operationId": "listSellerShipments",
+      "requirements": [
+        "FUL-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/shipments",
+      "operationId": "createShipment",
+      "requirements": [
+        "FUL-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/shipments/{shipmentId}/handover",
+      "operationId": "handoverShipment",
+      "requirements": [
+        "FUL-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/claims",
+      "operationId": "listSellerClaims",
+      "requirements": [
+        "CLM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/claims/{claimId}/decisions",
+      "operationId": "decideSellerClaim",
+      "requirements": [
+        "CLM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/claims/{claimId}/inspections",
+      "operationId": "inspectClaim",
+      "requirements": [
+        "CLM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/reviews/{reviewId}/reply",
+      "operationId": "createSellerReviewReply",
+      "requirements": [
+        "EXP-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "PATCH",
+      "path": "/api/v1/sellers/{sellerId}/reviews/{reviewId}/reply",
+      "operationId": "updateSellerReviewReply",
+      "requirements": [
+        "EXP-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/ledger",
+      "operationId": "listSellerLedger",
+      "requirements": [
+        "SET-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/settlements",
+      "operationId": "listSellerSettlements",
+      "requirements": [
+        "SET-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/settlements/{settlementId}",
+      "operationId": "getSellerSettlement",
+      "requirements": [
+        "SET-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/appeals",
+      "operationId": "createSellerAppeal",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/appeals",
+      "operationId": "listSellerAppeals",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-05"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/products/{productId}/analysis-runs",
+      "operationId": "createProductAnalysis",
+      "requirements": [
+        "DIS-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/products/{productId}/analysis-runs/{runId}",
+      "operationId": "getProductAnalysis",
+      "requirements": [
+        "DIS-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/products/{productId}/concept-reviews",
+      "operationId": "reviewProductConcept",
+      "requirements": [
+        "DIS-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/sessions",
+      "operationId": "adminLogin",
+      "requirements": [
+        "SEC-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/session",
+      "operationId": "adminSession",
+      "requirements": [
+        "SEC-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "DELETE",
+      "path": "/api/v1/admin/session",
+      "operationId": "adminLogout",
+      "requirements": [
+        "SEC-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/sellers/{sellerId}/verifications/{verificationId}/decisions",
+      "operationId": "decideSellerVerification",
+      "requirements": [
+        "COM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/sellers/{sellerId}/settlement-account-change-requests/{requestId}/decisions",
+      "operationId": "decideAccountChange",
+      "requirements": [
+        "COM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/products/{productId}/review-decisions",
+      "operationId": "decideProductReview",
+      "requirements": [
+        "CAT-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/shipments/{shipmentId}/tracking-events",
+      "operationId": "recordTrackingEvent",
+      "requirements": [
+        "FUL-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/reviews/{reviewId}/moderation",
+      "operationId": "moderateReview",
+      "requirements": [
+        "EXP-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/settlements/{settlementId}/calculate",
+      "operationId": "calculateSettlement",
+      "requirements": [
+        "SET-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/settlements/{settlementId}/approval-requests",
+      "operationId": "requestSettlementApproval",
+      "requirements": [
+        "SET-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/settlements/{settlementId}/payout",
+      "operationId": "requestPayout",
+      "requirements": [
+        "SET-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/payment-operations/{operationId}/recover",
+      "operationId": "recoverPaymentOperation",
+      "requirements": [
+        "PAY-05"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/reconciliation-discrepancies/{discrepancyId}/resolutions",
+      "operationId": "resolveDiscrepancy",
+      "requirements": [
+        "PAY-06",
+        "SET-04"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/approval-requests",
+      "operationId": "createApproval",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/approval-requests",
+      "operationId": "listApprovals",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/approval-requests/{approvalId}/decisions",
+      "operationId": "decideApproval",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/incidents",
+      "operationId": "createIncident",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/incidents",
+      "operationId": "listIncidents",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/seller-penalties",
+      "operationId": "createPenalty",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/seller-penalties",
+      "operationId": "listPenalties",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/compliance-rules",
+      "operationId": "createComplianceRule",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/compliance-rules",
+      "operationId": "listComplianceRules",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/appeals/{appealId}/decisions",
+      "operationId": "decideAppeal",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/concept-taxonomies",
+      "operationId": "createTaxonomy",
+      "requirements": [
+        "DIS-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/concept-taxonomies",
+      "operationId": "listConceptTaxonomies",
+      "requirements": [
+        "DIS-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-04"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/concept-taxonomies/{taxonomyId}/publish",
+      "operationId": "publishTaxonomy",
+      "requirements": [
+        "DIS-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/settlements",
+      "operationId": "listAdminSettlements",
+      "requirements": [
+        "SET-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/payment-operations",
+      "operationId": "listPaymentOperations",
+      "requirements": [
+        "PAY-05"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/reconciliation-discrepancies",
+      "operationId": "listDiscrepancies",
+      "requirements": [
+        "PAY-06",
+        "SET-04"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/audit-logs",
+      "operationId": "listAuditLogs",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/settlements/{settlementId}",
+      "operationId": "getAdminSettlement",
+      "requirements": [
+        "SET-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "PATCH",
+      "path": "/api/v1/admin/incidents/{incidentId}",
+      "operationId": "updateIncident",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/orders/{orderId}/claim-quotes",
+      "operationId": "quoteClaim",
+      "requirements": [
+        "CLM-01",
+        "CLM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-01"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/claims/{claimId}/reason-change-requests",
+      "operationId": "requestClaimReasonChange",
+      "requirements": [
+        "CLM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-02"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/claims/{claimId}/reason-change-requests",
+      "operationId": "listMyClaimReasonChanges",
+      "requirements": [
+        "CLM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-02"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/claims/{claimId}",
+      "operationId": "getSellerClaim",
+      "requirements": [
+        "CLM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-02"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/claims/{claimId}/reason-change-requests",
+      "operationId": "listSellerClaimReasonChanges",
+      "requirements": [
+        "CLM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-02"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/sellers/{sellerId}/claims/{claimId}/reason-change-requests/{requestId}/decisions",
+      "operationId": "decideClaimReasonChange",
+      "requirements": [
+        "CLM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-02"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/claims/{claimId}/return-tracking-events",
+      "operationId": "recordReturnTracking",
+      "requirements": [
+        "CLM-01",
+        "FUL-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-03"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/shipments/{shipmentId}/corrections",
+      "operationId": "correctShipment",
+      "requirements": [
+        "FUL-01",
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-03"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/seller-verifications",
+      "operationId": "listSellerVerificationReviews",
+      "requirements": [
+        "COM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-04"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/product-review-requests",
+      "operationId": "listProductReviewRequests",
+      "requirements": [
+        "CAT-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-04"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/review-moderation-requests",
+      "operationId": "listReviewModerationRequests",
+      "requirements": [
+        "EXP-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-04"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/settlement-account-change-requests",
+      "operationId": "listAccountChangeReviews",
+      "requirements": [
+        "COM-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-04"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/settlement-account",
+      "operationId": "getSellerSettlementAccount",
+      "requirements": [
+        "COM-02",
+        "SEC-04"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-05"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/sellers/{sellerId}/appeals/{appealId}",
+      "operationId": "getSellerAppeal",
+      "requirements": [
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-05"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/uploads/{uploadId}",
+      "operationId": "getUploadStatus",
+      "requirements": [
+        "SEC-04"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-05"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/administrators",
+      "operationId": "listAdministrators",
+      "requirements": [
+        "SEC-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-06"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/administrators/{adminId}",
+      "operationId": "getAdministrator",
+      "requirements": [
+        "SEC-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-06"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/administrators/{adminId}/role-change-requests",
+      "operationId": "requestAdminRoleChange",
+      "requirements": [
+        "SEC-02",
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-06"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/administrators/{adminId}/role-change-requests/{requestId}/execute",
+      "operationId": "executeAdminRoleChange",
+      "requirements": [
+        "SEC-02",
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-06"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/administrators/{adminId}/mfa-recovery-requests",
+      "operationId": "requestAdminMfaRecovery",
+      "requirements": [
+        "SEC-02",
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-06"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/administrators/{adminId}/mfa-recovery-requests/{requestId}/execute",
+      "operationId": "executeAdminMfaRecovery",
+      "requirements": [
+        "SEC-02",
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-06"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/approval-requests/{approvalId}",
+      "operationId": "getApproval",
+      "requirements": [
+        "OPS-01",
+        "SEC-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-06"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/event-queues",
+      "operationId": "listEventQueues",
+      "requirements": [
+        "EVT-03",
+        "OPS-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-07"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/event-queues/{entryId}/replays",
+      "operationId": "replayEventQueue",
+      "requirements": [
+        "EVT-03",
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-07"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/recovery-jobs/{jobId}",
+      "operationId": "getRecoveryJob",
+      "requirements": [
+        "EVT-03",
+        "OPS-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-07"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/claims/{claimId}/exchange-conversions",
+      "operationId": "convertExchange",
+      "requirements": [
+        "CLM-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-08"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/orders/{orderId}",
+      "operationId": "getOrderForSupport",
+      "requirements": [
+        "CLM-01",
+        "ORD-04"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-09"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/claims/{claimId}",
+      "operationId": "getClaimForSupport",
+      "requirements": [
+        "CLM-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-09"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/orders/{orderId}/claim-exceptions",
+      "operationId": "createClaimException",
+      "requirements": [
+        "CLM-01",
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-09"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "POST",
+      "path": "/api/v1/admin/search-rebuilds",
+      "operationId": "createSearchRebuild",
+      "requirements": [
+        "DIS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-11"
+    },
+    {
+      "contract": "commerce-public.openapi.json",
+      "method": "GET",
+      "path": "/api/v1/admin/search-rebuilds/{generationId}",
+      "operationId": "getSearchRebuild",
+      "requirements": [
+        "DIS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-11"
+    },
+    {
+      "contract": "discovery-internal.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/search/products",
+      "operationId": "querySearchProducts",
+      "requirements": [
+        "DIS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "discovery-internal.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/products/{productId}/analysis-runs",
+      "operationId": "queueAnalysis",
+      "requirements": [
+        "DIS-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "discovery-internal.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/analysis-runs/{runId}",
+      "operationId": "queryAnalysis",
+      "requirements": [
+        "DIS-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "discovery-internal.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/products/{productId}/concept-reviews",
+      "operationId": "applyConceptReview",
+      "requirements": [
+        "DIS-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "discovery-internal.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/concept-taxonomies",
+      "operationId": "addTaxonomy",
+      "requirements": [
+        "DIS-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "discovery-internal.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/concept-taxonomies",
+      "operationId": "queryTaxonomies",
+      "requirements": [
+        "DIS-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-04"
+    },
+    {
+      "contract": "discovery-internal.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/concept-taxonomies/{taxonomyId}/publish",
+      "operationId": "activateTaxonomy",
+      "requirements": [
+        "DIS-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "discovery-internal.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/behavior-events/batch",
+      "operationId": "ingestBehavior",
+      "requirements": [
+        "DIS-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "discovery-internal.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/search/rebuilds",
+      "operationId": "rebuildProjection",
+      "requirements": [
+        "DIS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "discovery-internal.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/search/rebuilds/{generationId}",
+      "operationId": "queryProjectionRebuild",
+      "requirements": [
+        "DIS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "discovery-internal.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/server-behavior-events",
+      "operationId": "ingestServerBehavior",
+      "requirements": [
+        "DIS-03",
+        "EXP-01",
+        "ORD-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-10"
+    },
+    {
+      "contract": "operations-internal.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/event-queues",
+      "operationId": "queryLocalEventQueues",
+      "requirements": [
+        "EVT-03",
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-07"
+    },
+    {
+      "contract": "operations-internal.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/event-queues/{entryId}/replays",
+      "operationId": "replayLocalEventQueue",
+      "requirements": [
+        "EVT-03",
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-07"
+    },
+    {
+      "contract": "operations-internal.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/recovery-jobs/{jobId}",
+      "operationId": "queryLocalRecoveryJob",
+      "requirements": [
+        "EVT-03",
+        "OPS-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": "X-07"
+    },
+    {
+      "contract": "payment-service.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/payment-attempts",
+      "operationId": "preparePaymentAttempt",
+      "requirements": [
+        "PAY-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "payment-service.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/payment-attempts/{paymentAttemptId}/approve",
+      "operationId": "approvePaymentAttempt",
+      "requirements": [
+        "PAY-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "payment-service.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/payment-attempts/{paymentAttemptId}",
+      "operationId": "getPaymentAttempt",
+      "requirements": [
+        "PAY-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "payment-service.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/refunds/{refundId}",
+      "operationId": "getRefund",
+      "requirements": [
+        "PAY-04"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "payment-service.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/payments/{paymentId}",
+      "operationId": "getPayment",
+      "requirements": [
+        "PAY-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "payment-service.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/payments/{paymentId}/cancel",
+      "operationId": "cancelPayment",
+      "requirements": [
+        "PAY-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "payment-service.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/payments/{paymentId}/refunds",
+      "operationId": "requestRefund",
+      "requirements": [
+        "PAY-04"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "payment-service.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/payment-webhooks/{provider}",
+      "operationId": "receivePaymentWebhook",
+      "requirements": [
+        "PG-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "payment-service.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/order-payment-guards/{orderId}/close",
+      "operationId": "closeOrderPaymentGuard",
+      "requirements": [
+        "PAY-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "payment-service.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/payment-operations/{operationId}",
+      "operationId": "getPaymentOperation",
+      "requirements": [
+        "PAY-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "pg-current.openapi.json",
+      "method": "POST",
+      "path": "/pg/v1/payments/approve",
+      "operationId": "pgApprove",
+      "requirements": [
+        "PG-01"
+      ],
+      "implementation": "implemented",
+      "contractExtension": null
+    },
+    {
+      "contract": "pg-current.openapi.json",
+      "method": "POST",
+      "path": "/pg/v1/payments/{paymentId}/cancel",
+      "operationId": "pgCancel",
+      "requirements": [
+        "PG-01"
+      ],
+      "implementation": "implemented",
+      "contractExtension": null
+    },
+    {
+      "contract": "pg-current.openapi.json",
+      "method": "POST",
+      "path": "/pg/v1/payments/{paymentId}/refund",
+      "operationId": "pgRefund",
+      "requirements": [
+        "PG-01"
+      ],
+      "implementation": "implemented",
+      "contractExtension": null
+    },
+    {
+      "contract": "pg-current.openapi.json",
+      "method": "GET",
+      "path": "/pg/v1/payments/{paymentId}",
+      "operationId": "pgGetPayment",
+      "requirements": [
+        "PG-01"
+      ],
+      "implementation": "implemented",
+      "contractExtension": null
+    },
+    {
+      "contract": "pg-target.openapi.json",
+      "method": "POST",
+      "path": "/pg/v1/payments/approve",
+      "operationId": "pgApprove",
+      "requirements": [
+        "PG-01"
+      ],
+      "implementation": "planned-upgrade",
+      "contractExtension": null
+    },
+    {
+      "contract": "pg-target.openapi.json",
+      "method": "POST",
+      "path": "/pg/v1/payments/{paymentId}/cancel",
+      "operationId": "pgCancel",
+      "requirements": [
+        "PG-01"
+      ],
+      "implementation": "planned-upgrade",
+      "contractExtension": null
+    },
+    {
+      "contract": "pg-target.openapi.json",
+      "method": "POST",
+      "path": "/pg/v1/payments/{paymentId}/refund",
+      "operationId": "pgRefund",
+      "requirements": [
+        "PG-01"
+      ],
+      "implementation": "planned-upgrade",
+      "contractExtension": null
+    },
+    {
+      "contract": "pg-target.openapi.json",
+      "method": "GET",
+      "path": "/pg/v1/payments/{paymentId}",
+      "operationId": "pgGetPayment",
+      "requirements": [
+        "PG-01"
+      ],
+      "implementation": "planned-upgrade",
+      "contractExtension": null
+    },
+    {
+      "contract": "pg-target.openapi.json",
+      "method": "GET",
+      "path": "/pg/v1/payments/by-merchant/{merchantTxId}",
+      "operationId": "pgGetByMerchant",
+      "requirements": [
+        "PG-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "pg-target.openapi.json",
+      "method": "GET",
+      "path": "/pg/v1/payments/{paymentId}/transactions",
+      "operationId": "pgGetPaymentTransactions",
+      "requirements": [
+        "PG-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "pg-target.openapi.json",
+      "method": "GET",
+      "path": "/pg/v1/transactions",
+      "operationId": "pgListTransactions",
+      "requirements": [
+        "PG-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "pg-target.openapi.json",
+      "method": "POST",
+      "path": "/pg/internal/v1/fault-scenarios",
+      "operationId": "pgSetFaultScenario",
+      "requirements": [
+        "PG-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "settlement-internal.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/sellers/{sellerId}/ledger",
+      "operationId": "queryLedger",
+      "requirements": [
+        "SET-01"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "settlement-internal.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/settlements",
+      "operationId": "querySettlements",
+      "requirements": [
+        "SET-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "settlement-internal.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/settlements/{settlementId}",
+      "operationId": "querySettlement",
+      "requirements": [
+        "SET-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "settlement-internal.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/settlements/{settlementId}/calculate",
+      "operationId": "runSettlementCalculation",
+      "requirements": [
+        "SET-02"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "settlement-internal.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/settlements/{settlementId}/payout",
+      "operationId": "dispatchSimulatedPayout",
+      "requirements": [
+        "SET-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "settlement-internal.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/payouts/{payoutId}",
+      "operationId": "queryPayout",
+      "requirements": [
+        "SET-03"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "settlement-internal.openapi.json",
+      "method": "GET",
+      "path": "/internal/v1/reconciliation-discrepancies",
+      "operationId": "queryBankDiscrepancies",
+      "requirements": [
+        "SET-04"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    },
+    {
+      "contract": "settlement-internal.openapi.json",
+      "method": "POST",
+      "path": "/internal/v1/reconciliation-discrepancies/{discrepancyId}/resolutions",
+      "operationId": "resolveBankDiscrepancy",
+      "requirements": [
+        "SET-04"
+      ],
+      "implementation": "planned",
+      "contractExtension": null
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "AT-01",
+      "requirements": [
+        "SEC-01",
+        "SEC-02"
+      ],
+      "assertion": "타회원 orderId/타seller SKU/비관리자 지급 요청 → 404/403, DB/PG 효과0"
+    },
+    {
+      "id": "AT-02",
+      "requirements": [
+        "SEC-01",
+        "SEC-03"
+      ],
+      "assertion": "CSRF 없음, 위조JWT/다른aud/만료/알고리즘변경 → 거부; token 로그0"
+    },
+    {
+      "id": "AT-03",
+      "requirements": [
+        "MONEY-01"
+      ],
+      "assertion": "KRW외통화, 소수/문자열/overflow/합계 mismatch → PG요청0"
+    },
+    {
+      "id": "AT-04",
+      "requirements": [
+        "ORD-02",
+        "INV-01"
+      ],
+      "assertion": "available10에 100 동시 구매예약 → 합계예약<=10, 부분실패 rollback"
+    },
+    {
+      "id": "AT-05",
+      "requirements": [
+        "ORD-03",
+        "PAY-01"
+      ],
+      "assertion": "동일 order PG1/PG2 각각 20 동시시도 → 유효 approval 최대1"
+    },
+    {
+      "id": "AT-06",
+      "requirements": [
+        "API-02"
+      ],
+      "assertion": "같은key·같은payload → 같은ID, 다른금액/배분/actor →409"
+    },
+    {
+      "id": "AT-07",
+      "requirements": [
+        "ORD-05"
+      ],
+      "assertion": "close-order가 prepare보다 먼저 도착 → CLOSED tombstone, 늦은승인0, 예약1회해제"
+    },
+    {
+      "id": "AT-08",
+      "requirements": [
+        "ORD-05",
+        "PAY-05"
+      ],
+      "assertion": "dispatch와15분expiry 경합·timeout → UNKNOWN예약유지, 다른PG재결제0"
+    },
+    {
+      "id": "AT-09",
+      "requirements": [
+        "PAY-02",
+        "PAY-05"
+      ],
+      "assertion": "PG승인commit후 응답유실+Payment재시작 → 원 key복구, SALE/PaymentApproved1회"
+    },
+    {
+      "id": "AT-10",
+      "requirements": [
+        "PG-01"
+      ],
+      "assertion": "각각 PG1/PG2 정상 결제·조회·전액취소·부분환불 → 독립DB, provider혼선0"
+    },
+    {
+      "id": "AT-11",
+      "requirements": [
+        "PAY-04"
+      ],
+      "assertion": "10,000원에 병렬7,000원 환불2개 → 예약/성공 총액<=10,000"
+    },
+    {
+      "id": "AT-12",
+      "requirements": [
+        "PAY-04",
+        "PAY-05"
+      ],
+      "assertion": "첫환불UNKNOWN+둘째환불 접수 → 둘째 dispatch대기, 새key재환불0"
+    },
+    {
+      "id": "AT-13",
+      "requirements": [
+        "PAY-04"
+      ],
+      "assertion": "VOID된결제 refundedAmount=0, voidedAmount=원금, refund불가; 금융순액0"
+    },
+    {
+      "id": "AT-14",
+      "requirements": [
+        "PG-03"
+      ],
+      "assertion": "서명오류/만료/같은event다른body →401/409; 유효중복·역순 → 1회effect"
+    },
+    {
+      "id": "AT-15",
+      "requirements": [
+        "EVT-03"
+      ],
+      "assertion": "Kafka ACK후outbox완료 전 crash, inbox업무commit후offset실패 → 재고/원장중복0"
+    },
+    {
+      "id": "AT-16",
+      "requirements": [
+        "ORD-04"
+      ],
+      "assertion": "PG승인후예약손상 fault → 출고차단·보상완료 후CANCELLED, 결제유실0"
+    },
+    {
+      "id": "AT-17",
+      "requirements": [
+        "FUL-01",
+        "CLM-01"
+      ],
+      "assertion": "인계와취소 동일unit 경합 → 둘 중 하나, 과출고/과환불0"
+    },
+    {
+      "id": "AT-18",
+      "requirements": [
+        "FUL-02"
+      ],
+      "assertion": "delivered+191:59:59 미확정, +192h대상; Claim hold수량만제외"
+    },
+    {
+      "id": "AT-19",
+      "requirements": [
+        "FUL-02"
+      ],
+      "assertion": "자동확정과Claim 동시 → 한쪽winner, 동일unit 매출/환불중복0"
+    },
+    {
+      "id": "AT-20",
+      "requirements": [
+        "CLM-02"
+      ],
+      "assertion": "seller2개·부분/전량취소·분할반품 → seller배송비1회, 재청구0, charge초과환급0"
+    },
+    {
+      "id": "AT-21",
+      "requirements": [
+        "CLM-03"
+      ],
+      "assertion": "교환예약만료/재고부족/대체배송 → 환불전환 또는1회교환, 두번째승인/매출0"
+    },
+    {
+      "id": "AT-22",
+      "requirements": [
+        "SET-01"
+      ],
+      "assertion": "승인만/확정전환불 → 지급원장0; 확정수량만매출, 원시환불+조정 중복차감0"
+    },
+    {
+      "id": "AT-23",
+      "requirements": [
+        "SET-02"
+      ],
+      "assertion": "10,001원 배분/일괄vs부분 확정/환불 → 원금·fee합계 및 잔여원단위 동일"
+    },
+    {
+      "id": "AT-24",
+      "requirements": [
+        "SET-02",
+        "SET-03"
+      ],
+      "assertion": "두정산worker/동일관리자승인/새Claim fence → 배분1회, 자기승인거부, hold또는지급후조정"
+    },
+    {
+      "id": "AT-25",
+      "requirements": [
+        "SET-03",
+        "SET-04"
+      ],
+      "assertion": "모의은행commit후timeout → 같은receipt복구·중복지급0; 지급후환불 음수이월보존"
+    },
+    {
+      "id": "AT-26",
+      "requirements": [
+        "PAY-06",
+        "SET-04"
+      ],
+      "assertion": "PG/은행 한쪽기록누락·금액차이 → discrepancy, 근거없는자동수정0"
+    },
+    {
+      "id": "AT-27",
+      "requirements": [
+        "EVT-02",
+        "EVT-03"
+      ],
+      "assertion": "sellerfinancial seq2먼저/seq1지연 → 보류후순차적용, 원장최종동일"
+    },
+    {
+      "id": "AT-28",
+      "requirements": [
+        "EXP-02",
+        "DIS-02"
+      ],
+      "assertion": "반품후리뷰·오래된분석결과 → 부정후기자동삭제0, 최신revision오염0"
+    },
+    {
+      "id": "AT-29",
+      "requirements": [
+        "FE-02"
+      ],
+      "assertion": "더블클릭/새로고침/네트워크끊김 →같은logicalkey, UNKNOWN을실패표시안함"
+    },
+    {
+      "id": "AT-30",
+      "requirements": [
+        "OPS-04"
+      ],
+      "assertion": "서비스DB복원+이벤트replay+대사 → 미해결목록보존·원장/재고합계일치"
+    },
+    {
+      "id": "AT-31",
+      "requirements": [
+        "DIS-01",
+        "FE-01"
+      ],
+      "assertion": "searchgeneration전환/판매중지event/area독립rollback → 상품권위보존·타앱배포불필요"
+    },
+    {
+      "id": "AT-32",
+      "requirements": [
+        "COM-02",
+        "OPS-01"
+      ],
+      "assertion": "계좌변경·권한회수·승인후payload변경 → 기존지급snapshot불변·실행차단"
+    }
+  ]
+}

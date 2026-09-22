@@ -1,0 +1,63 @@
+# payment / payment 2 — target
+
+주요 키/컬럼 최대10개 표시. 전체 컬럼/제약은 [서비스 데이터 사전](payment-service.md), 영역 밖 FK는 서비스 DBML을 확인합니다.
+
+```mermaid
+erDiagram
+    direction LR
+    paymentPaymentOperation["payment.payment_operation"] {
+        uuid operation_id PK "required"
+        uuid payment_attempt_id FK "nullable"
+        uuid payment_id FK "nullable"
+        uuid refund_id FK "nullable"
+        uuid order_id "required"
+        text kind "required"
+        text status "required"
+        text idempotency_key "required"
+        text request_hash "required"
+        jsonb request_payload "required"
+    }
+    paymentPaymentOperationResult["payment.payment_operation_result"] {
+        uuid operation_id PK, FK "required"
+        bigint result_version PK "required"
+        jsonb immutable_result "required"
+        text evidence_hash "required"
+        timestamptz occurred_at "required"
+    }
+    paymentRefundUnitAllocation["payment.refund_unit_allocation"] {
+        uuid refund_id PK, FK "required"
+        uuid order_item_id PK "required"
+        integer unit_ordinal PK "required"
+        bigint amount "required"
+    }
+    paymentPgReconciliationRun["payment.pg_reconciliation_run"] {
+        uuid run_id PK "required"
+        text provider "required"
+        date business_date "required"
+        timestamptz source_as_of "required"
+        text algorithm_version "required"
+        text status "required"
+        timestamptz created_at "required"
+    }
+    paymentPgReconciliationReceipt["payment.pg_reconciliation_receipt"] {
+        text provider PK "required"
+        uuid provider_transaction_id PK "required"
+        uuid run_id FK "required"
+        jsonb receipt "required"
+        text receipt_hash "required"
+    }
+    paymentPgReconciliationDiscrepancy["payment.pg_reconciliation_discrepancy"] {
+        uuid discrepancy_id PK "required"
+        uuid run_id FK "required"
+        text identity_key UK "required"
+        text kind "required"
+        text status "required"
+        jsonb expected_payload "required"
+        jsonb actual_payload "required"
+        uuid approval_id "nullable"
+        timestamptz resolved_at "nullable"
+    }
+    paymentPaymentOperation ||--o{ paymentPaymentOperationResult : "operation_id"
+    paymentPgReconciliationRun ||..o{ paymentPgReconciliationReceipt : "run_id"
+    paymentPgReconciliationRun ||..o{ paymentPgReconciliationDiscrepancy : "run_id"
+```

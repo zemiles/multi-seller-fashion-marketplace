@@ -1,0 +1,826 @@
+{
+  "asOf": "2026-09-22",
+  "applied": false,
+  "source": "docs/erd/target/schema.json",
+  "changes": [
+    {
+      "table": "commerce.consumer_inbox",
+      "kind": "ADD_TABLE",
+      "note": "EVT-03/X-07; entry_id identifies one consumer/event row; sequence collision with a different hash is quarantined before overwrite.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.consumer_stream_checkpoint",
+      "kind": "ADD_TABLE",
+      "note": "EVT-03; row lock with inbox business transaction.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.event_stream_sequence",
+      "kind": "ADD_TABLE",
+      "note": "EVT-01; allocate contiguous sequence with outbox insert.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.outbox_event",
+      "kind": "ALTER_COLUMNS",
+      "columns": "aggregate_id text,aggregate_version bigint,version bigint,payload_hash text,serialized_body bytea,lease_expires_at timestamptz?,event_version integer,producer text,correlation_id uuid,causation_id uuid,trace_id text",
+      "note": "EVT-01/X-07; text aggregateId, immutable published bytes/hash, optimistic replay version. Existing lock_token/locked_at retained; legacy non-v1 rows archived before NOT NULL validation.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.event_recovery_job",
+      "kind": "ADD_TABLE",
+      "note": "X-07/EVT-03; entry target is polymorphic inbox/outbox. Actor/approval IDs are verified by Commerce contract, no cross-service FK. Commit source retry and job state atomically; complete only after source effect/dedup confirmation.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.consumer_inbox",
+      "kind": "ADD_TABLE",
+      "note": "EVT-03/X-07; entry_id identifies one consumer/event row; sequence collision with a different hash is quarantined before overwrite.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.consumer_stream_checkpoint",
+      "kind": "ADD_TABLE",
+      "note": "EVT-03; row lock with inbox business transaction.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.event_stream_sequence",
+      "kind": "ADD_TABLE",
+      "note": "EVT-01; allocate contiguous sequence with outbox insert.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.outbox_event",
+      "kind": "ALTER_COLUMNS",
+      "columns": "aggregate_id text,aggregate_version bigint,version bigint,payload_hash text,serialized_body bytea,lease_expires_at timestamptz?,event_version integer,producer text,correlation_id uuid,causation_id uuid,trace_id text",
+      "note": "EVT-01/X-07; text aggregateId, immutable published bytes/hash, optimistic replay version. Existing lock_token/locked_at retained; legacy non-v1 rows archived before NOT NULL validation.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.event_recovery_job",
+      "kind": "ADD_TABLE",
+      "note": "X-07/EVT-03; entry target is polymorphic inbox/outbox. Actor/approval IDs are verified by Commerce contract, no cross-service FK. Commit source retry and job state atomically; complete only after source effect/dedup confirmation.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.consumer_inbox",
+      "kind": "ADD_TABLE",
+      "note": "EVT-03/X-07; entry_id identifies one consumer/event row; sequence collision with a different hash is quarantined before overwrite.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.consumer_stream_checkpoint",
+      "kind": "ADD_TABLE",
+      "note": "EVT-03; row lock with inbox business transaction.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.event_stream_sequence",
+      "kind": "ADD_TABLE",
+      "note": "EVT-01; allocate contiguous sequence with outbox insert.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.outbox_event",
+      "kind": "ALTER_COLUMNS",
+      "columns": "aggregate_id text,aggregate_version bigint,version bigint,payload_hash text,serialized_body bytea,lease_expires_at timestamptz?,event_version integer,producer text,correlation_id uuid,causation_id uuid,trace_id text",
+      "note": "EVT-01/X-07; text aggregateId, immutable published bytes/hash, optimistic replay version. Existing lock_token/locked_at retained; legacy non-v1 rows archived before NOT NULL validation.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.event_recovery_job",
+      "kind": "ADD_TABLE",
+      "note": "X-07/EVT-03; entry target is polymorphic inbox/outbox. Actor/approval IDs are verified by Commerce contract, no cross-service FK. Commit source retry and job state atomically; complete only after source effect/dedup confirmation.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "discovery.consumer_inbox",
+      "kind": "ADD_TABLE",
+      "note": "EVT-03/X-07; entry_id identifies one consumer/event row; sequence collision with a different hash is quarantined before overwrite.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "discovery.consumer_stream_checkpoint",
+      "kind": "ADD_TABLE",
+      "note": "EVT-03; row lock with inbox business transaction.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "discovery.event_stream_sequence",
+      "kind": "ADD_TABLE",
+      "note": "EVT-01; allocate contiguous sequence with outbox insert.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "discovery.outbox_event",
+      "kind": "ALTER_COLUMNS",
+      "columns": "aggregate_id text,aggregate_version bigint,version bigint,payload_hash text,serialized_body bytea,lease_expires_at timestamptz?,event_version integer,producer text,correlation_id uuid,causation_id uuid,trace_id text",
+      "note": "EVT-01/X-07; text aggregateId, immutable published bytes/hash, optimistic replay version. Existing lock_token/locked_at retained; legacy non-v1 rows archived before NOT NULL validation.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "discovery.event_recovery_job",
+      "kind": "ADD_TABLE",
+      "note": "X-07/EVT-03; entry target is polymorphic inbox/outbox. Actor/approval IDs are verified by Commerce contract, no cross-service FK. Commit source retry and job state atomically; complete only after source effect/dedup confirmation.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.member",
+      "kind": "ALTER_COLUMNS",
+      "columns": "session_version integer,nickname text,version integer",
+      "note": "SEC-01/COM-01; PASSWORD credential authority is member_auth_identity. Legacy member.password_hash must be migrated/disabled, not dual-written.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.admin_user",
+      "kind": "ALTER_COLUMNS",
+      "columns": "password_hash text,totp_secret_cipher bytea?,mfa_state text,session_version integer,version integer",
+      "note": "SEC-02/X-06; MFA recovery clears secret/codes and blocks privileged login until verified CLI enrollment.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.admin_recovery_code",
+      "kind": "ADD_TABLE",
+      "note": "SEC-02; one-time use conditional update.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.verification_token",
+      "kind": "ADD_TABLE",
+      "note": "SEC-01; VERIFY_EMAIL/RESET_PASSWORD, never raw token.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.seller_invitation",
+      "kind": "ADD_TABLE",
+      "note": "COM-02; 24h one-time invitation.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.command_idempotency",
+      "kind": "ADD_TABLE",
+      "note": "API-02; command and result atomically persisted, no secrets.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.claim_quote",
+      "kind": "ADD_TABLE",
+      "note": "X-01; 5 minute immutable quote, no stock/money reservation. Command idempotency replays same quote.",
+      "wave": "M3",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.claim_reason_change",
+      "kind": "ALTER_COLUMNS",
+      "columns": "version bigint,evidence_ids jsonb",
+      "note": "X-02; evidence IDs only, owner verified; one open reason change per claim.",
+      "wave": "M3",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.payment_dispatch_intent",
+      "kind": "ADD_TABLE",
+      "note": "ORD-05; attempt_id is external Payment ID, no FK.",
+      "wave": "M3",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.order_item_unit",
+      "kind": "ADD_TABLE",
+      "note": "MONEY-01; ordinal 1..quantity. Sums match immutable order item.",
+      "wave": "M3",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.shipment_item_unit",
+      "kind": "ADD_TABLE",
+      "note": "FUL-01; same order unit lock enforces only one active outbound per generation.",
+      "wave": "M3",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.claim_item_unit",
+      "kind": "ADD_TABLE",
+      "note": "CLM-01; immutable allocation/history.",
+      "wave": "M3",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.active_unit_claim_guard",
+      "kind": "ADD_TABLE",
+      "note": "CLM-01; unique live claim per unit; terminal history remains in claim_item_unit.",
+      "wave": "M3",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.purchase_confirmation_unit",
+      "kind": "ADD_TABLE",
+      "note": "FUL-02; local confirmation event writer; no second income after exchange.",
+      "wave": "M3",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.seller_financial_state",
+      "kind": "ADD_TABLE",
+      "note": "SET-03; barrier and fence and new hold share seller lock. Stream watermarks use event_stream_sequence.",
+      "wave": "M4",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.payout_fence",
+      "kind": "ADD_TABLE",
+      "note": "SET-03; external settlement/payout IDs are not FKs. Same consumed fence replays same permit. Under seller lock expire the old unconsumed fence before creating a new version for the SAME payout attempt; partial unique payout_attempt_id WHERE status IN (ACTIVE,CONSUMED) required. Never create a new bank idempotency key to bypass UNKNOWN.",
+      "wave": "M4",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.approval_execution",
+      "kind": "ADD_TABLE",
+      "note": "OPS-01; 1-time execution matching approved immutable payload.",
+      "wave": "M4",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.upload_asset",
+      "kind": "ADD_TABLE",
+      "note": "SEC-04; private evidence vs public image. Owner is polymorphic, checked in application.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.inventory_reservation",
+      "kind": "ALTER_COLUMNS",
+      "columns": "recovery_hold boolean,recovery_reason text?",
+      "note": "ORD-05; expiry never overrides financial hold.",
+      "wave": "M3",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.orders",
+      "kind": "ALTER_COLUMNS",
+      "columns": "pricing_policy_version text,recovery_status text,payment_snapshot_hash text?",
+      "note": "ORD-04; payment UNKNOWN is not order_status.",
+      "wave": "M3",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.admin_approval_request",
+      "kind": "ALTER_COLUMNS",
+      "columns": "payload_hash text,version bigint",
+      "note": "OPS-01; EXPIRED already exists; map DB PENDING to HTTP APPROVAL_PENDING. Do not overwrite prior migration.",
+      "wave": "M4",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.order_payment_guard",
+      "kind": "ADD_TABLE",
+      "note": "PAY-01/03; CLOSED tombstone even before prepare; order_id external Commerce ID.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.payment_operation",
+      "kind": "ADD_TABLE",
+      "note": "PAY-04; partial unique active dispatch per payment; due(status,next_retry_at). Payload may contain operation-local safe evidence only.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.payment_operation_result",
+      "kind": "ADD_TABLE",
+      "note": "PAY-02; immutable result, response and event reference identical version.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.refund_unit_allocation",
+      "kind": "ADD_TABLE",
+      "note": "PAY-04; order_item/unit external IDs validated against attempt snapshot; active/terminal successful unit reservation guard in owner transaction.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.pg_reconciliation_run",
+      "kind": "ADD_TABLE",
+      "note": "PAY-06; Payment owns PG reconciliation.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.pg_reconciliation_receipt",
+      "kind": "ADD_TABLE",
+      "note": "PAY-06; immutable receipt; a later run can re-observe without inserting a second receipt.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.pg_reconciliation_discrepancy",
+      "kind": "ADD_TABLE",
+      "note": "PAY-06; approval_id external Commerce identity.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.payment_attempt",
+      "kind": "ALTER_COLUMNS",
+      "columns": "payment_request_id uuid,request_hash text,expires_at timestamptz,pricing_policy_version text",
+      "note": "PAY-01; complete snapshot remains request_payload.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.payment",
+      "kind": "ALTER_COLUMNS",
+      "columns": "voided_amount bigint,version bigint",
+      "note": "PAY-04; VOID does not increment refunded_amount.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.refund",
+      "kind": "ALTER_COLUMNS",
+      "columns": "compensation_id uuid?,approval_id uuid?,request_hash text",
+      "note": "PAY-04; claimId or compensationId mandatory, approval for manual adjustment.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.seller_recognition_unit",
+      "kind": "ADD_TABLE",
+      "note": "SET-01; snapshot/projection, no FK to Commerce.",
+      "wave": "M4",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.seller_carry_forward",
+      "kind": "ADD_TABLE",
+      "note": "SET-02; signed debt/credit, no duplicate allocation.",
+      "wave": "M4",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.simulated_bank_receipt",
+      "kind": "ADD_TABLE",
+      "note": "SET-03; separate adapter transaction, no FK tying bank commit to caller commit.",
+      "wave": "M4",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.settlement",
+      "kind": "ALTER_COLUMNS",
+      "columns": "gross_net_amount bigint",
+      "note": "MIG-NET/SET-02; API netAmount = gross_net_amount = credit - debit. Keep legacy net_amount = gross_net_amount - hold; payout bounded by post-hold net.",
+      "wave": "M4",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.bank_reconciliation_run",
+      "kind": "ADD_TABLE",
+      "note": "MIG-BANK/SET-04; bank payout reconciliation only; fixed snapshot cursor and immutable run inputs.",
+      "wave": "M4",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.bank_reconciliation_receipt",
+      "kind": "ADD_TABLE",
+      "note": "MIG-BANK/SET-04; immutable observed bank fact. run_id is FIRST observation; later runs compare without updating original receipt. No FK to internal attempt: external-only receipts must be representable.",
+      "wave": "M4",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.bank_reconciliation_discrepancy",
+      "kind": "ADD_TABLE",
+      "note": "MIG-BANK/SET-04; deterministic identity excludes run ID, repeat observation reuses discrepancy; approval is external Commerce ID. Legacy reconciliation_* remain read-only.",
+      "wave": "M4",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.settlement_payout_attempt",
+      "kind": "ALTER_COLUMNS",
+      "columns": "approval_id uuid,fence_id uuid,dispatch_permit_id uuid?,operation_hash text,result_version bigint,lease_expires_at timestamptz?,next_retry_at timestamptz?",
+      "note": "SET-03; external Commerce approvals/fence, no cross-service FK.",
+      "wave": "M4",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "pg1.pg_webhook_outbox",
+      "kind": "ADD_TABLE",
+      "note": "PG-03; transaction commit and webhook row atomic; timestamp/signature refreshed on retry.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "pg1.pg_fault_scenario",
+      "kind": "ADD_TABLE",
+      "note": "PG-02; local/stage only; fail closed in prod profile.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "pg2.pg_webhook_outbox",
+      "kind": "ADD_TABLE",
+      "note": "PG-03; transaction commit and webhook row atomic; timestamp/signature refreshed on retry.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "pg2.pg_fault_scenario",
+      "kind": "ADD_TABLE",
+      "note": "PG-02; local/stage only; fail closed in prod profile.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "discovery.search_projection_generation",
+      "kind": "ADD_TABLE",
+      "note": "DIS-01; partial unique status ACTIVE; verified atomic generation switch.",
+      "wave": "M5",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "discovery.search_product_projection",
+      "kind": "ADD_TABLE",
+      "note": "DIS-01; all product/seller/revision IDs external, not FKs; query indexes on category/price/time+product_id.",
+      "wave": "M5",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "discovery.product_analysis_run",
+      "kind": "ALTER_COLUMNS",
+      "columns": "product_id uuid,simulated boolean,attempt_count integer,next_retry_at timestamptz?",
+      "note": "DIS-02; externally owned product/revision IDs; no Commerce DB read.",
+      "wave": "M5",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.member",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.orders",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M3",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.claim_reason_change",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M3",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.admin_user",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.admin_approval_request",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M4",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.outbox_event",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.payment_attempt",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.payment",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.refund",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "payment.outbox_event",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.settlement_payout_attempt",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M4",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.outbox_event",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "discovery.product_analysis_run",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M5",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "discovery.outbox_event",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M1",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.settlement",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M4",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "settlement.seller_ledger_entry",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M4",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "commerce.shipment_event",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M3",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "pg1.pg_transaction",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    },
+    {
+      "table": "pg2.pg_transaction",
+      "kind": "ALTER_CONSTRAINTS_INDEXES",
+      "note": "v1 CHECK/index definition is included in target data dictionary and generated empty-DB SQL. Existing-data upgrade follows migration wave/backfill gates.",
+      "wave": "M2",
+      "state": "PLANNED",
+      "actualMigration": null,
+      "backfillEvidence": null
+    }
+  ],
+  "policyDeltas": [
+    {
+      "id": "MIG-NET",
+      "wave": "M4",
+      "table": "settlement.settlement",
+      "change": "Add gross_net_amount, keep legacy net_amount post-hold mapping; validate payout limit",
+      "modelStatus": "SPECIFIED",
+      "ddl": "docs/ddl/target/settlement-service.sql",
+      "migrationStatus": "NOT_APPLIED"
+    },
+    {
+      "id": "MIG-REVERSAL",
+      "wave": "M4",
+      "table": "settlement.seller_ledger_entry",
+      "change": "Replace unique reversal_of_entry_id with index plus owner lock cumulative reversal cap",
+      "modelStatus": "SPECIFIED",
+      "ddl": "docs/ddl/target/settlement-service.sql",
+      "migrationStatus": "NOT_APPLIED"
+    },
+    {
+      "id": "MIG-APPROVAL",
+      "wave": "M4",
+      "table": "commerce.admin_approval_request",
+      "change": "Map DB PENDING to API APPROVAL_PENDING; EXPIRED already exists",
+      "modelStatus": "SPECIFIED",
+      "ddl": "docs/ddl/target/commerce-service.sql",
+      "migrationStatus": "NOT_APPLIED"
+    },
+    {
+      "id": "MIG-BANK",
+      "wave": "M4",
+      "table": "settlement.bank_reconciliation_*",
+      "change": "Create bank-specific run/receipt/discrepancy; retain legacy PG reconciliation read-only",
+      "modelStatus": "SPECIFIED",
+      "ddl": "docs/ddl/target/settlement-service.sql",
+      "migrationStatus": "NOT_APPLIED"
+    }
+  ]
+}

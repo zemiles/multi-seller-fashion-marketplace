@@ -1,0 +1,21 @@
+{
+  "eventId": "00000000-0000-4000-8000-000000000101",
+  "eventType": "ProductAvailabilityChanged",
+  "eventVersion": 1,
+  "producer": "commerce-service",
+  "aggregateType": "PRODUCT",
+  "aggregateId": "00000000-0000-4000-8000-000000000003",
+  "aggregateVersion": 1,
+  "occurredAt": "2026-09-22T00:00:00Z",
+  "correlationId": "00000000-0000-4000-8000-000000000040",
+  "causationId": "00000000-0000-4000-8000-000000000010",
+  "traceId": "cccccccccccccccccccccccccccccccc",
+  "payload": {
+    "productId": "00000000-0000-4000-8000-000000000003",
+    "revisionId": "00000000-0000-4000-8000-000000000004",
+    "saleStatus": "PAUSED",
+    "available": false,
+    "reasonCode": "SELLER_PAUSED"
+  },
+  "simulated": true
+}

@@ -1,0 +1,185 @@
+# commerce / 배송·클레임 — current
+
+주요 키/컬럼 최대10개 표시. 전체 컬럼/제약은 [서비스 데이터 사전](commerce-service.md), 영역 밖 FK는 서비스 DBML을 확인합니다.
+
+```mermaid
+erDiagram
+    direction LR
+    commerceShipment["commerce.shipment"] {
+        uuid shipment_id PK "required"
+        uuid order_id FK "required"
+        uuid order_shipping_group_id FK "nullable"
+        uuid seller_id FK "required"
+        uuid claim_id FK "nullable"
+        text direction "required"
+        text purpose "required"
+        text status "required"
+        text carrier_code "nullable"
+        text tracking_number "nullable"
+    }
+    commerceShipmentItem["commerce.shipment_item"] {
+        uuid shipment_item_id PK "required"
+        uuid shipment_id FK "required"
+        uuid order_item_id FK "required"
+        uuid sku_id FK "required"
+        uuid exchange_line_id FK "nullable"
+        integer quantity "required"
+        timestamptz created_at "required"
+    }
+    commerceShipmentEvent["commerce.shipment_event"] {
+        uuid shipment_event_id PK "required"
+        uuid shipment_id FK "required"
+        text provider "nullable"
+        text provider_event_id "nullable"
+        text event_type "required"
+        text location_text "nullable"
+        text description "nullable"
+        jsonb payload "required"
+        timestamptz occurred_at "required"
+        timestamptz received_at "required"
+    }
+    commercePurchaseConfirmationState["commerce.purchase_confirmation_state"] {
+        uuid shipment_item_id PK, FK "required"
+        integer delivered_quantity "required"
+        integer confirmed_quantity "required"
+        integer held_quantity "required"
+        timestamptz auto_confirm_at "nullable"
+        timestamptz last_delivered_at "nullable"
+        timestamptz last_confirmed_at "nullable"
+        integer version "required"
+        timestamptz created_at "required"
+        timestamptz updated_at "required"
+    }
+    commercePurchaseConfirmationEvent["commerce.purchase_confirmation_event"] {
+        uuid confirmation_event_id PK "required"
+        uuid shipment_item_id FK "required"
+        text event_type "required"
+        integer quantity "required"
+        text actor_type "required"
+        uuid actor_id "nullable"
+        text idempotency_key "required"
+        jsonb payload "required"
+        timestamptz occurred_at "required"
+        timestamptz recorded_at "required"
+    }
+    commercePurchaseConfirmationHold["commerce.purchase_confirmation_hold"] {
+        uuid hold_id PK "required"
+        uuid shipment_item_id FK "required"
+        uuid claim_item_id FK "required"
+        integer held_quantity "required"
+        text status "required"
+        text reason_code "nullable"
+        timestamptz held_at "required"
+        timestamptz released_at "nullable"
+    }
+    commerceClaim["commerce.claim"] {
+        uuid claim_id PK "required"
+        uuid member_id FK "required"
+        uuid order_id FK "required"
+        text claim_number UK "required"
+        text idempotency_key "required"
+        text claim_type "required"
+        text status "required"
+        text reason_code "required"
+        text reason_detail "nullable"
+        text responsibility "required"
+    }
+    commerceClaimItem["commerce.claim_item"] {
+        uuid claim_item_id PK "required"
+        uuid claim_id FK "required"
+        uuid order_item_id FK "required"
+        text status "required"
+        integer quantity "required"
+        integer approved_quantity "required"
+        integer received_quantity "required"
+        integer accepted_quantity "required"
+        integer rejected_quantity "required"
+        text responsibility "required"
+    }
+    commerceClaimItemSourceAllocation["commerce.claim_item_source_allocation"] {
+        uuid source_allocation_id PK "required"
+        uuid claim_item_id FK "required"
+        uuid outbound_shipment_item_id FK "required"
+        integer quantity "required"
+        timestamptz created_at "required"
+    }
+    commerceClaimEvidence["commerce.claim_evidence"] {
+        uuid evidence_id PK "required"
+        uuid claim_id FK "required"
+        uuid claim_item_id FK "nullable"
+        text evidence_type "required"
+        text file_url "nullable"
+        text description "nullable"
+        text content_hash "nullable"
+        jsonb metadata "required"
+        text submitted_by_type "required"
+        uuid submitted_by_id "nullable"
+    }
+    commerceClaimReasonChange["commerce.claim_reason_change"] {
+        uuid reason_change_id PK "required"
+        uuid claim_id FK "required"
+        text from_reason "required"
+        text to_reason "required"
+        text request_note "nullable"
+        text requested_by_type "required"
+        uuid requested_by_id "nullable"
+        text status "required"
+        uuid reviewed_by_id "nullable"
+        text review_note "nullable"
+    }
+    commerceClaimReview["commerce.claim_review"] {
+        uuid claim_review_id PK "required"
+        uuid claim_id FK "required"
+        uuid claim_item_id FK "nullable"
+        text reviewer_type "required"
+        uuid reviewer_id "nullable"
+        text decision "required"
+        text rationale "nullable"
+        jsonb evidence_summary "required"
+        numeric_5_4_ confidence "nullable"
+        text model_version "nullable"
+    }
+    commerceClaimEvent["commerce.claim_event"] {
+        uuid claim_event_id PK "required"
+        uuid claim_id FK "required"
+        uuid claim_item_id FK "nullable"
+        text event_type "required"
+        text from_status "nullable"
+        text to_status "nullable"
+        integer quantity "nullable"
+        text actor_type "required"
+        uuid actor_id "nullable"
+        text idempotency_key "required"
+    }
+    commerceExchangeLine["commerce.exchange_line"] {
+        uuid exchange_line_id PK "required"
+        uuid claim_item_id FK "required"
+        uuid replacement_sku_id FK "required"
+        integer quantity "required"
+        bigint price_difference "required"
+        varchar_3_ currency "required"
+        text status "required"
+        jsonb replacement_snapshot "required"
+        timestamptz created_at "required"
+        timestamptz updated_at "required"
+    }
+    commerceClaim |o..o{ commerceShipment : "claim_id"
+    commerceShipment ||..o{ commerceShipmentItem : "shipment_id"
+    commerceExchangeLine |o..o{ commerceShipmentItem : "exchange_line_id"
+    commerceShipment ||..o{ commerceShipmentEvent : "shipment_id"
+    commerceShipmentItem ||--o| commercePurchaseConfirmationState : "shipment_item_id"
+    commerceShipmentItem ||..o{ commercePurchaseConfirmationEvent : "shipment_item_id"
+    commerceShipmentItem ||..o{ commercePurchaseConfirmationHold : "shipment_item_id"
+    commerceClaimItem ||..o{ commercePurchaseConfirmationHold : "claim_item_id"
+    commerceClaim ||..o{ commerceClaimItem : "claim_id"
+    commerceClaimItem ||..o{ commerceClaimItemSourceAllocation : "claim_item_id"
+    commerceShipmentItem ||..o{ commerceClaimItemSourceAllocation : "outbound_shipment_item_id"
+    commerceClaim ||..o{ commerceClaimEvidence : "claim_id"
+    commerceClaimItem |o..o{ commerceClaimEvidence : "claim_item_id"
+    commerceClaim ||..o{ commerceClaimReasonChange : "claim_id"
+    commerceClaim ||..o{ commerceClaimReview : "claim_id"
+    commerceClaimItem |o..o{ commerceClaimReview : "claim_item_id"
+    commerceClaim ||..o{ commerceClaimEvent : "claim_id"
+    commerceClaimItem |o..o{ commerceClaimEvent : "claim_item_id"
+    commerceClaimItem ||..o{ commerceExchangeLine : "claim_item_id"
+```

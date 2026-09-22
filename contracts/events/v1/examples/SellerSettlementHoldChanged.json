@@ -1,0 +1,30 @@
+{
+  "eventId": "00000000-0000-4000-8000-000000000108",
+  "eventType": "SellerSettlementHoldChanged",
+  "eventVersion": 1,
+  "producer": "commerce-service",
+  "aggregateType": "ORDER_SELLER",
+  "aggregateId": "00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002",
+  "aggregateVersion": 1,
+  "occurredAt": "2026-09-22T00:00:00Z",
+  "correlationId": "00000000-0000-4000-8000-000000000040",
+  "causationId": "00000000-0000-4000-8000-000000000010",
+  "traceId": "cccccccccccccccccccccccccccccccc",
+  "payload": {
+    "sellerId": "00000000-0000-4000-8000-000000000002",
+    "orderId": "00000000-0000-4000-8000-000000000001",
+    "holdId": "00000000-0000-4000-8000-000000000021",
+    "holdVersion": 1,
+    "action": "PLACE",
+    "reasonCode": "CLAIM_OPENED",
+    "unitIds": [
+      "00000000-0000-4000-8000-000000000005:1"
+    ],
+    "amount": {
+      "currency": "KRW",
+      "amount": 9000
+    },
+    "currency": "KRW"
+  },
+  "simulated": true
+}

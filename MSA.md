@@ -1,113 +1,123 @@
-# 4개 서비스 마켓플레이스 MSA
+# 백엔드 실행·검증 가이드
 
-첫 서비스 경계는 합의한 비즈니스 역량을 기준으로 정했습니다. 도메인 코드는 서비스 내부에서 모듈로 나누고, 독립 배포·확장·장애 격리·정합성 요구가 충분해질 때만 서비스를 추가로 분리합니다.
+기준일: 2026-09-21. 아키텍처·업무 규칙의 기준은 [BACKEND_DESIGN.md](docs/BACKEND_DESIGN.md)입니다. 이 문서는 실행과 검증만 다룹니다.
 
-```text
-multi-seller-fashtion-marketplace/
-├─ commerce-service/       # 마켓플레이스 거래 코어
-├─ payment-service/        # 결제와 환불 처리
-├─ settlement-service/     # 셀러 정산과 대사
-├─ discovery-data-service/ # 검색, 전시, 행동 데이터
-├─ pg-simulator/           # 개발·통합 테스트용 가상 PG
-├─ compose.yaml            # 로컬 4개 서비스 실행 환경
-└─ scripts/                # DB 기준 생성 스크립트
-```
+## 모듈과 포트
 
-| 서비스 | 담당 기능 | 포트 | 데이터베이스 |
+| 모듈 | 앱 포트 | DB / schema | PostgreSQL 호스트 포트 |
+| --- | ---: | --- | ---: |
+| commerce-service | 8081 | commerce / marketplace | 5432 |
+| payment-service | 8082 | payment / marketplace | 5433 |
+| settlement-service | 8083 | settlement / marketplace | 5434 |
+| discovery-data-service | 8084 | discovery / marketplace | 5435 |
+| pg-kakao-simulator | 8090 | pgkakao / pgkakao | 5436 |
+| pg-naver-simulator | 8091 | pgnaver / pgnaver | 5437 |
+
+`pg-simulator-common`은 HTTP DTO 라이브러리이며 별도 프로세스가 아닙니다. Redis는 6379, Kafka는 9092를 사용합니다. 기존 `pg-simulator` 모듈은 Kakao/Naver 모듈로 교체됐습니다.
+
+실제 Java package는 `multi.com.marketplace.{commerce,payment,settlement,discovery,pgkakaosimulator,pgnaversimulator,pgsimulatorcommon}`입니다. 각 모듈은 독립 jar와 DB를 가집니다.
+
+## 환경 프로필
+
+| 프로필 | DB | Flyway | 사용 범위 |
 | --- | --- | --- | --- |
-| `commerce-service` | 회원/셀러, 상품/재고, 장바구니, 주문, 배송, 클레임, 리뷰 | 8081 | `commerce` |
-| `payment-service` | 결제 승인·취소, 환불, PG 웹훅 | 8082 | `payment` |
-| `settlement-service` | 구매확정, 셀러 원장, 정산, 지급, 대사 | 8083 | `settlement` |
-| `discovery-data-service` | 검색, 전시/추천 입력, 사용자 행동 분석 | 8084 | `discovery` |
-| `pg-simulator` | 승인·취소·부분환불을 흉내 내는 개발용 PG | 8090 | 없음 |
+| 기본 local — 업무 4개 | H2 메모리 | 꺼짐 | 기동·단위 개발; PostgreSQL 스키마 검증 아님 |
+| 기본 local — PG 2개 | H2 메모리 | 켜짐 | 실제 PG V1으로 API 테스트 |
+| test — 업무 4개 | H2 메모리 | 꺼짐 | context 테스트 |
+| docker | PostgreSQL | 켜짐 | 개인 로컬 Compose |
+| dev | 외부 주입 PostgreSQL | 켜짐 | 공유 개발 인프라는 별도 구성 필요 |
+| stage/prod | 외부 주입 PostgreSQL | 명시적 환경변수 | 배포 인프라·인증·복구 정책은 아직 미구현 |
 
-각 서비스는 자신의 데이터베이스와 Flyway migration 이력을 소유합니다. 서비스 경계를 넘는 관계는 데이터베이스 외래 키가 아니라 외부 UUID로 표현합니다. 변경은 버전이 있는 HTTP 계약과 서비스별 outbox/inbox를 사용하는 Kafka 이벤트로 조정합니다.
+PG 테스트는 기본 local을 사용하며 PostgreSQL 검증 시 docker와 전용 datasource를 주입합니다. 프로필 파일의 존재는 실제 배포 완료를 의미하지 않습니다. 어떤 프로필이든 PG simulator는 실결제를 수행하지 않습니다.
 
-## 서비스 내부 뼈대 (2026-09-09)
+`dev/stage/prod`에서 필요한 환경변수:
 
-각 서비스의 기존 `multi.com.marketplace.<service>` 패키지 아래에 업무 패키지를 두고, 업무별로 다음 계층을 구성합니다. 디렉터리는 역할을 설명하는 `package-info.java`로 보존합니다. 결제 서비스에는 핵심 도메인 모델과 내부 유스케이스 인터페이스를 추가했습니다. 세부 범위는 [결제 서비스 문서](payment-service/README.md)를 참고합니다. 아직 Controller, JPA Entity, Repository, PG 호출이나 공개 API 계약은 구현하지 않았습니다.
-
-```text
-<업무>/
-├─ api/             # HTTP·이벤트 수신, 전송 DTO
-├─ application/     # 유스케이스, 트랜잭션 경계, 연동 포트
-├─ domain/          # 업무 모델과 규칙
-└─ infrastructure/  # 영속성, 메시징, 외부 연동 구현
-```
-
-| 서비스 | 내부 업무 패키지 |
+| 대상 | 변수 |
 | --- | --- |
-| commerce | member, seller, catalog, inventory, cart, order, fulfillment, claim, review |
-| payment | transaction, refund, webhook |
-| settlement | ledger, calculation, payout, reconciliation |
-| discovery | search, concept, analysis, behavior |
+| 모든 실행 모듈 | MARKETPLACE_DATASOURCE_URL, MARKETPLACE_DATASOURCE_USERNAME, MARKETPLACE_DATASOURCE_PASSWORD |
+| Commerce/Discovery | MARKETPLACE_REDIS_HOST, MARKETPLACE_REDIS_PORT, MARKETPLACE_KAFKA_BOOTSTRAP_SERVERS |
+| Payment/Settlement | MARKETPLACE_KAFKA_BOOTSTRAP_SERVERS |
+| stage/prod 전체 | MARKETPLACE_FLYWAY_ENABLED |
 
-- 서비스 간 Java 모듈 의존성이나 공유 Entity는 추가하지 않습니다.
-- 다른 업무의 repository를 직접 호출하지 않고 application 계층의 공개 기능으로 연동합니다.
-- 패키지는 현재 주요 업무를 위한 시작점입니다. 추가 업무와 세부 클래스는 해당 기능을 구현할 때 만듭니다.
-- 구매확정 관련 테이블은 현재 commerce migration에 있으므로 `commerce.fulfillment`에 자리를 마련했습니다. 위 서비스 담당 표의 settlement 구매확정 표기는 추후 소유권 논의가 필요하며 이번 작업에서 테이블을 이동하지 않았습니다.
+`SPRING_PROFILES_ACTIVE`로 활성화합니다. 현재 PG endpoint·credential 설정은 Payment HTTP adapter가 없어 소비되지 않습니다. 아직 없는 변수를 설정하는 것만으로 연동된다고 가정하지 않습니다.
 
-## 명령어
+## 로컬 빌드·단일 실행
 
-Windows에서 로컬 빌드는 JDK 17을 사용합니다. 현재 PC의 설치 경로는 아래와 같습니다.
+JDK 17과 Gradle wrapper를 사용합니다. PowerShell에서 현재 PC의 JDK 경로가 필요하면 설정합니다.
 
 ```powershell
 $env:JAVA_HOME = 'C:\Program Files\Java\jdk-17'
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
+.\gradlew.bat clean build --no-daemon
+.\gradlew.bat :payment-service:test --no-daemon
+.\gradlew.bat :pg-kakao-simulator:bootRun
 ```
 
-```powershell
-# 모든 서비스를 빌드하고 테스트합니다.
-.\gradlew.bat clean build
+다른 모듈도 `:모듈명:bootRun`으로 실행합니다. H2는 종료 시 데이터가 사라집니다. Compose와 같은 포트로 동시에 실행하지 않습니다. 업무 서비스는 현재 기동 기반이며 고객 API가 없습니다. Commerce/Payment/Settlement에는 Spring Security 기본 설정이 적용되고, 정식 인증 계약은 미구현입니다.
 
-# H2를 사용하는 local 프로필로 서비스 하나를 실행합니다.
-.\gradlew.bat :commerce-service:bootRun
-.\gradlew.bat :payment-service:bootRun
-.\gradlew.bat :settlement-service:bootRun
-.\gradlew.bat :discovery-data-service:bootRun
-```
+## 전체 로컬 Compose
 
-기본 `local`, `test` 프로필은 H2를 사용하며 Flyway를 실행하지 않습니다. `docker` 프로필은 PostgreSQL을 사용하며 Flyway를 실행합니다.
-
-## 데이터베이스 기준
-
-상위 워크스페이스의 `database/` 폴더가 검토된 마켓플레이스 데이터 모델의 원본입니다. 원본이 변경되면 다음 명령으로 서비스별 Flyway 기준 migration을 다시 생성합니다.
+PostgreSQL 17.11, Redis 7.4.11, Kafka 4.1.2 이미지가 compose.yaml에 고정돼 있습니다. `.env.example`은 로컬 값의 예시입니다. 기존 `.env`를 덮어쓰지 말고 필요한 변수만 맞춥니다.
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/generate-service-migrations.ps1
-```
-
-생성기는 각 서비스에 할당된 테이블과 양쪽 모두 해당 서비스가 소유한 외래 키만 복사합니다. 서비스 간 참조는 UUID로 남깁니다. 공유·운영 환경에 적용하기 전에는 생성된 migration을 반드시 검토해야 합니다.
-
-## Docker Compose
-
-```powershell
-# 선택 사항: .env.example을 .env로 복사한 뒤 로컬 값만 변경합니다.
-
-# 이미지 빌드, 4개 DB 생성, Flyway migration 적용, 전체 실행
+docker compose config --quiet
 docker compose up --build -d
-
-# 상태와 시작 로그 확인
 docker compose ps
-docker compose logs -f commerce-service payment-service settlement-service discovery-data-service
-
-# 컨테이너만 내리고 로컬 데이터는 유지
+docker compose logs --tail 100 commerce-service payment-service settlement-service discovery-data-service pg-kakao-simulator pg-naver-simulator
 docker compose down
-
-# 컨테이너와 모든 로컬 볼륨을 함께 삭제
-docker compose down -v
 ```
 
-Compose는 PostgreSQL을 `5432`~`5435`, Redis를 `6379`, Kafka를 `9092`, 애플리케이션을 `8081`~`8084` 포트로 노출합니다. `.env.example`의 값은 로컬 개발 전용입니다. 공유·운영 환경에서는 별도 자격 증명과 외부 인프라 주소를 주입해야 합니다.
+`down`은 DB volume을 유지합니다. `down -v`는 모든 해당 로컬 DB 데이터를 삭제하므로 일반 종료 명령으로 사용하지 않습니다. 이번 검토에서 기존 Compose DB를 초기화하거나 운영 migration을 실행하지 않았습니다.
 
-## 현재 PC의 로컬 환경 (2026-09-09)
+Compose의 host 공개 포트는 127.0.0.1에 바인딩합니다. 이 환경은 로컬용이며 simulator에 인증은 없습니다. 공유 배포 전 호출 인증과 네트워크 정책을 구현합니다. 개별 bootRun도 공개 네트워크에 노출하지 않습니다.
 
-검증 완료: `clean build --no-daemon` 성공, 서비스별 context 테스트 총 4개 통과, 네 서비스의 `/actuator/health`가 모두 `UP`, PostgreSQL 4개·Redis·Kafka가 모두 healthy입니다. 네 DB의 Flyway V1 성공 이력을 직접 조회했습니다. 업무 테이블은 commerce 76개, payment 11개, settlement 12개, discovery 10개이며 각 DB에는 별도의 Flyway 이력 테이블이 1개씩 있습니다.
+Kafka가 광고하는 `kafka:9092`는 Docker 내부용입니다. 호스트 JVM에서 Kafka를 실제 사용할 때는 별도 외부 listener를 구성합니다. 현재 Kafka producer/consumer는 미구현입니다.
 
-- `.env`를 생성했으며 `COMPOSE_PROJECT_NAME=marketplace-four-services-local`을 지정했습니다. 이전 `multi-seller-marketplace` 환경과 컨테이너·볼륨을 분리합니다. `.env`는 Git에서 제외됩니다.
-- 전체 환경은 프로젝트 루트에서 `docker compose up --build -d`로 실행하고 `docker compose down`으로 종료합니다. 일반 종료 시 DB 볼륨은 유지됩니다.
-- Docker 실행 시 각 서비스의 PostgreSQL 스키마는 `spring-boot-starter-flyway`를 통해 자동 적용됩니다. Spring Boot 4에서는 `flyway-core`만 추가하면 자동 설정이 포함되지 않습니다. [공식 설명](https://spring.io/blog/2025/10/28/modularizing-spring-boot/)
-- `pg-simulator`는 전용 PostgreSQL `pgsim`(호스트 5436)과 Flyway V1을 사용합니다. 승인·취소·환불 호출과 거래 이력은 `pgsim.pg_payment`, `pgsim.pg_transaction`에 저장됩니다.
-- 서비스 상태 확인 주소는 `http://localhost:8081/actuator/health`부터 `http://localhost:8084/actuator/health`까지입니다.
-- 현재 실행 방식은 전체 Docker Compose 또는 개별 서비스의 H2 `local` 프로필입니다. Kafka의 광고 주소 `kafka:9092`는 Docker 내부용이므로 호스트에서 실행하는 앱과 Kafka를 연동하려면 별도 외부 listener 설정이 필요합니다.
-- Docker Compose가 실행 중일 때 같은 서비스의 `bootRun`을 동시에 실행하면 8081~8084 포트가 이미 사용 중이라 실패합니다. 먼저 해당 컨테이너를 멈추거나 별도 포트를 사용합니다.
+업무 서비스 Actuator 확인:
+
+```powershell
+Invoke-RestMethod http://localhost:8081/actuator/health
+Invoke-RestMethod http://localhost:8082/actuator/health
+Invoke-RestMethod http://localhost:8083/actuator/health
+Invoke-RestMethod http://localhost:8084/actuator/health
+```
+
+PG simulator에는 Actuator 의존성이 없습니다. 앱 기동 로그와 PG API 호출로 확인합니다. 없는 UUID에 대한 GET의 provider별 404는 API 처리 확인에 사용할 수 있지만 DB 전체 상태를 보장하는 health check는 아닙니다.
+
+## DB 변경·검증
+
+각 서비스의 `src/main/resources/db/migration`에 버전 migration을 추가합니다. V1은 이미 적용된 기준이므로 수정·재생성하지 않습니다. V2는 누락 내부 FK를 복원합니다. 기존 orphan이 있으면 실패하며 데이터 검토 후 해결해야 합니다.
+
+통합 워크스페이스에 `../../database/_parts`가 있을 때 다음을 실행합니다.
+
+```powershell
+.\scripts\generate-service-migrations.ps1
+.\scripts\verify-service-schema.ps1
+```
+
+생성기는 `build/schema-preview/<service>/V1__service_owned_schema.sql`에 비교 후보만 생성합니다. 기존 서비스 migration 파일을 덮어쓰지 않습니다. 새로운 원본 변경은 candidate diff를 검토하여 새 버전 migration으로 작성합니다. SQL 적용은 빈 격리 PostgreSQL에서 서비스별 DB에 V1, V2 순으로 검증하고, 기존 DB용 업그레이드 경로도 검증합니다.
+
+## 검증 명령과 한계
+
+```powershell
+.\gradlew.bat clean build --no-daemon
+.\scripts\verify-service-schema.ps1
+.\scripts\verify-doc-links.ps1
+git diff --check
+```
+
+문서 검사는 상대 링크와 코드 블록을 확인하며 외부 URL 가용성이나 업무 의미를 증명하지 않습니다.
+
+PG PostgreSQL 테스트는 기존 데이터와 분리된 DB를 준비한 뒤, 새 PowerShell 세션에서 아래처럼 실행합니다. URL은 반드시 테스트 DB로 바꿉니다. 테스트가 결제 데이터를 작성합니다.
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE = 'docker'
+$env:SPRING_DATASOURCE_URL = 'jdbc:postgresql://localhost:15439/postgres'
+$env:SPRING_DATASOURCE_USERNAME = 'postgres'
+$env:SPRING_DATASOURCE_PASSWORD = '<test-db-password>'
+.\gradlew.bat :pg-kakao-simulator:test :pg-naver-simulator:test --rerun-tasks --no-daemon
+```
+
+위 환경변수는 현재 셸에 남으므로 테스트용 셸을 종료한 뒤 일반 개발 명령을 실행합니다. 두 simulator는 서로 다른 schema를 생성하므로 테스트에서는 한 격리 DB를 사용할 수 있습니다. 실제 Compose는 별도 DB입니다.
+
+2026-09-21 검증 결과: clean build 및 후속 변경을 포함한 전체 build 성공, 최종 39개 테스트 통과. PG API/동시성 테스트는 별도 PostgreSQL 17.11에서도 검증했습니다. 4개 업무 서비스의 V1+V2 SQL 적용 및 내부 FK 136/14/14/7개 확인. 전체 Compose 앱 E2E, 실결제, 재시작 복구, 운영 배포는 검증 범위가 아닙니다.

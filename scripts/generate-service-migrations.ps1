@@ -1,5 +1,7 @@
 [CmdletBinding()]
-param()
+param(
+    [string]$OutputDirectory = (Join-Path $PSScriptRoot '..\build\schema-preview')
+)
 
 $ErrorActionPreference = 'Stop'
 
@@ -81,7 +83,17 @@ foreach ($file in $tableFiles) {
 
 $foreignKeyStatements = @()
 foreach ($file in $foreignKeyFiles) {
-    $foreignKeyStatements += [regex]::Matches((Get-Content -LiteralPath $file -Raw -Encoding UTF8), '(?ms)^ALTER TABLE marketplace\.(?<table>[a-z0-9_]+).*?;')
+    foreach ($statement in [regex]::Matches((Get-Content -LiteralPath $file -Raw -Encoding UTF8), '(?ms)^ALTER TABLE marketplace\.(?<table>[a-z0-9_]+).*?;')) {
+        $owner = $statement.Groups['table'].Value
+        # A single ALTER can contain both internal and external references.
+        # Filter each constraint, never discard the entire ALTER.
+        foreach ($constraint in [regex]::Matches($statement.Value, '(?s)ADD CONSTRAINT\s+\w+.*?(?=,\s*ADD CONSTRAINT|;\s*$)')) {
+            $foreignKeyStatements += [pscustomobject]@{
+                Owner = $owner
+                Value = "ALTER TABLE marketplace.$owner " + $constraint.Value.Trim() + ';'
+            }
+        }
+    }
 }
 
 $indexStatements = @()
@@ -110,7 +122,7 @@ foreach ($service in $serviceTables.Keys) {
 
     foreach ($statementMatch in $foreignKeyStatements) {
         $statement = $statementMatch.Value.Trim()
-        $owner = $statementMatch.Groups['table'].Value
+        $owner = $statementMatch.Owner
         $referencedTables = [regex]::Matches($statement, 'REFERENCES marketplace\.([a-z0-9_]+)') | ForEach-Object { $_.Groups[1].Value }
         if ($ownedTableSet.Contains($owner) -and @($referencedTables | Where-Object { -not $ownedTableSet.Contains($_) }).Count -eq 0) {
             $migration += $statement
@@ -125,7 +137,11 @@ foreach ($service in $serviceTables.Keys) {
         }
     }
 
-    $migrationDirectory = Join-Path $repositoryRoot "$service\src\main\resources\db\migration"
+    $migrationDirectory = Join-Path $OutputDirectory $service
+    $resolvedOutput = [System.IO.Path]::GetFullPath($migrationDirectory)
+    if ($resolvedOutput -match '[\\/]src[\\/]main[\\/]resources[\\/]db[\\/]migration([\\/]|$)') {
+        throw 'Do not overwrite applied Flyway migrations. Generate a preview and add a new version.'
+    }
     New-Item -ItemType Directory -Path $migrationDirectory -Force | Out-Null
     $migrationPath = Join-Path $migrationDirectory 'V1__service_owned_schema.sql'
     Set-Content -LiteralPath $migrationPath -Value ($migration -join "`n`n") -Encoding utf8

@@ -1,0 +1,2241 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Payment Service API",
+    "version": "1.0.0",
+    "description": "Target v1 contract; NOT implemented HTTP endpoints. See docs/requirements for business rules.\nPayment-attempt creation is a Commerce backend-to-Payment call: Commerce owns checkout\nvalidation and the immutable order-price snapshot. See commerce-payment-checkout-contract-v0.1.md.\nCommerce service RS256 JWT only (aud=payment-service, 60-second TTL, scope per operation).\nPG1=KAKAO and PG2=NAVER are the existing simulators. All transactions are simulated.\nCommon 400/401/403/429/503 responses follow ErrorResponse. Never expose these internal paths to browsers.\n"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8082",
+      "description": "Local development"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Payment attempts"
+    },
+    {
+      "name": "Payments"
+    },
+    {
+      "name": "Refunds"
+    },
+    {
+      "name": "PG webhooks"
+    }
+  ],
+  "paths": {
+    "/internal/v1/payment-attempts": {
+      "post": {
+        "tags": [
+          "Payment attempts"
+        ],
+        "summary": "Prepare a payment attempt from a Commerce-verified checkout snapshot",
+        "operationId": "preparePaymentAttempt",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreparePaymentRequest"
+              },
+              "example": {
+                "checkoutId": "11111111-1111-4111-8111-111111111111",
+                "checkoutRevision": 1,
+                "orderId": "11111111-1111-4111-8111-111111111111",
+                "memberId": "11111111-1111-4111-8111-111111111111",
+                "paymentRequestId": "11111111-1111-4111-8111-111111111111",
+                "pricingPolicyVersion": "sample",
+                "provider": "KAKAO",
+                "merchantTxId": "mp-11111111-1111-4111-8111-111111111111-11111111-1111-4111-8111-111111111111",
+                "paymentMethod": "SIMULATED",
+                "amount": {
+                  "currency": "KRW",
+                  "amount": 10000
+                },
+                "expiresAt": "2026-09-21T00:00:00Z",
+                "items": [
+                  {
+                    "orderItemId": "11111111-1111-4111-8111-111111111111",
+                    "sellerId": "11111111-1111-4111-8111-111111111111",
+                    "quantity": 1,
+                    "productAmount": 10000,
+                    "discountAmount": 0,
+                    "taxAmount": 0,
+                    "paidAmount": 10000,
+                    "units": [
+                      {
+                        "unitOrdinal": 1,
+                        "productAmount": 10000,
+                        "discountAmount": 0,
+                        "paidAmount": 10000,
+                        "commissionAmount": 1000
+                      }
+                    ]
+                  }
+                ],
+                "charges": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created or previously created idempotent attempt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentAttempt"
+                },
+                "example": {
+                  "checkoutId": "11111111-1111-4111-8111-111111111111",
+                  "checkoutRevision": 1,
+                  "orderId": "11111111-1111-4111-8111-111111111111",
+                  "memberId": "11111111-1111-4111-8111-111111111111",
+                  "paymentRequestId": "11111111-1111-4111-8111-111111111111",
+                  "pricingPolicyVersion": "sample",
+                  "provider": "KAKAO",
+                  "merchantTxId": "mp-11111111-1111-4111-8111-111111111111-11111111-1111-4111-8111-111111111111",
+                  "paymentMethod": "SIMULATED",
+                  "amount": {
+                    "currency": "KRW",
+                    "amount": 10000
+                  },
+                  "expiresAt": "2026-09-21T00:00:00Z",
+                  "items": [
+                    {
+                      "orderItemId": "11111111-1111-4111-8111-111111111111",
+                      "sellerId": "11111111-1111-4111-8111-111111111111",
+                      "quantity": 1,
+                      "productAmount": 10000,
+                      "discountAmount": 0,
+                      "taxAmount": 0,
+                      "paidAmount": 10000,
+                      "units": [
+                        {
+                          "unitOrdinal": 1,
+                          "productAmount": 10000,
+                          "discountAmount": 0,
+                          "paidAmount": 10000,
+                          "commissionAmount": 1000
+                        }
+                      ]
+                    }
+                  ],
+                  "charges": [],
+                  "id": "11111111-1111-4111-8111-111111111111",
+                  "status": "CREATED",
+                  "simulated": true
+                }
+              }
+            }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        },
+        "x-implementation": "planned",
+        "x-requirements": [
+          "PAY-01"
+        ],
+        "x-authorized-roles": [
+          "commerce-service"
+        ]
+      }
+    },
+    "/internal/v1/payment-attempts/{paymentAttemptId}/approve": {
+      "post": {
+        "tags": [
+          "Payment attempts"
+        ],
+        "summary": "Approve an attempt through the configured PG",
+        "operationId": "approvePaymentAttempt",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PaymentAttemptId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Approved payment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Payment"
+                },
+                "example": {
+                  "id": "11111111-1111-4111-8111-111111111111",
+                  "paymentAttemptId": "11111111-1111-4111-8111-111111111111",
+                  "orderId": "11111111-1111-4111-8111-111111111111",
+                  "provider": "KAKAO",
+                  "providerPaymentKey": "sample",
+                  "amount": {
+                    "currency": "KRW",
+                    "amount": 10000
+                  },
+                  "refundedAmount": {
+                    "currency": "KRW",
+                    "amount": 0
+                  },
+                  "voidedAmount": {
+                    "currency": "KRW",
+                    "amount": 0
+                  },
+                  "status": "APPROVED",
+                  "approvedAt": "2026-09-21T00:00:00Z",
+                  "simulated": true,
+                  "operationId": "11111111-1111-4111-8111-111111111111",
+                  "resultVersion": 1
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Attempt pending or UNKNOWN; query this attempt, never initiate another payment on timeout.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentAttempt"
+                },
+                "example": {
+                  "checkoutId": "11111111-1111-4111-8111-111111111111",
+                  "checkoutRevision": 1,
+                  "orderId": "11111111-1111-4111-8111-111111111111",
+                  "memberId": "11111111-1111-4111-8111-111111111111",
+                  "paymentRequestId": "11111111-1111-4111-8111-111111111111",
+                  "pricingPolicyVersion": "sample",
+                  "provider": "KAKAO",
+                  "merchantTxId": "mp-11111111-1111-4111-8111-111111111111-11111111-1111-4111-8111-111111111111",
+                  "paymentMethod": "SIMULATED",
+                  "amount": {
+                    "currency": "KRW",
+                    "amount": 10000
+                  },
+                  "expiresAt": "2026-09-21T00:00:00Z",
+                  "items": [
+                    {
+                      "orderItemId": "11111111-1111-4111-8111-111111111111",
+                      "sellerId": "11111111-1111-4111-8111-111111111111",
+                      "quantity": 1,
+                      "productAmount": 10000,
+                      "discountAmount": 0,
+                      "taxAmount": 0,
+                      "paidAmount": 10000,
+                      "units": [
+                        {
+                          "unitOrdinal": 1,
+                          "productAmount": 10000,
+                          "discountAmount": 0,
+                          "paidAmount": 10000,
+                          "commissionAmount": 1000
+                        }
+                      ]
+                    }
+                  ],
+                  "charges": [],
+                  "id": "11111111-1111-4111-8111-111111111111",
+                  "status": "CREATED",
+                  "simulated": true
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "502": {
+            "$ref": "#/components/responses/ProviderError"
+          }
+        },
+        "x-implementation": "planned",
+        "x-requirements": [
+          "PAY-02"
+        ],
+        "x-authorized-roles": [
+          "commerce-service"
+        ]
+      }
+    },
+    "/internal/v1/payment-attempts/{paymentAttemptId}": {
+      "get": {
+        "tags": [
+          "Payment attempts"
+        ],
+        "summary": "Query an attempt after a pending or unknown approval result",
+        "operationId": "getPaymentAttempt",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PaymentAttemptId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current attempt snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentAttempt"
+                },
+                "example": {
+                  "checkoutId": "11111111-1111-4111-8111-111111111111",
+                  "checkoutRevision": 1,
+                  "orderId": "11111111-1111-4111-8111-111111111111",
+                  "memberId": "11111111-1111-4111-8111-111111111111",
+                  "paymentRequestId": "11111111-1111-4111-8111-111111111111",
+                  "pricingPolicyVersion": "sample",
+                  "provider": "KAKAO",
+                  "merchantTxId": "mp-11111111-1111-4111-8111-111111111111-11111111-1111-4111-8111-111111111111",
+                  "paymentMethod": "SIMULATED",
+                  "amount": {
+                    "currency": "KRW",
+                    "amount": 10000
+                  },
+                  "expiresAt": "2026-09-21T00:00:00Z",
+                  "items": [
+                    {
+                      "orderItemId": "11111111-1111-4111-8111-111111111111",
+                      "sellerId": "11111111-1111-4111-8111-111111111111",
+                      "quantity": 1,
+                      "productAmount": 10000,
+                      "discountAmount": 0,
+                      "taxAmount": 0,
+                      "paidAmount": 10000,
+                      "units": [
+                        {
+                          "unitOrdinal": 1,
+                          "productAmount": 10000,
+                          "discountAmount": 0,
+                          "paidAmount": 10000,
+                          "commissionAmount": 1000
+                        }
+                      ]
+                    }
+                  ],
+                  "charges": [],
+                  "id": "11111111-1111-4111-8111-111111111111",
+                  "status": "CREATED",
+                  "simulated": true
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-implementation": "planned",
+        "x-requirements": [
+          "PAY-01"
+        ],
+        "x-authorized-roles": [
+          "commerce-service"
+        ]
+      }
+    },
+    "/internal/v1/refunds/{refundId}": {
+      "get": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Query a pending or unknown refund",
+        "operationId": "getRefund",
+        "parameters": [
+          {
+            "name": "refundId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current refund snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Refund"
+                },
+                "example": {
+                  "amount": {
+                    "currency": "KRW",
+                    "amount": 10000
+                  },
+                  "reasonCode": "CUSTOMER_CANCEL",
+                  "requestedByType": "MEMBER",
+                  "items": [
+                    {
+                      "orderItemId": "11111111-1111-4111-8111-111111111111",
+                      "unitOrdinals": [
+                        1
+                      ],
+                      "productRefundAmount": 10000,
+                      "discountReversalAmount": 0,
+                      "taxRefundAmount": 0,
+                      "refundAmount": 10000
+                    }
+                  ],
+                  "charges": [],
+                  "claimId": "11111111-1111-4111-8111-111111111111",
+                  "id": "11111111-1111-4111-8111-111111111111",
+                  "paymentId": "11111111-1111-4111-8111-111111111111",
+                  "status": "REQUESTED",
+                  "actualRefundedAmount": {
+                    "currency": "KRW",
+                    "amount": 0
+                  },
+                  "simulated": true,
+                  "operationId": "11111111-1111-4111-8111-111111111111",
+                  "resultVersion": 1,
+                  "requestedById": "11111111-1111-4111-8111-111111111111"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-implementation": "planned",
+        "x-requirements": [
+          "PAY-04"
+        ],
+        "x-authorized-roles": [
+          "commerce-service"
+        ]
+      }
+    },
+    "/internal/v1/payments/{paymentId}": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Get a payment",
+        "operationId": "getPayment",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PaymentId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Payment"
+                },
+                "example": {
+                  "id": "11111111-1111-4111-8111-111111111111",
+                  "paymentAttemptId": "11111111-1111-4111-8111-111111111111",
+                  "orderId": "11111111-1111-4111-8111-111111111111",
+                  "provider": "KAKAO",
+                  "providerPaymentKey": "sample",
+                  "amount": {
+                    "currency": "KRW",
+                    "amount": 10000
+                  },
+                  "refundedAmount": {
+                    "currency": "KRW",
+                    "amount": 0
+                  },
+                  "voidedAmount": {
+                    "currency": "KRW",
+                    "amount": 0
+                  },
+                  "status": "APPROVED",
+                  "approvedAt": "2026-09-21T00:00:00Z",
+                  "simulated": true,
+                  "operationId": "11111111-1111-4111-8111-111111111111",
+                  "resultVersion": 1
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-implementation": "planned",
+        "x-requirements": [
+          "PAY-01"
+        ],
+        "x-authorized-roles": [
+          "commerce-service"
+        ]
+      }
+    },
+    "/internal/v1/payments/{paymentId}/cancel": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Cancel or void an approved payment when the provider allows it",
+        "operationId": "cancelPayment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancellationRequest"
+              },
+              "example": {
+                "actorType": "MEMBER",
+                "reasonCode": "CUSTOMER_CANCEL",
+                "claimId": "11111111-1111-4111-8111-111111111111",
+                "actorId": "11111111-1111-4111-8111-111111111111"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PaymentId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cancelled payment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Payment"
+                },
+                "example": {
+                  "id": "11111111-1111-4111-8111-111111111111",
+                  "paymentAttemptId": "11111111-1111-4111-8111-111111111111",
+                  "orderId": "11111111-1111-4111-8111-111111111111",
+                  "provider": "KAKAO",
+                  "providerPaymentKey": "sample",
+                  "amount": {
+                    "currency": "KRW",
+                    "amount": 10000
+                  },
+                  "refundedAmount": {
+                    "currency": "KRW",
+                    "amount": 0
+                  },
+                  "voidedAmount": {
+                    "currency": "KRW",
+                    "amount": 0
+                  },
+                  "status": "APPROVED",
+                  "approvedAt": "2026-09-21T00:00:00Z",
+                  "simulated": true,
+                  "operationId": "11111111-1111-4111-8111-111111111111",
+                  "resultVersion": 1
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Cancellation accepted with an unknown provider result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationPending"
+                },
+                "example": {
+                  "operationId": "11111111-1111-4111-8111-111111111111",
+                  "status": "PENDING",
+                  "statusUrl": "sample",
+                  "simulated": true
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "502": {
+            "$ref": "#/components/responses/ProviderError"
+          }
+        },
+        "x-implementation": "planned",
+        "x-requirements": [
+          "PAY-01"
+        ],
+        "x-authorized-roles": [
+          "commerce-service"
+        ]
+      }
+    },
+    "/internal/v1/payments/{paymentId}/refunds": {
+      "post": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Request a full or partial refund",
+        "operationId": "requestRefund",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PaymentId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefundRequest"
+              },
+              "example": {
+                "amount": {
+                  "currency": "KRW",
+                  "amount": 10000
+                },
+                "reasonCode": "CUSTOMER_CANCEL",
+                "requestedByType": "MEMBER",
+                "items": [
+                  {
+                    "orderItemId": "11111111-1111-4111-8111-111111111111",
+                    "unitOrdinals": [
+                      1
+                    ],
+                    "productRefundAmount": 10000,
+                    "discountReversalAmount": 0,
+                    "taxRefundAmount": 0,
+                    "refundAmount": 10000
+                  }
+                ],
+                "charges": [],
+                "claimId": "11111111-1111-4111-8111-111111111111",
+                "requestedById": "11111111-1111-4111-8111-111111111111"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Refund completed or previously completed idempotent refund",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Refund"
+                },
+                "example": {
+                  "amount": {
+                    "currency": "KRW",
+                    "amount": 10000
+                  },
+                  "reasonCode": "CUSTOMER_CANCEL",
+                  "requestedByType": "MEMBER",
+                  "items": [
+                    {
+                      "orderItemId": "11111111-1111-4111-8111-111111111111",
+                      "unitOrdinals": [
+                        1
+                      ],
+                      "productRefundAmount": 10000,
+                      "discountReversalAmount": 0,
+                      "taxRefundAmount": 0,
+                      "refundAmount": 10000
+                    }
+                  ],
+                  "charges": [],
+                  "claimId": "11111111-1111-4111-8111-111111111111",
+                  "id": "11111111-1111-4111-8111-111111111111",
+                  "paymentId": "11111111-1111-4111-8111-111111111111",
+                  "status": "REQUESTED",
+                  "actualRefundedAmount": {
+                    "currency": "KRW",
+                    "amount": 0
+                  },
+                  "simulated": true,
+                  "operationId": "11111111-1111-4111-8111-111111111111",
+                  "resultVersion": 1,
+                  "requestedById": "11111111-1111-4111-8111-111111111111"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Refund accepted but provider result is pending or unknown",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Refund"
+                },
+                "example": {
+                  "amount": {
+                    "currency": "KRW",
+                    "amount": 10000
+                  },
+                  "reasonCode": "CUSTOMER_CANCEL",
+                  "requestedByType": "MEMBER",
+                  "items": [
+                    {
+                      "orderItemId": "11111111-1111-4111-8111-111111111111",
+                      "unitOrdinals": [
+                        1
+                      ],
+                      "productRefundAmount": 10000,
+                      "discountReversalAmount": 0,
+                      "taxRefundAmount": 0,
+                      "refundAmount": 10000
+                    }
+                  ],
+                  "charges": [],
+                  "claimId": "11111111-1111-4111-8111-111111111111",
+                  "id": "11111111-1111-4111-8111-111111111111",
+                  "paymentId": "11111111-1111-4111-8111-111111111111",
+                  "status": "REQUESTED",
+                  "actualRefundedAmount": {
+                    "currency": "KRW",
+                    "amount": 0
+                  },
+                  "simulated": true,
+                  "operationId": "11111111-1111-4111-8111-111111111111",
+                  "resultVersion": 1,
+                  "requestedById": "11111111-1111-4111-8111-111111111111"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "502": {
+            "$ref": "#/components/responses/ProviderError"
+          }
+        },
+        "x-implementation": "planned",
+        "x-requirements": [
+          "PAY-04"
+        ],
+        "x-authorized-roles": [
+          "commerce-service"
+        ]
+      }
+    },
+    "/internal/v1/payment-webhooks/{provider}": {
+      "post": {
+        "tags": [
+          "PG webhooks"
+        ],
+        "summary": "Receive and deduplicate a PG webhook",
+        "operationId": "receivePaymentWebhook",
+        "security": [],
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "KAKAO",
+                "NAVER"
+              ]
+            }
+          },
+          {
+            "name": "X-Provider-Event-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "X-Signature",
+            "in": "header",
+            "required": true,
+            "description": "HMAC-SHA256 of timestamp.eventId.rawBody; provider-specific secret; constant-time verification.",
+            "schema": {
+              "type": "string",
+              "pattern": "^v1=[0-9a-f]{64}$"
+            }
+          },
+          {
+            "name": "X-Provider-Timestamp",
+            "in": "header",
+            "required": true,
+            "description": "Unix seconds; absolute clock skew at most 300 seconds.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]+$"
+            }
+          },
+          {
+            "name": "X-Key-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PgWebhook"
+              },
+              "example": {
+                "eventId": "11111111-1111-4111-8111-111111111111",
+                "provider": "KAKAO",
+                "eventType": "PaymentApproved",
+                "occurredAt": "2026-09-21T00:00:00Z",
+                "transaction": {
+                  "transactionId": "11111111-1111-4111-8111-111111111111",
+                  "paymentId": "11111111-1111-4111-8111-111111111111",
+                  "merchantTxId": "mp-11111111-1111-4111-8111-111111111111-11111111-1111-4111-8111-111111111111",
+                  "transactionType": "APPROVE",
+                  "idempotencyKey": "sample",
+                  "amount": 10000,
+                  "currency": "KRW",
+                  "status": "SUCCEEDED",
+                  "occurredAt": "2026-09-21T00:00:00Z",
+                  "simulated": true
+                },
+                "payment": {
+                  "paymentId": "11111111-1111-4111-8111-111111111111",
+                  "merchantTxId": "mp-11111111-1111-4111-8111-111111111111-11111111-1111-4111-8111-111111111111",
+                  "currency": "KRW",
+                  "amount": 10000,
+                  "status": "APPROVED",
+                  "refundedAmount": 0,
+                  "simulated": true
+                },
+                "simulated": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted for idempotent processing"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "description": "Invalid provider signature"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        },
+        "x-implementation": "planned",
+        "x-requirements": [
+          "PG-03"
+        ],
+        "x-authorized-roles": [
+          "PG1/PG2_SIGNED_WEBHOOK"
+        ]
+      }
+    },
+    "/internal/v1/order-payment-guards/{orderId}/close": {
+      "post": {
+        "tags": [
+          "Payment attempts"
+        ],
+        "operationId": "closeOrderPaymentGuard",
+        "summary": "Fence future prepare/approve before Commerce releases stock",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Actor"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "reason"
+                    ],
+                    "properties": {
+                      "reason": {
+                        "type": "string",
+                        "enum": [
+                          "EXPIRED",
+                          "CUSTOMER_CANCELLED",
+                          "COMPENSATION"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "example": {
+                "actorType": "MEMBER",
+                "reason": "EXPIRED",
+                "actorId": "11111111-1111-4111-8111-111111111111"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Persistent CLOSED gate and current disposition; only CLOSED_NO_EFFECT permits release.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderGuardResult"
+                },
+                "example": {
+                  "orderId": "11111111-1111-4111-8111-111111111111",
+                  "outcome": "CLOSED_NO_EFFECT",
+                  "guardVersion": 1
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Gate closed but a prior financial operation remains in flight.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderGuardResult"
+                },
+                "example": {
+                  "orderId": "11111111-1111-4111-8111-111111111111",
+                  "outcome": "CLOSED_NO_EFFECT",
+                  "guardVersion": 1
+                }
+              }
+            }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        },
+        "x-implementation": "planned",
+        "x-requirements": [
+          "PAY-03"
+        ],
+        "x-authorized-roles": [
+          "commerce-service"
+        ]
+      }
+    },
+    "/internal/v1/payment-operations/{operationId}": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "operationId": "getPaymentOperation",
+        "parameters": [
+          {
+            "name": "operationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current durable approval, void or refund operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "operationId",
+                    "kind",
+                    "status",
+                    "orderId",
+                    "resultVersion",
+                    "simulated"
+                  ],
+                  "properties": {
+                    "operationId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "APPROVE",
+                        "CANCEL",
+                        "REFUND"
+                      ]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "REQUESTED",
+                        "PROCESSING",
+                        "PENDING",
+                        "SUCCEEDED",
+                        "FAILED",
+                        "UNKNOWN",
+                        "CANCELLED"
+                      ]
+                    },
+                    "orderId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "resultVersion": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "paymentId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "uuid"
+                    },
+                    "refundId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "uuid"
+                    },
+                    "simulated": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "immutableResult": {
+                      "type": "object",
+                      "description": "Frozen result at resultVersion, not a join to the latest payment snapshot. Present after a definitive outcome; reconcile using operationId/resultVersion.",
+                      "required": [
+                        "occurredAt"
+                      ],
+                      "properties": {
+                        "occurredAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "payment": {
+                          "$ref": "#/components/schemas/Payment"
+                        },
+                        "refund": {
+                          "$ref": "#/components/schemas/Refund"
+                        },
+                        "receipt": {
+                          "$ref": "#/components/schemas/PgTransactionReceipt"
+                        },
+                        "noEffectEvidenceId": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "operationId": "11111111-1111-4111-8111-111111111111",
+                  "kind": "APPROVE",
+                  "status": "REQUESTED",
+                  "orderId": "11111111-1111-4111-8111-111111111111",
+                  "resultVersion": 1,
+                  "simulated": true
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-implementation": "planned",
+        "x-requirements": [
+          "PAY-01"
+        ],
+        "x-authorized-roles": [
+          "commerce-service"
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "RS256 service JWT. Allowlisted Commerce issuer/sub, payment-service audience, 60s expiry and operation-specific scope. No browser bearer tokens."
+      }
+    },
+    "parameters": {
+      "IdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "^[A-Za-z0-9._:-]+$"
+        }
+      },
+      "PaymentAttemptId": {
+        "name": "paymentAttemptId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "PaymentId": {
+        "name": "paymentId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "schemas": {
+      "NonNegativeMoney": {
+        "type": "object",
+        "required": [
+          "currency",
+          "amount"
+        ],
+        "properties": {
+          "currency": {
+            "type": "string",
+            "const": "KRW"
+          },
+          "amount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 100000000
+          }
+        }
+      },
+      "PaymentUnit": {
+        "type": "object",
+        "required": [
+          "unitOrdinal",
+          "productAmount",
+          "discountAmount",
+          "paidAmount",
+          "commissionAmount"
+        ],
+        "properties": {
+          "unitOrdinal": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 99
+          },
+          "productAmount": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000000
+          },
+          "discountAmount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000000
+          },
+          "paidAmount": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000000
+          },
+          "commissionAmount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000000
+          }
+        }
+      },
+      "RefundItemAllocation": {
+        "type": "object",
+        "required": [
+          "orderItemId",
+          "unitOrdinals",
+          "productRefundAmount",
+          "discountReversalAmount",
+          "taxRefundAmount",
+          "refundAmount"
+        ],
+        "properties": {
+          "orderItemId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "unitOrdinals": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 99,
+            "uniqueItems": true,
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 99
+            }
+          },
+          "productRefundAmount": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000000
+          },
+          "discountReversalAmount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000000
+          },
+          "taxRefundAmount": {
+            "type": "integer",
+            "const": 0
+          },
+          "refundAmount": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000000
+          }
+        }
+      },
+      "RefundChargeAllocation": {
+        "type": "object",
+        "required": [
+          "orderChargeId",
+          "amount"
+        ],
+        "properties": {
+          "orderChargeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000000
+          }
+        }
+      },
+      "Actor": {
+        "type": "object",
+        "required": [
+          "actorType"
+        ],
+        "properties": {
+          "actorType": {
+            "type": "string",
+            "enum": [
+              "MEMBER",
+              "SELLER_MEMBER",
+              "ADMIN",
+              "SYSTEM"
+            ]
+          },
+          "actorId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "actorType": {
+                  "enum": [
+                    "MEMBER",
+                    "SELLER_MEMBER",
+                    "ADMIN"
+                  ]
+                }
+              },
+              "required": [
+                "actorType"
+              ]
+            },
+            "then": {
+              "required": [
+                "actorId"
+              ],
+              "properties": {
+                "actorId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CancellationRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Actor"
+          },
+          {
+            "type": "object",
+            "required": [
+              "reasonCode"
+            ],
+            "properties": {
+              "claimId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "compensationId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "reasonCode": {
+                "type": "string",
+                "enum": [
+                  "CUSTOMER_CANCEL",
+                  "ORDER_COMPENSATION"
+                ]
+              }
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "claimId"
+                ],
+                "properties": {
+                  "claimId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              },
+              {
+                "required": [
+                  "compensationId"
+                ],
+                "properties": {
+                  "compensationId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "OrderGuardResult": {
+        "type": "object",
+        "required": [
+          "orderId",
+          "outcome",
+          "guardVersion"
+        ],
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "CLOSED_NO_EFFECT",
+              "IN_FLIGHT",
+              "PAYMENT_EXISTS"
+            ]
+          },
+          "guardVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "attemptId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "REQUESTED",
+              "PENDING",
+              "UNKNOWN",
+              "SUCCEEDED"
+            ]
+          }
+        }
+      },
+      "PgTransactionReceipt": {
+        "type": "object",
+        "required": [
+          "transactionId",
+          "paymentId",
+          "merchantTxId",
+          "transactionType",
+          "idempotencyKey",
+          "amount",
+          "currency",
+          "status",
+          "occurredAt",
+          "simulated"
+        ],
+        "properties": {
+          "transactionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "merchantTxId": {
+            "type": "string"
+          },
+          "transactionType": {
+            "type": "string",
+            "enum": [
+              "APPROVE",
+              "CANCEL",
+              "REFUND"
+            ]
+          },
+          "idempotencyKey": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000000
+          },
+          "currency": {
+            "type": "string",
+            "const": "KRW"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "SUCCEEDED",
+              "FAILED"
+            ]
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "simulated": {
+            "type": "boolean",
+            "const": true
+          }
+        }
+      },
+      "PgPaymentSnapshot": {
+        "type": "object",
+        "required": [
+          "paymentId",
+          "merchantTxId",
+          "currency",
+          "amount",
+          "status",
+          "refundedAmount",
+          "simulated"
+        ],
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "merchantTxId": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string",
+            "const": "KRW"
+          },
+          "amount": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000000
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "CANCELLED",
+              "PARTIALLY_REFUNDED",
+              "REFUNDED"
+            ]
+          },
+          "refundedAmount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000000
+          },
+          "simulated": {
+            "type": "boolean",
+            "const": true
+          }
+        }
+      },
+      "PgWebhook": {
+        "type": "object",
+        "description": "Verify HMAC on raw bytes before JSON parsing; maximum 256 KiB.",
+        "required": [
+          "eventId",
+          "provider",
+          "eventType",
+          "occurredAt",
+          "transaction",
+          "payment",
+          "simulated"
+        ],
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "KAKAO",
+              "NAVER"
+            ]
+          },
+          "eventType": {
+            "type": "string",
+            "enum": [
+              "PaymentApproved",
+              "PaymentCancelled",
+              "PaymentRefunded"
+            ]
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "transaction": {
+            "$ref": "#/components/schemas/PgTransactionReceipt"
+          },
+          "payment": {
+            "$ref": "#/components/schemas/PgPaymentSnapshot"
+          },
+          "simulated": {
+            "type": "boolean",
+            "const": true
+          }
+        }
+      },
+      "Money": {
+        "type": "object",
+        "required": [
+          "currency",
+          "amount"
+        ],
+        "properties": {
+          "currency": {
+            "type": "string",
+            "enum": [
+              "KRW"
+            ],
+            "example": "KRW"
+          },
+          "amount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 100000000,
+            "example": 10000
+          }
+        }
+      },
+      "PreparePaymentRequest": {
+        "type": "object",
+        "description": "Internal Commerce-to-Payment request. The caller must be an authenticated Commerce service;\nclients must not submit a price or order reference directly to Payment.\n",
+        "required": [
+          "checkoutId",
+          "checkoutRevision",
+          "orderId",
+          "memberId",
+          "paymentRequestId",
+          "pricingPolicyVersion",
+          "provider",
+          "merchantTxId",
+          "paymentMethod",
+          "amount",
+          "expiresAt",
+          "items",
+          "charges"
+        ],
+        "properties": {
+          "checkoutId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "checkoutRevision": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "memberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "paymentRequestId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "pricingPolicyVersion": {
+            "type": "string",
+            "minLength": 1
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "KAKAO",
+              "NAVER"
+            ]
+          },
+          "merchantTxId": {
+            "type": "string",
+            "pattern": "^mp-[0-9a-f-]{36}-[0-9a-f-]{36}$",
+            "description": "mp-orderId-paymentRequestId; verified against UUID fields."
+          },
+          "paymentMethod": {
+            "type": "string",
+            "const": "SIMULATED"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/CheckoutPaymentItem"
+            }
+          },
+          "charges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CheckoutPaymentCharge"
+            }
+          }
+        }
+      },
+      "CheckoutPaymentItem": {
+        "type": "object",
+        "required": [
+          "orderItemId",
+          "sellerId",
+          "quantity",
+          "productAmount",
+          "discountAmount",
+          "taxAmount",
+          "paidAmount",
+          "units"
+        ],
+        "properties": {
+          "orderItemId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sellerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 99
+          },
+          "units": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 99,
+            "items": {
+              "$ref": "#/components/schemas/PaymentUnit"
+            }
+          },
+          "productAmount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 100000000
+          },
+          "discountAmount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 100000000
+          },
+          "taxAmount": {
+            "type": "integer",
+            "const": 0
+          },
+          "paidAmount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 100000000,
+            "description": "productAmount - discountAmount + taxAmount"
+          }
+        }
+      },
+      "CheckoutPaymentCharge": {
+        "type": "object",
+        "required": [
+          "orderChargeId",
+          "sellerId",
+          "chargeType",
+          "amount"
+        ],
+        "properties": {
+          "orderChargeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sellerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "chargeType": {
+            "type": "string",
+            "const": "SHIPPING"
+          },
+          "amount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 100000000
+          }
+        }
+      },
+      "PaymentAttempt": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PreparePaymentRequest"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "status",
+              "simulated"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "simulated": {
+                "type": "boolean",
+                "const": true
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "CREATED",
+                  "REQUESTED",
+                  "PENDING",
+                  "SUCCEEDED",
+                  "FAILED",
+                  "UNKNOWN",
+                  "CANCELLED"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "Payment": {
+        "type": "object",
+        "required": [
+          "id",
+          "paymentAttemptId",
+          "orderId",
+          "provider",
+          "providerPaymentKey",
+          "amount",
+          "refundedAmount",
+          "voidedAmount",
+          "status",
+          "approvedAt",
+          "simulated",
+          "operationId",
+          "resultVersion"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "operationId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Source operation for this result; reconcile immutable facts via payment-operations."
+          },
+          "resultVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "paymentAttemptId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "KAKAO",
+              "NAVER"
+            ]
+          },
+          "providerPaymentKey": {
+            "type": "string"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "const": "SIMULATED"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "refundedAmount": {
+            "type": "object",
+            "required": [
+              "currency",
+              "amount"
+            ],
+            "properties": {
+              "currency": {
+                "type": "string",
+                "enum": [
+                  "KRW"
+                ]
+              },
+              "amount": {
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0,
+                "maximum": 100000000
+              }
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "PARTIALLY_REFUNDED",
+              "REFUNDED",
+              "VOIDED"
+            ]
+          },
+          "approvedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "simulated": {
+            "type": "boolean",
+            "const": true
+          },
+          "voidedAmount": {
+            "$ref": "#/components/schemas/NonNegativeMoney"
+          }
+        }
+      },
+      "RefundRequest": {
+        "type": "object",
+        "required": [
+          "amount",
+          "reasonCode",
+          "requestedByType",
+          "items",
+          "charges"
+        ],
+        "properties": {
+          "claimId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "compensationId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "approvalId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/RefundItemAllocation"
+            }
+          },
+          "charges": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/RefundChargeAllocation"
+            }
+          },
+          "amount": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "reasonCode": {
+            "type": "string",
+            "enum": [
+              "CUSTOMER_CANCEL",
+              "BUYER_RETURN",
+              "SELLER_FAULT",
+              "LOST_SHIPMENT",
+              "EXCHANGE_UNAVAILABLE",
+              "ORDER_COMPENSATION",
+              "APPROVED_ADJUSTMENT"
+            ]
+          },
+          "reasonText": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "requestedByType": {
+            "type": "string",
+            "enum": [
+              "MEMBER",
+              "SELLER_MEMBER",
+              "ADMIN",
+              "SYSTEM"
+            ]
+          },
+          "requestedById": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "claimId"
+            ],
+            "properties": {
+              "claimId": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "required": [
+              "compensationId"
+            ],
+            "properties": {
+              "compensationId": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "reasonCode": {
+                  "const": "APPROVED_ADJUSTMENT"
+                }
+              },
+              "required": [
+                "reasonCode"
+              ]
+            },
+            "then": {
+              "required": [
+                "approvalId"
+              ],
+              "properties": {
+                "approvalId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "requestedByType": {
+                  "enum": [
+                    "MEMBER",
+                    "SELLER_MEMBER",
+                    "ADMIN"
+                  ]
+                }
+              },
+              "required": [
+                "requestedByType"
+              ]
+            },
+            "then": {
+              "required": [
+                "requestedById"
+              ],
+              "properties": {
+                "requestedById": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Refund": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RefundRequest"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "paymentId",
+              "status",
+              "actualRefundedAmount",
+              "simulated",
+              "operationId",
+              "resultVersion"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "operationId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "resultVersion": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "paymentId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "simulated": {
+                "type": "boolean",
+                "const": true
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "REQUESTED",
+                  "PROCESSING",
+                  "SUCCEEDED",
+                  "FAILED",
+                  "UNKNOWN",
+                  "CANCELLED"
+                ]
+              },
+              "actualRefundedAmount": {
+                "type": "object",
+                "required": [
+                  "currency",
+                  "amount"
+                ],
+                "properties": {
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "KRW"
+                    ]
+                  },
+                  "amount": {
+                    "type": "integer",
+                    "format": "int64",
+                    "minimum": 0,
+                    "maximum": 100000000
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "OperationPending": {
+        "type": "object",
+        "required": [
+          "operationId",
+          "status",
+          "statusUrl",
+          "simulated"
+        ],
+        "properties": {
+          "operationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "UNKNOWN"
+            ]
+          },
+          "statusUrl": {
+            "type": "string"
+          },
+          "simulated": {
+            "type": "boolean",
+            "const": true
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "traceId"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "REFUND_EXCEEDS_REMAINING"
+          },
+          "message": {
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "responses": {
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Idempotency or state conflict",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Invalid request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "ProviderError": {
+        "description": "Provider call could not be dispatched. Ambiguous dispatched results must be retained as UNKNOWN and returned via 202, not retried as a new operation.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    }
+  }
+}

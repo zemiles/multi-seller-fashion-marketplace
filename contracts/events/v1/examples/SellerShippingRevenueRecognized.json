@@ -1,0 +1,25 @@
+{
+  "eventId": "00000000-0000-4000-8000-000000000106",
+  "eventType": "SellerShippingRevenueRecognized",
+  "eventVersion": 1,
+  "producer": "commerce-service",
+  "aggregateType": "ORDER_SELLER",
+  "aggregateId": "00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002",
+  "aggregateVersion": 1,
+  "occurredAt": "2026-09-22T00:00:00Z",
+  "correlationId": "00000000-0000-4000-8000-000000000040",
+  "causationId": "00000000-0000-4000-8000-000000000010",
+  "traceId": "cccccccccccccccccccccccccccccccc",
+  "payload": {
+    "orderId": "00000000-0000-4000-8000-000000000001",
+    "sellerId": "00000000-0000-4000-8000-000000000002",
+    "orderChargeId": "00000000-0000-4000-8000-000000000006",
+    "amount": {
+      "currency": "KRW",
+      "amount": 3000
+    },
+    "currency": "KRW",
+    "priorFinancialVersion": 0
+  },
+  "simulated": true
+}

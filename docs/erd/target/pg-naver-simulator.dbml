@@ -1,0 +1,52 @@
+Project marketplace {
+  database_type: 'PostgreSQL'
+  Note: 'Documentation namespaces stand for separate service databases. No cross-service physical FK. CURRENT is migration-derived; PLANNED requires future migrations.'
+}
+
+Table pg2.pg_payment {
+  payment_id "uuid" [not null, pk, note: 'payment_id uuid PRIMARY KEY']
+  merchant_tx_id "text" [not null, unique, note: 'merchant_tx_id text NOT NULL UNIQUE']
+  currency "varchar(3)" [not null, note: 'currency varchar(3) NOT NULL']
+  amount "bigint" [not null, note: 'amount bigint NOT NULL']
+  status "text" [not null, note: 'status text NOT NULL DEFAULT \'APPROVED\'']
+  refunded_amount "bigint" [not null, note: 'refunded_amount bigint NOT NULL DEFAULT 0']
+  created_at "timestamp with time zone" [not null, note: 'created_at timestamp with time zone NOT NULL DEFAULT now()']
+  updated_at "timestamp with time zone" [not null, note: 'updated_at timestamp with time zone NOT NULL DEFAULT now()']
+}
+
+Table pg2.pg_transaction {
+  transaction_id "uuid" [not null, pk, note: 'transaction_id uuid PRIMARY KEY']
+  payment_id "uuid" [not null, note: 'payment_id uuid NOT NULL REFERENCES pgnaver.pg_payment(payment_id)']
+  transaction_type "text" [not null, note: 'transaction_type text NOT NULL']
+  amount "bigint" [not null, note: 'amount bigint NOT NULL']
+  status "text" [not null, note: 'status text NOT NULL']
+  idempotency_key "text" [null, note: 'idempotency_key text']
+  created_at "timestamp with time zone" [not null, note: 'created_at timestamp with time zone NOT NULL DEFAULT now()']
+  indexes {
+    (payment_id, transaction_type, idempotency_key) [unique]
+  }
+}
+
+Table pg2.pg_webhook_outbox {
+  event_id "uuid" [not null, pk, note: 'PLANNED event_id uuid NOT NULL']
+  transaction_id "uuid" [not null, note: 'PLANNED transaction_id uuid NOT NULL']
+  body "jsonb" [not null, note: 'PLANNED body jsonb NOT NULL']
+  body_hash "text" [not null, note: 'PLANNED body_hash text NOT NULL']
+  status "text" [not null, note: 'PLANNED status text NOT NULL']
+  attempt_count "integer" [not null, note: 'PLANNED attempt_count integer NOT NULL']
+  next_retry_at "timestamptz" [not null, note: 'PLANNED next_retry_at timestamptz NOT NULL']
+  lease_expires_at "timestamptz" [null, note: 'PLANNED lease_expires_at timestamptz NULL']
+  created_at "timestamptz" [not null, note: 'PLANNED created_at timestamptz NOT NULL']
+}
+
+Table pg2.pg_fault_scenario {
+  scenario_id "uuid" [not null, pk, note: 'PLANNED scenario_id uuid NOT NULL']
+  scenario_type "text" [not null, note: 'PLANNED scenario_type text NOT NULL']
+  remaining_uses "integer" [not null, note: 'PLANNED remaining_uses integer NOT NULL']
+  delay_ms "integer" [not null, note: 'PLANNED delay_ms integer NOT NULL']
+  expires_at "timestamptz" [not null, note: 'PLANNED expires_at timestamptz NOT NULL']
+  enabled "boolean" [not null, note: 'PLANNED enabled boolean NOT NULL']
+}
+
+Ref pg2_pg_transaction_payment_id_fkey: pg2.pg_transaction.payment_id > pg2.pg_payment.payment_id
+Ref pg2_pg_webhook_outbox_transaction_id_planned_fk: pg2.pg_webhook_outbox.transaction_id > pg2.pg_transaction.transaction_id

@@ -1,0 +1,638 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PG1 · PG2 현재 구현 API",
+    "version": "current-2026-09-21",
+    "description": "현재 코드에 구현된 공통 4개 경로. 무인증, 임의 대문자 3자리 통화, 양수 long. v1 목표 인증/통화 제한/웹훅/조회 확장은 별도 명세."
+  },
+  "x-owner-service": "pg-simulator",
+  "servers": [
+    {
+      "url": "http://localhost:8090",
+      "description": "PG1 / KAKAO"
+    },
+    {
+      "url": "http://localhost:8091",
+      "description": "PG2 / NAVER"
+    }
+  ],
+  "paths": {
+    "/pg/v1/payments/approve": {
+      "post": {
+        "operationId": "pgApprove",
+        "summary": "pgApprove",
+        "tags": [
+          "현재 PG"
+        ],
+        "security": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "최신 PG payment snapshot. 최초 응답 캐시/불변 거래 영수증이 아님.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgPayment"
+                },
+                "example": {
+                  "paymentId": "11111111-1111-4111-8111-111111111111",
+                  "merchantTxId": "mp-11111111-1111-4111-8111-111111111111-11111111-1111-4111-8111-111111111111",
+                  "currency": "KRW",
+                  "amount": 10000,
+                  "status": "APPROVED",
+                  "refundedAmount": 0
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "provider별 오류 코드 KAKAO_PG_xxx/NAVER_PG_xxx 또는 HTTP_xxx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgError"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "timestamp": "2026-09-21T00:00:00Z",
+                  "path": "sample"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "provider별 오류 코드 KAKAO_PG_xxx/NAVER_PG_xxx 또는 HTTP_xxx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgError"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "timestamp": "2026-09-21T00:00:00Z",
+                  "path": "sample"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "provider별 오류 코드 KAKAO_PG_xxx/NAVER_PG_xxx 또는 HTTP_xxx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgError"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "timestamp": "2026-09-21T00:00:00Z",
+                  "path": "sample"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "provider별 오류 코드 KAKAO_PG_xxx/NAVER_PG_xxx 또는 HTTP_xxx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgError"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "timestamp": "2026-09-21T00:00:00Z",
+                  "path": "sample"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation": "implemented",
+        "x-requirements": [
+          "PG-01"
+        ],
+        "x-authorized-roles": [
+          "LOCAL_NETWORK_ONLY"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PgApprove"
+              },
+              "example": {
+                "merchantTxId": "mp-11111111-1111-4111-8111-111111111111-11111111-1111-4111-8111-111111111111",
+                "currency": "KRW",
+                "amount": 10000,
+                "idempotencyKey": "sample"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pg/v1/payments/{paymentId}/cancel": {
+      "post": {
+        "operationId": "pgCancel",
+        "summary": "pgCancel",
+        "tags": [
+          "현재 PG"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "paymentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "최신 PG payment snapshot. 최초 응답 캐시/불변 거래 영수증이 아님.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgPayment"
+                },
+                "example": {
+                  "paymentId": "11111111-1111-4111-8111-111111111111",
+                  "merchantTxId": "mp-11111111-1111-4111-8111-111111111111-11111111-1111-4111-8111-111111111111",
+                  "currency": "KRW",
+                  "amount": 10000,
+                  "status": "APPROVED",
+                  "refundedAmount": 0
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "provider별 오류 코드 KAKAO_PG_xxx/NAVER_PG_xxx 또는 HTTP_xxx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgError"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "timestamp": "2026-09-21T00:00:00Z",
+                  "path": "sample"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "provider별 오류 코드 KAKAO_PG_xxx/NAVER_PG_xxx 또는 HTTP_xxx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgError"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "timestamp": "2026-09-21T00:00:00Z",
+                  "path": "sample"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "provider별 오류 코드 KAKAO_PG_xxx/NAVER_PG_xxx 또는 HTTP_xxx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgError"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "timestamp": "2026-09-21T00:00:00Z",
+                  "path": "sample"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "provider별 오류 코드 KAKAO_PG_xxx/NAVER_PG_xxx 또는 HTTP_xxx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgError"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "timestamp": "2026-09-21T00:00:00Z",
+                  "path": "sample"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation": "implemented",
+        "x-requirements": [
+          "PG-01"
+        ],
+        "x-authorized-roles": [
+          "LOCAL_NETWORK_ONLY"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PgCancel"
+              },
+              "example": {
+                "idempotencyKey": "sample"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pg/v1/payments/{paymentId}/refund": {
+      "post": {
+        "operationId": "pgRefund",
+        "summary": "pgRefund",
+        "tags": [
+          "현재 PG"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "paymentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "최신 PG payment snapshot. 최초 응답 캐시/불변 거래 영수증이 아님.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgPayment"
+                },
+                "example": {
+                  "paymentId": "11111111-1111-4111-8111-111111111111",
+                  "merchantTxId": "mp-11111111-1111-4111-8111-111111111111-11111111-1111-4111-8111-111111111111",
+                  "currency": "KRW",
+                  "amount": 10000,
+                  "status": "APPROVED",
+                  "refundedAmount": 0
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "provider별 오류 코드 KAKAO_PG_xxx/NAVER_PG_xxx 또는 HTTP_xxx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgError"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "timestamp": "2026-09-21T00:00:00Z",
+                  "path": "sample"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "provider별 오류 코드 KAKAO_PG_xxx/NAVER_PG_xxx 또는 HTTP_xxx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgError"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "timestamp": "2026-09-21T00:00:00Z",
+                  "path": "sample"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "provider별 오류 코드 KAKAO_PG_xxx/NAVER_PG_xxx 또는 HTTP_xxx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgError"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "timestamp": "2026-09-21T00:00:00Z",
+                  "path": "sample"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "provider별 오류 코드 KAKAO_PG_xxx/NAVER_PG_xxx 또는 HTTP_xxx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgError"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "timestamp": "2026-09-21T00:00:00Z",
+                  "path": "sample"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation": "implemented",
+        "x-requirements": [
+          "PG-01"
+        ],
+        "x-authorized-roles": [
+          "LOCAL_NETWORK_ONLY"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PgRefund"
+              },
+              "example": {
+                "amount": 1000,
+                "idempotencyKey": "sample"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pg/v1/payments/{paymentId}": {
+      "get": {
+        "operationId": "pgGetPayment",
+        "summary": "pgGetPayment",
+        "tags": [
+          "현재 PG"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "paymentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "최신 PG payment snapshot. 최초 응답 캐시/불변 거래 영수증이 아님.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgPayment"
+                },
+                "example": {
+                  "paymentId": "11111111-1111-4111-8111-111111111111",
+                  "merchantTxId": "mp-11111111-1111-4111-8111-111111111111-11111111-1111-4111-8111-111111111111",
+                  "currency": "KRW",
+                  "amount": 10000,
+                  "status": "APPROVED",
+                  "refundedAmount": 0
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "provider별 오류 코드 KAKAO_PG_xxx/NAVER_PG_xxx 또는 HTTP_xxx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgError"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "timestamp": "2026-09-21T00:00:00Z",
+                  "path": "sample"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "provider별 오류 코드 KAKAO_PG_xxx/NAVER_PG_xxx 또는 HTTP_xxx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgError"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "timestamp": "2026-09-21T00:00:00Z",
+                  "path": "sample"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "provider별 오류 코드 KAKAO_PG_xxx/NAVER_PG_xxx 또는 HTTP_xxx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgError"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "timestamp": "2026-09-21T00:00:00Z",
+                  "path": "sample"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "provider별 오류 코드 KAKAO_PG_xxx/NAVER_PG_xxx 또는 HTTP_xxx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgError"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "timestamp": "2026-09-21T00:00:00Z",
+                  "path": "sample"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation": "implemented",
+        "x-requirements": [
+          "PG-01"
+        ],
+        "x-authorized-roles": [
+          "LOCAL_NETWORK_ONLY"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PgApprove": {
+        "type": "object",
+        "properties": {
+          "merchantTxId": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "amount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "merchantTxId",
+          "currency",
+          "amount",
+          "idempotencyKey"
+        ]
+      },
+      "PgCancel": {
+        "type": "object",
+        "properties": {
+          "idempotencyKey": {
+            "type": "string",
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "idempotencyKey"
+        ]
+      },
+      "PgRefund": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "amount",
+          "idempotencyKey"
+        ]
+      },
+      "PgPayment": {
+        "type": "object",
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "merchantTxId": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "amount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "CANCELLED",
+              "PARTIALLY_REFUNDED",
+              "REFUNDED"
+            ]
+          },
+          "refundedAmount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "paymentId",
+          "merchantTxId",
+          "currency",
+          "amount",
+          "status",
+          "refundedAmount"
+        ]
+      },
+      "PgError": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "timestamp",
+          "path"
+        ]
+      }
+    },
+    "securitySchemes": {}
+  }
+}

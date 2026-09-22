@@ -1,33 +1,33 @@
-# 결제 서비스
+# Payment Service
 
-## 현재 구현 범위
+상세 구현 기준은 [BACKEND_DESIGN](../docs/BACKEND_DESIGN.md), 실행은 [MSA](../MSA.md)를 따릅니다.
 
-2026-09-09 기준 PG와 무관한 도메인 모델 및 내부 유스케이스 인터페이스를 마련했습니다. 이 단계에는 실행 가능한 결제 API, DB 저장, PG 승인·취소 호출, 웹훅 처리, 이벤트 발행이 없습니다. 인터페이스를 Spring Bean으로 등록하거나 임시 성공 응답을 반환하지 않습니다.
+## 현재 구현
 
-| 패키지 | 구성 |
-| --- | --- |
-| transaction.domain | PaymentAmount, PaymentAttempt, Payment, 결제 시도·결제·거래 상태 및 거래 유형 |
-| transaction.application | PaymentUseCase: 결제 시도 준비, 시도 조회, 승인 결제 조회 |
-| refund.domain | Refund, 환불 상태, 요청자 유형 |
-| refund.application | RefundUseCase: 환불 요청 등록, 조회 |
-| webhook.domain | WebhookStatus |
+`PaymentAmount`, `PaymentAttempt`, `Payment`, `Refund` 불변 snapshot과 상태 enum, 내부 port, 메모리 `PaymentLifecycleService`가 있습니다. 이 클래스는 Spring Bean이 아니며 REST Controller·JPA repository·provider HTTP adapter·거래/배분 영속화·webhook·outbox 발행은 미구현입니다.
 
-금액은 외부 database 문서와 동일하게 통화의 최소 단위 정수(long)로 표현합니다. 통화 형식, 양수 요청 금액, 누적 환불 상한 등을 검증합니다. 상태 enum은 기존 V1 SQL의 CHECK 값에 맞췄으며, 상태 전이 규칙은 아직 구현하지 않았습니다.
+`prepare`는 provider/key와 provider/merchantTxId를 검사하고 동일 주문의 미해결/성공 시도를 다른 provider까지 차단합니다. 같은 key의 요청 내용은 같아야 합니다. `approve`는 요청 전 REQUESTED, 성공 시 SUCCEEDED, 응답 유실·불일치·예외 시 UNKNOWN을 보존합니다. UNKNOWN/PENDING을 approve로 재호출하지 않습니다.
 
-모델은 핵심 필드만 포함한 불변 스냅샷이며 JPA Entity나 DB 전체 행의 대체물이 아닙니다. payment_item, 비용 배분, 거래 이력, 환불 항목·배송비 조정 및 webhook/outbox 영속 모델은 해당 유스케이스 구현 시 추가합니다. Payment.remainingAmount는 단순 회계 잔액이며 환불 가능 여부 판단이나 동시 환불 예약을 대신하지 않습니다.
+환불은 PG 호출 전에 필수값·통화·상태·미예약 잔액을 검증합니다. 같은 key에 금액·claim·사유·요청자가 다르면 거부합니다. SYSTEM 외 요청자 ID는 필수이나 인증·권한 검증 자체는 아직 없습니다. PG 요청에는 providerPaymentKey와 멱등 키를 전달합니다. UNKNOWN은 키와 금액 예약을 유지하며 동일 요청은 재호출 없이 기존 상태를 반환합니다.
 
-## 다음 구현 기준
+Map/synchronized는 단일 인스턴스에서만 유효합니다. 재시작하면 상태가 사라지므로 운영 처리에 사용하지 않습니다. UNKNOWN 해제/복구도 미구현입니다. 기존 V1의 주문/provider 부분 인덱스는 provider 변경이나 성공 후 재결제를 막지 못하므로 영속 구현 시 주문 기준 DB 보호를 추가합니다.
 
-1. 사용할 PG와 승인·취소 방식, 인증·인가와 HTTP 계약을 확정합니다. 내부 command record는 공개 API 계약이 아닙니다.
-2. Commerce에서 주문·체크아웃 소유권과 결제 금액을 확인한 뒤 결제 시도를 저장합니다. provider + idempotency_key 중복 요청은 내용까지 비교하며, 같은 주문에 미해결 시도가 있는지도 확인합니다.
-3. PG 승인 결과를 확인한 경우에만 Payment와 거래 이력·outbox를 같은 DB 트랜잭션에 기록합니다. 타임아웃처럼 결과가 불명확하면 UNKNOWN으로 남기고 PG 조회로 확인합니다. 네트워크 실패를 결제 실패나 재결제 허용으로 단정하지 않습니다.
-4. 환불은 결제별 멱등성, 통화, 요청자 권한, 상품·비용 배분과 진행 중 환불 금액을 검증하고 동시 요청을 원자적으로 제어해야 합니다. 현재 RefundUseCase에는 이 실행 구현이 없습니다.
-5. PG 웹훅은 원문 기반 검증과 provider + provider_event_id 중복 처리를 구현한 뒤 상태에 반영합니다. 현재는 상태값만 있습니다.
+## 데이터와 계약
 
-기존 V1 migration과 타 서비스는 변경하지 않았습니다. 상태 전이, JPA 매핑, PG adapter, Controller를 구현할 때 테스트 범위를 넓힙니다.
+Payment DB의 11개 테이블은 [설계 기준의 소유 목록](../docs/BACKEND_DESIGN.md#4-데이터-소유권과-변경-방법)에 있습니다. V1을 보존하고 V2에서 내부 FK 11개를 복원하여 총 14개로 맞췄습니다. 물리 테이블이 있다는 사실과 메모리 유스케이스가 DB에 저장된다는 것은 다릅니다.
+
+[Checkout 계약](../contracts/commerce-payment-checkout-contract-v0.1.md)과 [OpenAPI](../contracts/payment-service.openapi.yaml)는 v1 목표 계약이며 HTTP 구현은 아직 없습니다. [Payment/PG 전체 요구사항](../docs/requirements/03-payment-pg.md)의 영속 guard·close-order·수량 배분·복구를 함께 구현합니다. 현재 내부 PreparePayment에는 전체 snapshot이 없으므로 확장해야 합니다. 고객의 임의 금액을 신뢰하지 않고 인증된 Commerce 요청만 받습니다.
+
+## 다음 작업
+
+1. snapshot·attempt·결제·거래·환불·배분 영속화와 주문 단위 중복 결제 가드.
+2. provider별 HTTP adapter, 요청 전 commit, PG 결과 불명 복구.
+3. 결과·거래·outbox 원자적 저장 및 소비 측 inbox.
+4. webhook 원문 검증·중복·역순 처리.
+5. PG 거래 대사. Settlement DB의 과거 reconciliation 테이블을 직접 사용하지 않고 Payment 소유 migration으로 설계합니다.
+
+PG simulator 자체는 승인/취소/환불/조회 및 DB 잠금·멱등 처리를 구현했습니다. 실제 PG 연결, 인증, webhook, 대사 API는 없습니다.
 
 ## 검증
 
-프로젝트 루트에서 `.\gradlew.bat :payment-service:test`를 실행합니다. 금액·환불 경계와 멱등 키 필수값에 대한 단위 테스트 및 기존 Spring context 테스트가 있습니다.
-
-Docker Compose 컨테이너가 실행 중이면 로컬 bootRun의 8082 포트와 충돌합니다. 컨테이너를 먼저 중지하거나 별도 포트를 지정하세요.
+프로젝트 루트에서 `.\gradlew.bat :payment-service:test --no-daemon`을 실행합니다. 현재 총 18개 테스트로 금액·도메인 검증, 요청 변경 멱등 충돌, 외부 호출 전 검증, 주문/merchant 중복, UNKNOWN 차단·예약을 확인합니다. DB 영속·다중 프로세스·서비스 간 E2E 검증은 포함하지 않습니다.

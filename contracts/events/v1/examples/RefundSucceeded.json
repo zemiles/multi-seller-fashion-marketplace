@@ -1,0 +1,41 @@
+{
+  "eventId": "00000000-0000-4000-8000-000000000114",
+  "eventType": "RefundSucceeded",
+  "eventVersion": 1,
+  "producer": "payment-service",
+  "aggregateType": "PAYMENT_FLOW",
+  "aggregateId": "00000000-0000-4000-8000-000000000001",
+  "aggregateVersion": 1,
+  "occurredAt": "2026-09-22T00:00:00Z",
+  "correlationId": "00000000-0000-4000-8000-000000000040",
+  "causationId": "00000000-0000-4000-8000-000000000010",
+  "traceId": "cccccccccccccccccccccccccccccccc",
+  "payload": {
+    "operationId": "00000000-0000-4000-8000-000000000010",
+    "resultVersion": 1,
+    "orderId": "00000000-0000-4000-8000-000000000001",
+    "paymentId": "00000000-0000-4000-8000-000000000007",
+    "refundId": "00000000-0000-4000-8000-000000000019",
+    "claimId": "00000000-0000-4000-8000-000000000016",
+    "transactionId": "00000000-0000-4000-8000-000000000027",
+    "amount": {
+      "currency": "KRW",
+      "amount": 10000
+    },
+    "items": [
+      {
+        "orderItemId": "00000000-0000-4000-8000-000000000005",
+        "unitOrdinals": [
+          1
+        ],
+        "productRefundAmount": 10000,
+        "discountReversalAmount": 0,
+        "taxRefundAmount": 0,
+        "refundAmount": 10000
+      }
+    ],
+    "charges": [],
+    "completedAt": "2026-09-22T00:00:00Z"
+  },
+  "simulated": true
+}

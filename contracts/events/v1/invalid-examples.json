@@ -1,0 +1,1819 @@
+[
+  {
+    "id": "ProductRevisionPublished-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000100",
+      "eventType": "ProductRevisionPublished",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "PRODUCT",
+      "aggregateId": "00000000-0000-4000-8000-000000000003",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "revisionId": "00000000-0000-4000-8000-000000000004",
+        "revisionNumber": 1,
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "title": "모의 상품",
+        "categoryId": "00000000-0000-4000-8000-000000000012",
+        "brandId": null,
+        "imageUrl": "https://example.test/product.png",
+        "features": [
+          {
+            "key": "material",
+            "value": "cotton",
+            "source": "SELLER"
+          }
+        ],
+        "skuSummaries": [
+          {
+            "skuId": "00000000-0000-4000-8000-000000000013",
+            "price": 10000,
+            "available": true
+          }
+        ],
+        "publishedAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "ProductRevisionPublished-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000100",
+      "eventType": "ProductRevisionPublished",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "PRODUCT",
+      "aggregateId": "00000000-0000-4000-8000-000000000003",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "productId": "00000000-0000-4000-8000-000000000003",
+        "revisionId": "00000000-0000-4000-8000-000000000004",
+        "revisionNumber": 1,
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "title": "모의 상품",
+        "categoryId": "00000000-0000-4000-8000-000000000012",
+        "brandId": null,
+        "imageUrl": "https://example.test/product.png",
+        "features": [
+          {
+            "key": "material",
+            "value": "cotton",
+            "source": "SELLER"
+          }
+        ],
+        "skuSummaries": [
+          {
+            "skuId": "00000000-0000-4000-8000-000000000013",
+            "price": 10000,
+            "available": true
+          }
+        ],
+        "publishedAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "ProductAvailabilityChanged-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000101",
+      "eventType": "ProductAvailabilityChanged",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "PRODUCT",
+      "aggregateId": "00000000-0000-4000-8000-000000000003",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "revisionId": "00000000-0000-4000-8000-000000000004",
+        "saleStatus": "PAUSED",
+        "available": false,
+        "reasonCode": "SELLER_PAUSED"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "ProductAvailabilityChanged-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000101",
+      "eventType": "ProductAvailabilityChanged",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "PRODUCT",
+      "aggregateId": "00000000-0000-4000-8000-000000000003",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "productId": "00000000-0000-4000-8000-000000000003",
+        "revisionId": "00000000-0000-4000-8000-000000000004",
+        "saleStatus": "PAUSED",
+        "available": false,
+        "reasonCode": "SELLER_PAUSED"
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "OrderPaid-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000102",
+      "eventType": "OrderPaid",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "memberPseudonym": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "paymentId": "00000000-0000-4000-8000-000000000007",
+        "totalAmount": 13000,
+        "items": [
+          {
+            "productId": "00000000-0000-4000-8000-000000000003",
+            "revisionId": "00000000-0000-4000-8000-000000000004",
+            "quantity": 1
+          }
+        ]
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "OrderPaid-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000102",
+      "eventType": "OrderPaid",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "memberPseudonym": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "paymentId": "00000000-0000-4000-8000-000000000007",
+        "totalAmount": 13000,
+        "items": [
+          {
+            "productId": "00000000-0000-4000-8000-000000000003",
+            "revisionId": "00000000-0000-4000-8000-000000000004",
+            "quantity": 1
+          }
+        ]
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "ShipmentDelivered-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000103",
+      "eventType": "ShipmentDelivered",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "shipmentId": "00000000-0000-4000-8000-000000000014",
+        "items": [
+          {
+            "shipmentItemId": "00000000-0000-4000-8000-000000000015",
+            "orderItemId": "00000000-0000-4000-8000-000000000005",
+            "unitOrdinals": [
+              1
+            ]
+          }
+        ],
+        "deliveredAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "ShipmentDelivered-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000103",
+      "eventType": "ShipmentDelivered",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "shipmentId": "00000000-0000-4000-8000-000000000014",
+        "items": [
+          {
+            "shipmentItemId": "00000000-0000-4000-8000-000000000015",
+            "orderItemId": "00000000-0000-4000-8000-000000000005",
+            "unitOrdinals": [
+              1
+            ]
+          }
+        ],
+        "deliveredAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "ClaimStatusChanged-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000104",
+      "eventType": "ClaimStatusChanged",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "claimId": "00000000-0000-4000-8000-000000000016",
+        "status": "REQUESTED",
+        "reasonCode": "DEFECT",
+        "affectedUnitIds": [
+          "00000000-0000-4000-8000-000000000005:1"
+        ]
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "ClaimStatusChanged-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000104",
+      "eventType": "ClaimStatusChanged",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "claimId": "00000000-0000-4000-8000-000000000016",
+        "status": "REQUESTED",
+        "reasonCode": "DEFECT",
+        "affectedUnitIds": [
+          "00000000-0000-4000-8000-000000000005:1"
+        ]
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "PurchaseConfirmed-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000105",
+      "eventType": "PurchaseConfirmed",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER_SELLER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "confirmationId": "00000000-0000-4000-8000-000000000017",
+        "priorFinancialVersion": 0,
+        "units": [
+          {
+            "orderItemId": "00000000-0000-4000-8000-000000000005",
+            "unitOrdinal": 1,
+            "paidAmount": 10000,
+            "commissionAmount": 1000
+          }
+        ],
+        "currency": "KRW",
+        "policyVersion": "pricing-v1"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "PurchaseConfirmed-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000105",
+      "eventType": "PurchaseConfirmed",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER_SELLER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "confirmationId": "00000000-0000-4000-8000-000000000017",
+        "priorFinancialVersion": 0,
+        "units": [
+          {
+            "orderItemId": "00000000-0000-4000-8000-000000000005",
+            "unitOrdinal": 1,
+            "paidAmount": 10000,
+            "commissionAmount": 1000
+          }
+        ],
+        "currency": "KRW",
+        "policyVersion": "pricing-v1"
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "SellerShippingRevenueRecognized-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000106",
+      "eventType": "SellerShippingRevenueRecognized",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER_SELLER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "orderChargeId": "00000000-0000-4000-8000-000000000006",
+        "amount": {
+          "currency": "KRW",
+          "amount": 3000
+        },
+        "currency": "KRW",
+        "priorFinancialVersion": 0
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "SellerShippingRevenueRecognized-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000106",
+      "eventType": "SellerShippingRevenueRecognized",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER_SELLER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "orderChargeId": "00000000-0000-4000-8000-000000000006",
+        "amount": {
+          "currency": "KRW",
+          "amount": 3000
+        },
+        "currency": "KRW",
+        "priorFinancialVersion": 0
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "SellerFinancialAdjusted-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000107",
+      "eventType": "SellerFinancialAdjusted",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER_SELLER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "adjustmentId": "00000000-0000-4000-8000-000000000018",
+        "refundId": "00000000-0000-4000-8000-000000000019",
+        "reasonCode": "APPROVED_RETURN",
+        "priorFinancialVersion": 0,
+        "adjustments": [
+          {
+            "sourceUnitOrChargeId": "UNIT:00000000-0000-4000-8000-000000000005:1",
+            "originalRecognitionId": "00000000-0000-4000-8000-000000000020",
+            "signedRevenueAmount": -10000,
+            "signedFeeAmount": 1000
+          }
+        ],
+        "currency": "KRW"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "SellerFinancialAdjusted-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000107",
+      "eventType": "SellerFinancialAdjusted",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER_SELLER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "adjustmentId": "00000000-0000-4000-8000-000000000018",
+        "refundId": "00000000-0000-4000-8000-000000000019",
+        "reasonCode": "APPROVED_RETURN",
+        "priorFinancialVersion": 0,
+        "adjustments": [
+          {
+            "sourceUnitOrChargeId": "UNIT:00000000-0000-4000-8000-000000000005:1",
+            "originalRecognitionId": "00000000-0000-4000-8000-000000000020",
+            "signedRevenueAmount": -10000,
+            "signedFeeAmount": 1000
+          }
+        ],
+        "currency": "KRW"
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "SellerSettlementHoldChanged-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000108",
+      "eventType": "SellerSettlementHoldChanged",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER_SELLER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "holdId": "00000000-0000-4000-8000-000000000021",
+        "holdVersion": 1,
+        "action": "PLACE",
+        "reasonCode": "CLAIM_OPENED",
+        "unitIds": [
+          "00000000-0000-4000-8000-000000000005:1"
+        ],
+        "amount": {
+          "currency": "KRW",
+          "amount": 9000
+        },
+        "currency": "KRW"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "SellerSettlementHoldChanged-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000108",
+      "eventType": "SellerSettlementHoldChanged",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER_SELLER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "holdId": "00000000-0000-4000-8000-000000000021",
+        "holdVersion": 1,
+        "action": "PLACE",
+        "reasonCode": "CLAIM_OPENED",
+        "unitIds": [
+          "00000000-0000-4000-8000-000000000005:1"
+        ],
+        "amount": {
+          "currency": "KRW",
+          "amount": 9000
+        },
+        "currency": "KRW"
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "SellerPenaltyApplied-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000109",
+      "eventType": "SellerPenaltyApplied",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "SELLER_CONTROL",
+      "aggregateId": "00000000-0000-4000-8000-000000000002",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "penaltyId": "00000000-0000-4000-8000-000000000022",
+        "approvalId": "00000000-0000-4000-8000-000000000023",
+        "type": "FEE",
+        "amount": {
+          "currency": "KRW",
+          "amount": 1000
+        },
+        "currency": "KRW",
+        "action": "APPLY"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "SellerPenaltyApplied-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000109",
+      "eventType": "SellerPenaltyApplied",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "SELLER_CONTROL",
+      "aggregateId": "00000000-0000-4000-8000-000000000002",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "penaltyId": "00000000-0000-4000-8000-000000000022",
+        "approvalId": "00000000-0000-4000-8000-000000000023",
+        "type": "FEE",
+        "amount": {
+          "currency": "KRW",
+          "amount": 1000
+        },
+        "currency": "KRW",
+        "action": "APPLY"
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "PaymentApproved-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000110",
+      "eventType": "PaymentApproved",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "attemptId": "00000000-0000-4000-8000-000000000008",
+        "paymentId": "00000000-0000-4000-8000-000000000007",
+        "provider": "KAKAO",
+        "merchantTxId": "mp-00000000-0000-4000-8000-000000000001-00000000-0000-4000-8000-000000000009",
+        "providerPaymentKey": "00000000-0000-4000-8000-000000000024",
+        "amount": {
+          "currency": "KRW",
+          "amount": 13000
+        },
+        "approvedAt": "2026-09-22T00:00:00Z",
+        "snapshotHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "items": [
+          {
+            "orderItemId": "00000000-0000-4000-8000-000000000005",
+            "sellerId": "00000000-0000-4000-8000-000000000002",
+            "quantity": 1,
+            "productAmount": 10000,
+            "discountAmount": 0,
+            "taxAmount": 0,
+            "paidAmount": 10000,
+            "units": [
+              {
+                "unitOrdinal": 1,
+                "productAmount": 10000,
+                "discountAmount": 0,
+                "paidAmount": 10000,
+                "commissionAmount": 1000
+              }
+            ]
+          }
+        ],
+        "charges": [
+          {
+            "orderChargeId": "00000000-0000-4000-8000-000000000006",
+            "sellerId": "00000000-0000-4000-8000-000000000002",
+            "chargeType": "SHIPPING",
+            "amount": 3000
+          }
+        ]
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "PaymentApproved-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000110",
+      "eventType": "PaymentApproved",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "operationId": "00000000-0000-4000-8000-000000000010",
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "attemptId": "00000000-0000-4000-8000-000000000008",
+        "paymentId": "00000000-0000-4000-8000-000000000007",
+        "provider": "KAKAO",
+        "merchantTxId": "mp-00000000-0000-4000-8000-000000000001-00000000-0000-4000-8000-000000000009",
+        "providerPaymentKey": "00000000-0000-4000-8000-000000000024",
+        "amount": {
+          "currency": "KRW",
+          "amount": 13000
+        },
+        "approvedAt": "2026-09-22T00:00:00Z",
+        "snapshotHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "items": [
+          {
+            "orderItemId": "00000000-0000-4000-8000-000000000005",
+            "sellerId": "00000000-0000-4000-8000-000000000002",
+            "quantity": 1,
+            "productAmount": 10000,
+            "discountAmount": 0,
+            "taxAmount": 0,
+            "paidAmount": 10000,
+            "units": [
+              {
+                "unitOrdinal": 1,
+                "productAmount": 10000,
+                "discountAmount": 0,
+                "paidAmount": 10000,
+                "commissionAmount": 1000
+              }
+            ]
+          }
+        ],
+        "charges": [
+          {
+            "orderChargeId": "00000000-0000-4000-8000-000000000006",
+            "sellerId": "00000000-0000-4000-8000-000000000002",
+            "chargeType": "SHIPPING",
+            "amount": 3000
+          }
+        ]
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "PaymentFailed-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000111",
+      "eventType": "PaymentFailed",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "attemptId": "00000000-0000-4000-8000-000000000008",
+        "reasonCode": "PROVIDER_DECLINED",
+        "noEffectEvidenceId": "00000000-0000-4000-8000-000000000025"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "PaymentFailed-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000111",
+      "eventType": "PaymentFailed",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "operationId": "00000000-0000-4000-8000-000000000010",
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "attemptId": "00000000-0000-4000-8000-000000000008",
+        "reasonCode": "PROVIDER_DECLINED",
+        "noEffectEvidenceId": "00000000-0000-4000-8000-000000000025"
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "PaymentUnknown-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000112",
+      "eventType": "PaymentUnknown",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "attemptId": "00000000-0000-4000-8000-000000000008",
+        "kind": "APPROVE",
+        "firstUnknownAt": "2026-09-22T00:00:00Z",
+        "reasonCode": "RESPONSE_TIMEOUT"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "PaymentUnknown-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000112",
+      "eventType": "PaymentUnknown",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "operationId": "00000000-0000-4000-8000-000000000010",
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "attemptId": "00000000-0000-4000-8000-000000000008",
+        "kind": "APPROVE",
+        "firstUnknownAt": "2026-09-22T00:00:00Z",
+        "reasonCode": "RESPONSE_TIMEOUT"
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "PaymentVoided-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000113",
+      "eventType": "PaymentVoided",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "paymentId": "00000000-0000-4000-8000-000000000007",
+        "transactionId": "00000000-0000-4000-8000-000000000026",
+        "amount": {
+          "currency": "KRW",
+          "amount": 13000
+        },
+        "reasonCode": "CUSTOMER_CANCEL",
+        "voidedAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "PaymentVoided-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000113",
+      "eventType": "PaymentVoided",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "operationId": "00000000-0000-4000-8000-000000000010",
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "paymentId": "00000000-0000-4000-8000-000000000007",
+        "transactionId": "00000000-0000-4000-8000-000000000026",
+        "amount": {
+          "currency": "KRW",
+          "amount": 13000
+        },
+        "reasonCode": "CUSTOMER_CANCEL",
+        "voidedAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "RefundSucceeded-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000114",
+      "eventType": "RefundSucceeded",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "paymentId": "00000000-0000-4000-8000-000000000007",
+        "refundId": "00000000-0000-4000-8000-000000000019",
+        "claimId": "00000000-0000-4000-8000-000000000016",
+        "transactionId": "00000000-0000-4000-8000-000000000027",
+        "amount": {
+          "currency": "KRW",
+          "amount": 10000
+        },
+        "items": [
+          {
+            "orderItemId": "00000000-0000-4000-8000-000000000005",
+            "unitOrdinals": [
+              1
+            ],
+            "productRefundAmount": 10000,
+            "discountReversalAmount": 0,
+            "taxRefundAmount": 0,
+            "refundAmount": 10000
+          }
+        ],
+        "charges": [],
+        "completedAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "RefundSucceeded-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000114",
+      "eventType": "RefundSucceeded",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "operationId": "00000000-0000-4000-8000-000000000010",
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "paymentId": "00000000-0000-4000-8000-000000000007",
+        "refundId": "00000000-0000-4000-8000-000000000019",
+        "claimId": "00000000-0000-4000-8000-000000000016",
+        "transactionId": "00000000-0000-4000-8000-000000000027",
+        "amount": {
+          "currency": "KRW",
+          "amount": 10000
+        },
+        "items": [
+          {
+            "orderItemId": "00000000-0000-4000-8000-000000000005",
+            "unitOrdinals": [
+              1
+            ],
+            "productRefundAmount": 10000,
+            "discountReversalAmount": 0,
+            "taxRefundAmount": 0,
+            "refundAmount": 10000
+          }
+        ],
+        "charges": [],
+        "completedAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "RefundFailed-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000115",
+      "eventType": "RefundFailed",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "paymentId": "00000000-0000-4000-8000-000000000007",
+        "refundId": "00000000-0000-4000-8000-000000000019",
+        "reasonCode": "PROVIDER_DECLINED",
+        "noEffectEvidenceId": "00000000-0000-4000-8000-000000000028"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "RefundFailed-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000115",
+      "eventType": "RefundFailed",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "operationId": "00000000-0000-4000-8000-000000000010",
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "paymentId": "00000000-0000-4000-8000-000000000007",
+        "refundId": "00000000-0000-4000-8000-000000000019",
+        "reasonCode": "PROVIDER_DECLINED",
+        "noEffectEvidenceId": "00000000-0000-4000-8000-000000000028"
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "SettlementPaid-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000116",
+      "eventType": "SettlementPaid",
+      "eventVersion": 1,
+      "producer": "settlement-service",
+      "aggregateType": "SETTLEMENT",
+      "aggregateId": "00000000-0000-4000-8000-000000000011",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "payoutAttemptId": "00000000-0000-4000-8000-000000000029",
+        "bankReceiptId": "00000000-0000-4000-8000-000000000030",
+        "amount": {
+          "currency": "KRW",
+          "amount": 12000
+        },
+        "paidAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "SettlementPaid-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000116",
+      "eventType": "SettlementPaid",
+      "eventVersion": 1,
+      "producer": "settlement-service",
+      "aggregateType": "SETTLEMENT",
+      "aggregateId": "00000000-0000-4000-8000-000000000011",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "settlementId": "00000000-0000-4000-8000-000000000011",
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "payoutAttemptId": "00000000-0000-4000-8000-000000000029",
+        "bankReceiptId": "00000000-0000-4000-8000-000000000030",
+        "amount": {
+          "currency": "KRW",
+          "amount": 12000
+        },
+        "paidAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "PayoutUnknown-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000117",
+      "eventType": "PayoutUnknown",
+      "eventVersion": 1,
+      "producer": "settlement-service",
+      "aggregateType": "SETTLEMENT",
+      "aggregateId": "00000000-0000-4000-8000-000000000011",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "payoutAttemptId": "00000000-0000-4000-8000-000000000029",
+        "amount": {
+          "currency": "KRW",
+          "amount": 12000
+        },
+        "firstUnknownAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "PayoutUnknown-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000117",
+      "eventType": "PayoutUnknown",
+      "eventVersion": 1,
+      "producer": "settlement-service",
+      "aggregateType": "SETTLEMENT",
+      "aggregateId": "00000000-0000-4000-8000-000000000011",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "settlementId": "00000000-0000-4000-8000-000000000011",
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "payoutAttemptId": "00000000-0000-4000-8000-000000000029",
+        "amount": {
+          "currency": "KRW",
+          "amount": 12000
+        },
+        "firstUnknownAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "ProductAnalysisCompleted-missing-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000118",
+      "eventType": "ProductAnalysisCompleted",
+      "eventVersion": 1,
+      "producer": "discovery-data-service",
+      "aggregateType": "PRODUCT_ANALYSIS",
+      "aggregateId": "00000000-0000-4000-8000-000000000003",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "revisionId": "00000000-0000-4000-8000-000000000004",
+        "runId": "00000000-0000-4000-8000-000000000031",
+        "taxonomyVersion": "taxonomy-v1",
+        "modelVersion": "rules-v1",
+        "promptVersion": "none-v1",
+        "concepts": [
+          {
+            "conceptId": "00000000-0000-4000-8000-000000000032",
+            "score": 0.8,
+            "evidenceRefs": [
+              "FEATURE:material"
+            ]
+          }
+        ],
+        "completedAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "ProductAnalysisCompleted-real-flag",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000118",
+      "eventType": "ProductAnalysisCompleted",
+      "eventVersion": 1,
+      "producer": "discovery-data-service",
+      "aggregateType": "PRODUCT_ANALYSIS",
+      "aggregateId": "00000000-0000-4000-8000-000000000003",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "productId": "00000000-0000-4000-8000-000000000003",
+        "revisionId": "00000000-0000-4000-8000-000000000004",
+        "runId": "00000000-0000-4000-8000-000000000031",
+        "taxonomyVersion": "taxonomy-v1",
+        "modelVersion": "rules-v1",
+        "promptVersion": "none-v1",
+        "concepts": [
+          {
+            "conceptId": "00000000-0000-4000-8000-000000000032",
+            "score": 0.8,
+            "evidenceRefs": [
+              "FEATURE:material"
+            ]
+          }
+        ],
+        "completedAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": false
+    }
+  },
+  {
+    "id": "string-money",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000110",
+      "eventType": "PaymentApproved",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "operationId": "00000000-0000-4000-8000-000000000010",
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "attemptId": "00000000-0000-4000-8000-000000000008",
+        "paymentId": "00000000-0000-4000-8000-000000000007",
+        "provider": "KAKAO",
+        "merchantTxId": "mp-00000000-0000-4000-8000-000000000001-00000000-0000-4000-8000-000000000009",
+        "providerPaymentKey": "00000000-0000-4000-8000-000000000024",
+        "amount": {
+          "currency": "KRW",
+          "amount": "13000"
+        },
+        "approvedAt": "2026-09-22T00:00:00Z",
+        "snapshotHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "items": [
+          {
+            "orderItemId": "00000000-0000-4000-8000-000000000005",
+            "sellerId": "00000000-0000-4000-8000-000000000002",
+            "quantity": 1,
+            "productAmount": 10000,
+            "discountAmount": 0,
+            "taxAmount": 0,
+            "paidAmount": 10000,
+            "units": [
+              {
+                "unitOrdinal": 1,
+                "productAmount": 10000,
+                "discountAmount": 0,
+                "paidAmount": 10000,
+                "commissionAmount": 1000
+              }
+            ]
+          }
+        ],
+        "charges": [
+          {
+            "orderChargeId": "00000000-0000-4000-8000-000000000006",
+            "sellerId": "00000000-0000-4000-8000-000000000002",
+            "chargeType": "SHIPPING",
+            "amount": 3000
+          }
+        ]
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "amount-sum-mismatch",
+    "expected": "business-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000110",
+      "eventType": "PaymentApproved",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "operationId": "00000000-0000-4000-8000-000000000010",
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "attemptId": "00000000-0000-4000-8000-000000000008",
+        "paymentId": "00000000-0000-4000-8000-000000000007",
+        "provider": "KAKAO",
+        "merchantTxId": "mp-00000000-0000-4000-8000-000000000001-00000000-0000-4000-8000-000000000009",
+        "providerPaymentKey": "00000000-0000-4000-8000-000000000024",
+        "amount": {
+          "currency": "KRW",
+          "amount": 13001
+        },
+        "approvedAt": "2026-09-22T00:00:00Z",
+        "snapshotHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "items": [
+          {
+            "orderItemId": "00000000-0000-4000-8000-000000000005",
+            "sellerId": "00000000-0000-4000-8000-000000000002",
+            "quantity": 1,
+            "productAmount": 10000,
+            "discountAmount": 0,
+            "taxAmount": 0,
+            "paidAmount": 10000,
+            "units": [
+              {
+                "unitOrdinal": 1,
+                "productAmount": 10000,
+                "discountAmount": 0,
+                "paidAmount": 10000,
+                "commissionAmount": 1000
+              }
+            ]
+          }
+        ],
+        "charges": [
+          {
+            "orderChargeId": "00000000-0000-4000-8000-000000000006",
+            "sellerId": "00000000-0000-4000-8000-000000000002",
+            "chargeType": "SHIPPING",
+            "amount": 3000
+          }
+        ]
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "wrong-order-stream",
+    "expected": "business-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000110",
+      "eventType": "PaymentApproved",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000999",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "operationId": "00000000-0000-4000-8000-000000000010",
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "attemptId": "00000000-0000-4000-8000-000000000008",
+        "paymentId": "00000000-0000-4000-8000-000000000007",
+        "provider": "KAKAO",
+        "merchantTxId": "mp-00000000-0000-4000-8000-000000000001-00000000-0000-4000-8000-000000000009",
+        "providerPaymentKey": "00000000-0000-4000-8000-000000000024",
+        "amount": {
+          "currency": "KRW",
+          "amount": 13000
+        },
+        "approvedAt": "2026-09-22T00:00:00Z",
+        "snapshotHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "items": [
+          {
+            "orderItemId": "00000000-0000-4000-8000-000000000005",
+            "sellerId": "00000000-0000-4000-8000-000000000002",
+            "quantity": 1,
+            "productAmount": 10000,
+            "discountAmount": 0,
+            "taxAmount": 0,
+            "paidAmount": 10000,
+            "units": [
+              {
+                "unitOrdinal": 1,
+                "productAmount": 10000,
+                "discountAmount": 0,
+                "paidAmount": 10000,
+                "commissionAmount": 1000
+              }
+            ]
+          }
+        ],
+        "charges": [
+          {
+            "orderChargeId": "00000000-0000-4000-8000-000000000006",
+            "sellerId": "00000000-0000-4000-8000-000000000002",
+            "chargeType": "SHIPPING",
+            "amount": 3000
+          }
+        ]
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "duplicate-unit",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000114",
+      "eventType": "RefundSucceeded",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "operationId": "00000000-0000-4000-8000-000000000010",
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "paymentId": "00000000-0000-4000-8000-000000000007",
+        "refundId": "00000000-0000-4000-8000-000000000019",
+        "claimId": "00000000-0000-4000-8000-000000000016",
+        "transactionId": "00000000-0000-4000-8000-000000000027",
+        "amount": {
+          "currency": "KRW",
+          "amount": 10000
+        },
+        "items": [
+          {
+            "orderItemId": "00000000-0000-4000-8000-000000000005",
+            "unitOrdinals": [
+              1,
+              1
+            ],
+            "productRefundAmount": 10000,
+            "discountReversalAmount": 0,
+            "taxRefundAmount": 0,
+            "refundAmount": 10000
+          }
+        ],
+        "charges": [],
+        "completedAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "refund-sum-mismatch",
+    "expected": "business-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000114",
+      "eventType": "RefundSucceeded",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "operationId": "00000000-0000-4000-8000-000000000010",
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "paymentId": "00000000-0000-4000-8000-000000000007",
+        "refundId": "00000000-0000-4000-8000-000000000019",
+        "claimId": "00000000-0000-4000-8000-000000000016",
+        "transactionId": "00000000-0000-4000-8000-000000000027",
+        "amount": {
+          "currency": "KRW",
+          "amount": 10001
+        },
+        "items": [
+          {
+            "orderItemId": "00000000-0000-4000-8000-000000000005",
+            "unitOrdinals": [
+              1
+            ],
+            "productRefundAmount": 10000,
+            "discountReversalAmount": 0,
+            "taxRefundAmount": 0,
+            "refundAmount": 10000
+          }
+        ],
+        "charges": [],
+        "completedAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "financial-gap",
+    "expected": "business-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000105",
+      "eventType": "PurchaseConfirmed",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER_SELLER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "confirmationId": "00000000-0000-4000-8000-000000000017",
+        "priorFinancialVersion": 3,
+        "units": [
+          {
+            "orderItemId": "00000000-0000-4000-8000-000000000005",
+            "unitOrdinal": 1,
+            "paidAmount": 10000,
+            "commissionAmount": 1000
+          }
+        ],
+        "currency": "KRW",
+        "policyVersion": "pricing-v1"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "zero-adjustment",
+    "expected": "business-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000107",
+      "eventType": "SellerFinancialAdjusted",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER_SELLER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "adjustmentId": "00000000-0000-4000-8000-000000000018",
+        "refundId": "00000000-0000-4000-8000-000000000019",
+        "reasonCode": "APPROVED_RETURN",
+        "priorFinancialVersion": 0,
+        "adjustments": [
+          {
+            "sourceUnitOrChargeId": "UNIT:00000000-0000-4000-8000-000000000005:1",
+            "originalRecognitionId": "00000000-0000-4000-8000-000000000020",
+            "signedRevenueAmount": 0,
+            "signedFeeAmount": 0
+          }
+        ],
+        "currency": "KRW"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "wrong-producer",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000100",
+      "eventType": "ProductRevisionPublished",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PRODUCT",
+      "aggregateId": "00000000-0000-4000-8000-000000000003",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "productId": "00000000-0000-4000-8000-000000000003",
+        "revisionId": "00000000-0000-4000-8000-000000000004",
+        "revisionNumber": 1,
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "title": "모의 상품",
+        "categoryId": "00000000-0000-4000-8000-000000000012",
+        "brandId": null,
+        "imageUrl": "https://example.test/product.png",
+        "features": [
+          {
+            "key": "material",
+            "value": "cotton",
+            "source": "SELLER"
+          }
+        ],
+        "skuSummaries": [
+          {
+            "skuId": "00000000-0000-4000-8000-000000000013",
+            "price": 10000,
+            "available": true
+          }
+        ],
+        "publishedAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "safe-integer-overflow",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000117",
+      "eventType": "PayoutUnknown",
+      "eventVersion": 1,
+      "producer": "settlement-service",
+      "aggregateType": "SETTLEMENT",
+      "aggregateId": "00000000-0000-4000-8000-000000000011",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "settlementId": "00000000-0000-4000-8000-000000000011",
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "payoutAttemptId": "00000000-0000-4000-8000-000000000029",
+        "amount": {
+          "currency": "KRW",
+          "amount": 9007199254740992
+        },
+        "firstUnknownAt": "2026-09-22T00:00:00Z"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "unknown-nested-field",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000110",
+      "eventType": "PaymentApproved",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "operationId": "00000000-0000-4000-8000-000000000010",
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "attemptId": "00000000-0000-4000-8000-000000000008",
+        "paymentId": "00000000-0000-4000-8000-000000000007",
+        "provider": "KAKAO",
+        "merchantTxId": "mp-00000000-0000-4000-8000-000000000001-00000000-0000-4000-8000-000000000009",
+        "providerPaymentKey": "00000000-0000-4000-8000-000000000024",
+        "amount": {
+          "currency": "KRW",
+          "amount": 13000
+        },
+        "approvedAt": "2026-09-22T00:00:00Z",
+        "snapshotHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "items": [
+          {
+            "orderItemId": "00000000-0000-4000-8000-000000000005",
+            "sellerId": "00000000-0000-4000-8000-000000000002",
+            "quantity": 1,
+            "productAmount": 10000,
+            "discountAmount": 0,
+            "taxAmount": 0,
+            "paidAmount": 10000,
+            "units": [
+              {
+                "unitOrdinal": 1,
+                "productAmount": 10000,
+                "discountAmount": 0,
+                "paidAmount": 10000,
+                "commissionAmount": 1000,
+                "unexpected": true
+              }
+            ]
+          }
+        ],
+        "charges": [
+          {
+            "orderChargeId": "00000000-0000-4000-8000-000000000006",
+            "sellerId": "00000000-0000-4000-8000-000000000002",
+            "chargeType": "SHIPPING",
+            "amount": 3000
+          }
+        ]
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "hold-wrong-stream",
+    "expected": "business-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000108",
+      "eventType": "SellerSettlementHoldChanged",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "SELLER_CONTROL",
+      "aggregateId": "00000000-0000-4000-8000-000000000002",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "holdId": "00000000-0000-4000-8000-000000000021",
+        "holdVersion": 1,
+        "action": "PLACE",
+        "reasonCode": "CLAIM_OPENED",
+        "unitIds": [
+          "00000000-0000-4000-8000-000000000005:1"
+        ],
+        "amount": {
+          "currency": "KRW",
+          "amount": 9000
+        },
+        "currency": "KRW"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "fee-exceeds-paid",
+    "expected": "business-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000105",
+      "eventType": "PurchaseConfirmed",
+      "eventVersion": 1,
+      "producer": "commerce-service",
+      "aggregateType": "ORDER_SELLER",
+      "aggregateId": "00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "sellerId": "00000000-0000-4000-8000-000000000002",
+        "confirmationId": "00000000-0000-4000-8000-000000000017",
+        "priorFinancialVersion": 0,
+        "units": [
+          {
+            "orderItemId": "00000000-0000-4000-8000-000000000005",
+            "unitOrdinal": 1,
+            "paidAmount": 10000,
+            "commissionAmount": 10001
+          }
+        ],
+        "currency": "KRW",
+        "policyVersion": "pricing-v1"
+      },
+      "simulated": true
+    }
+  },
+  {
+    "id": "missing-approval-attempt",
+    "expected": "schema-reject",
+    "data": {
+      "eventId": "00000000-0000-4000-8000-000000000112",
+      "eventType": "PaymentUnknown",
+      "eventVersion": 1,
+      "producer": "payment-service",
+      "aggregateType": "PAYMENT_FLOW",
+      "aggregateId": "00000000-0000-4000-8000-000000000001",
+      "aggregateVersion": 1,
+      "occurredAt": "2026-09-22T00:00:00Z",
+      "correlationId": "00000000-0000-4000-8000-000000000040",
+      "causationId": "00000000-0000-4000-8000-000000000010",
+      "traceId": "cccccccccccccccccccccccccccccccc",
+      "payload": {
+        "operationId": "00000000-0000-4000-8000-000000000010",
+        "resultVersion": 1,
+        "orderId": "00000000-0000-4000-8000-000000000001",
+        "kind": "APPROVE",
+        "firstUnknownAt": "2026-09-22T00:00:00Z",
+        "reasonCode": "RESPONSE_TIMEOUT"
+      },
+      "simulated": true
+    }
+  }
+]

@@ -1,0 +1,22 @@
+erDiagram
+    direction LR
+    pg1PgPayment["pg1.pg_payment"] {
+        uuid payment_id PK "required"
+        text merchant_tx_id UK "required"
+        varchar_3_ currency "required"
+        bigint amount "required"
+        text status "required"
+        bigint refunded_amount "required"
+        timestamp_with_time_zone created_at "required"
+        timestamp_with_time_zone updated_at "required"
+    }
+    pg1PgTransaction["pg1.pg_transaction"] {
+        uuid transaction_id PK "required"
+        uuid payment_id FK "required"
+        text transaction_type "required"
+        bigint amount "required"
+        text status "required"
+        text idempotency_key "nullable"
+        timestamp_with_time_zone created_at "required"
+    }
+    pg1PgPayment ||..o{ pg1PgTransaction : "payment_id"

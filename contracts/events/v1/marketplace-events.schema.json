@@ -1,0 +1,3119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:marketplace:events:v1",
+  "title": "Marketplace v1 events — target contract",
+  "description": "Typed target contract; current producers/consumers are not implemented. Business invariants in docs/implementation/02-event-contracts.md also apply.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/EventProductRevisionPublished"
+    },
+    {
+      "$ref": "#/$defs/EventProductAvailabilityChanged"
+    },
+    {
+      "$ref": "#/$defs/EventOrderPaid"
+    },
+    {
+      "$ref": "#/$defs/EventShipmentDelivered"
+    },
+    {
+      "$ref": "#/$defs/EventClaimStatusChanged"
+    },
+    {
+      "$ref": "#/$defs/EventPurchaseConfirmed"
+    },
+    {
+      "$ref": "#/$defs/EventSellerShippingRevenueRecognized"
+    },
+    {
+      "$ref": "#/$defs/EventSellerFinancialAdjusted"
+    },
+    {
+      "$ref": "#/$defs/EventSellerSettlementHoldChanged"
+    },
+    {
+      "$ref": "#/$defs/EventSellerPenaltyApplied"
+    },
+    {
+      "$ref": "#/$defs/EventPaymentApproved"
+    },
+    {
+      "$ref": "#/$defs/EventPaymentFailed"
+    },
+    {
+      "$ref": "#/$defs/EventPaymentUnknown"
+    },
+    {
+      "$ref": "#/$defs/EventPaymentVoided"
+    },
+    {
+      "$ref": "#/$defs/EventRefundSucceeded"
+    },
+    {
+      "$ref": "#/$defs/EventRefundFailed"
+    },
+    {
+      "$ref": "#/$defs/EventSettlementPaid"
+    },
+    {
+      "$ref": "#/$defs/EventPayoutUnknown"
+    },
+    {
+      "$ref": "#/$defs/EventProductAnalysisCompleted"
+    }
+  ],
+  "$defs": {
+    "Money": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "const": "KRW",
+          "type": "string"
+        },
+        "amount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000000
+        }
+      },
+      "required": [
+        "currency",
+        "amount"
+      ],
+      "additionalProperties": false
+    },
+    "SettlementMoney": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "const": "KRW",
+          "type": "string"
+        },
+        "amount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "currency",
+        "amount"
+      ],
+      "additionalProperties": false
+    },
+    "Feature": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "SELLER",
+            "ADMIN"
+          ]
+        }
+      },
+      "required": [
+        "key",
+        "value",
+        "source"
+      ],
+      "additionalProperties": false
+    },
+    "RecognitionUnit": {
+      "type": "object",
+      "properties": {
+        "orderItemId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "unitOrdinal": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 99
+        },
+        "paidAmount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000000
+        },
+        "commissionAmount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000000
+        }
+      },
+      "required": [
+        "orderItemId",
+        "unitOrdinal",
+        "paidAmount",
+        "commissionAmount"
+      ],
+      "additionalProperties": false
+    },
+    "FinancialAdjustment": {
+      "type": "object",
+      "properties": {
+        "sourceUnitOrChargeId": {
+          "type": "string",
+          "pattern": "^(UNIT:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]?|CHARGE:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$"
+        },
+        "originalRecognitionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "signedRevenueAmount": {
+          "type": "integer",
+          "minimum": -100000000,
+          "maximum": 0
+        },
+        "signedFeeAmount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000000
+        }
+      },
+      "required": [
+        "sourceUnitOrChargeId",
+        "originalRecognitionId",
+        "signedRevenueAmount",
+        "signedFeeAmount"
+      ],
+      "additionalProperties": false
+    },
+    "Concept": {
+      "type": "object",
+      "properties": {
+        "conceptId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "minItems": 1,
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "conceptId",
+        "score",
+        "evidenceRefs"
+      ],
+      "additionalProperties": false
+    },
+    "HttpPaymentUnit": {
+      "type": "object",
+      "required": [
+        "unitOrdinal",
+        "productAmount",
+        "discountAmount",
+        "paidAmount",
+        "commissionAmount"
+      ],
+      "properties": {
+        "unitOrdinal": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 99
+        },
+        "productAmount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000000
+        },
+        "discountAmount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000000
+        },
+        "paidAmount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000000
+        },
+        "commissionAmount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000000
+        }
+      },
+      "additionalProperties": false
+    },
+    "HttpCheckoutPaymentItem": {
+      "type": "object",
+      "required": [
+        "orderItemId",
+        "sellerId",
+        "quantity",
+        "productAmount",
+        "discountAmount",
+        "taxAmount",
+        "paidAmount",
+        "units"
+      ],
+      "properties": {
+        "orderItemId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sellerId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 99
+        },
+        "units": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 99,
+          "items": {
+            "$ref": "#/$defs/HttpPaymentUnit"
+          }
+        },
+        "productAmount": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 100000000
+        },
+        "discountAmount": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 100000000
+        },
+        "taxAmount": {
+          "type": "integer",
+          "const": 0
+        },
+        "paidAmount": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1,
+          "maximum": 100000000,
+          "description": "productAmount - discountAmount + taxAmount"
+        }
+      },
+      "additionalProperties": false
+    },
+    "HttpCheckoutPaymentCharge": {
+      "type": "object",
+      "required": [
+        "orderChargeId",
+        "sellerId",
+        "chargeType",
+        "amount"
+      ],
+      "properties": {
+        "orderChargeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sellerId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "chargeType": {
+          "type": "string",
+          "const": "SHIPPING"
+        },
+        "amount": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1,
+          "maximum": 100000000
+        }
+      },
+      "additionalProperties": false
+    },
+    "HttpRefundItemAllocation": {
+      "type": "object",
+      "required": [
+        "orderItemId",
+        "unitOrdinals",
+        "productRefundAmount",
+        "discountReversalAmount",
+        "taxRefundAmount",
+        "refundAmount"
+      ],
+      "properties": {
+        "orderItemId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "unitOrdinals": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 99,
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 99
+          }
+        },
+        "productRefundAmount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000000
+        },
+        "discountReversalAmount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000000
+        },
+        "taxRefundAmount": {
+          "type": "integer",
+          "const": 0
+        },
+        "refundAmount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000000
+        }
+      },
+      "additionalProperties": false
+    },
+    "HttpRefundChargeAllocation": {
+      "type": "object",
+      "required": [
+        "orderChargeId",
+        "amount"
+      ],
+      "properties": {
+        "orderChargeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "amount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000000
+        }
+      },
+      "additionalProperties": false
+    },
+    "EventProductRevisionPublished": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "ProductRevisionPublished"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "commerce-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "PRODUCT"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "productId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "revisionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "revisionNumber": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "sellerId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "categoryId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "brandId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "imageUrl": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https?://"
+            },
+            "features": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Feature"
+              },
+              "minItems": 0,
+              "maxItems": 100
+            },
+            "skuSummaries": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "skuId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "price": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100000000
+                  },
+                  "available": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "skuId",
+                  "price",
+                  "available"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 500
+            },
+            "publishedAt": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "Z$"
+            }
+          },
+          "required": [
+            "productId",
+            "revisionId",
+            "revisionNumber",
+            "sellerId",
+            "title",
+            "categoryId",
+            "brandId",
+            "imageUrl",
+            "features",
+            "skuSummaries",
+            "publishedAt"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.commerce.catalog.v1",
+      "x-consumer-groups": [
+        "discovery-catalog-v1"
+      ]
+    },
+    "EventProductAvailabilityChanged": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "ProductAvailabilityChanged"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "commerce-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "PRODUCT"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "productId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "revisionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "saleStatus": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "IN_REVIEW",
+                "READY",
+                "ON_SALE",
+                "PAUSED",
+                "SOLD_OUT",
+                "ARCHIVED"
+              ]
+            },
+            "available": {
+              "type": "boolean"
+            },
+            "reasonCode": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Z][A-Z0-9_]*$"
+            }
+          },
+          "required": [
+            "productId",
+            "revisionId",
+            "saleStatus",
+            "available",
+            "reasonCode"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.commerce.catalog.v1",
+      "x-consumer-groups": [
+        "discovery-catalog-v1"
+      ]
+    },
+    "EventOrderPaid": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "OrderPaid"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "commerce-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "ORDER"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "orderId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "memberPseudonym": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "paymentId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "totalAmount": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100000000
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "productId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "revisionId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 99
+                  }
+                },
+                "required": [
+                  "productId",
+                  "revisionId",
+                  "quantity"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 100
+            }
+          },
+          "required": [
+            "orderId",
+            "memberPseudonym",
+            "paymentId",
+            "totalAmount",
+            "items"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.commerce.order.v1",
+      "x-consumer-groups": [
+        "commerce-notification-v1",
+        "discovery-conversion-v1"
+      ]
+    },
+    "EventShipmentDelivered": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "ShipmentDelivered"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "commerce-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "ORDER"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "orderId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "shipmentId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "shipmentItemId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "orderItemId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "unitOrdinals": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 99
+                    },
+                    "minItems": 1,
+                    "maxItems": 99,
+                    "uniqueItems": true
+                  }
+                },
+                "required": [
+                  "shipmentItemId",
+                  "orderItemId",
+                  "unitOrdinals"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 100
+            },
+            "deliveredAt": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "Z$"
+            }
+          },
+          "required": [
+            "orderId",
+            "shipmentId",
+            "items",
+            "deliveredAt"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.commerce.order.v1",
+      "x-consumer-groups": [
+        "commerce-notification-v1",
+        "discovery-conversion-v1"
+      ]
+    },
+    "EventClaimStatusChanged": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "ClaimStatusChanged"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "commerce-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "ORDER"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "orderId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "claimId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "REQUESTED",
+                "UNDER_REVIEW",
+                "APPROVED",
+                "REJECTED",
+                "PICKUP_PENDING",
+                "IN_TRANSIT",
+                "RECEIVED",
+                "INSPECTING",
+                "REFUND_PENDING",
+                "COMPLETED",
+                "CANCELLED"
+              ]
+            },
+            "reasonCode": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Z][A-Z0-9_]*$"
+            },
+            "affectedUnitIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]?$"
+              },
+              "minItems": 1,
+              "maxItems": 9900,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "orderId",
+            "claimId",
+            "status",
+            "reasonCode",
+            "affectedUnitIds"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.commerce.order.v1",
+      "x-consumer-groups": [
+        "commerce-notification-v1",
+        "discovery-conversion-v1"
+      ]
+    },
+    "EventPurchaseConfirmed": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "PurchaseConfirmed"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "commerce-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "ORDER_SELLER"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "orderId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "sellerId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "confirmationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "priorFinancialVersion": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "units": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/RecognitionUnit"
+              },
+              "minItems": 1,
+              "maxItems": 9900
+            },
+            "currency": {
+              "const": "KRW",
+              "type": "string"
+            },
+            "policyVersion": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            }
+          },
+          "required": [
+            "orderId",
+            "sellerId",
+            "confirmationId",
+            "priorFinancialVersion",
+            "units",
+            "currency",
+            "policyVersion"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.commerce.seller-financial.v1",
+      "x-consumer-groups": [
+        "settlement-ledger-v1"
+      ]
+    },
+    "EventSellerShippingRevenueRecognized": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "SellerShippingRevenueRecognized"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "commerce-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "ORDER_SELLER"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "orderId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "sellerId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "orderChargeId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "amount": {
+              "$ref": "#/$defs/Money"
+            },
+            "currency": {
+              "const": "KRW",
+              "type": "string"
+            },
+            "priorFinancialVersion": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "orderId",
+            "sellerId",
+            "orderChargeId",
+            "amount",
+            "currency",
+            "priorFinancialVersion"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.commerce.seller-financial.v1",
+      "x-consumer-groups": [
+        "settlement-ledger-v1"
+      ]
+    },
+    "EventSellerFinancialAdjusted": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "SellerFinancialAdjusted"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "commerce-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "ORDER_SELLER"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "orderId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "sellerId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "adjustmentId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "refundId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "reasonCode": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Z][A-Z0-9_]*$"
+            },
+            "priorFinancialVersion": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "adjustments": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/FinancialAdjustment"
+              },
+              "minItems": 1,
+              "maxItems": 10000
+            },
+            "currency": {
+              "const": "KRW",
+              "type": "string"
+            }
+          },
+          "required": [
+            "orderId",
+            "sellerId",
+            "adjustmentId",
+            "reasonCode",
+            "priorFinancialVersion",
+            "adjustments",
+            "currency"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.commerce.seller-financial.v1",
+      "x-consumer-groups": [
+        "settlement-ledger-v1"
+      ]
+    },
+    "EventSellerSettlementHoldChanged": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "SellerSettlementHoldChanged"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "commerce-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "ORDER_SELLER",
+            "SELLER_CONTROL"
+          ]
+        },
+        "aggregateId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          ]
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "sellerId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "orderId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "holdId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "holdVersion": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "action": {
+              "type": "string",
+              "enum": [
+                "PLACE",
+                "RELEASE"
+              ]
+            },
+            "reasonCode": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Z][A-Z0-9_]*$"
+            },
+            "unitIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]?$"
+              },
+              "minItems": 0,
+              "maxItems": 9900,
+              "uniqueItems": true
+            },
+            "amount": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "const": "KRW",
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "currency",
+                "amount"
+              ],
+              "additionalProperties": false
+            },
+            "currency": {
+              "const": "KRW",
+              "type": "string"
+            }
+          },
+          "required": [
+            "sellerId",
+            "holdId",
+            "holdVersion",
+            "action",
+            "reasonCode",
+            "unitIds",
+            "amount",
+            "currency"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.commerce.seller-financial.v1",
+      "x-consumer-groups": [
+        "settlement-ledger-v1"
+      ]
+    },
+    "EventSellerPenaltyApplied": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "SellerPenaltyApplied"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "commerce-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "SELLER_CONTROL"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "sellerId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "penaltyId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "approvalId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "WARNING",
+                "FEE",
+                "LISTING_RESTRICTION",
+                "PAYOUT_HOLD",
+                "SUSPENSION",
+                "TERMINATION"
+              ]
+            },
+            "amount": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "const": "KRW",
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100000000
+                }
+              },
+              "required": [
+                "currency",
+                "amount"
+              ],
+              "additionalProperties": false
+            },
+            "currency": {
+              "const": "KRW",
+              "type": "string"
+            },
+            "action": {
+              "type": "string",
+              "enum": [
+                "APPLY",
+                "REVOKE"
+              ]
+            },
+            "originalPenaltyId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "sellerId",
+            "penaltyId",
+            "approvalId",
+            "type",
+            "amount",
+            "currency",
+            "action"
+          ],
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "action": {
+                    "const": "REVOKE"
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "originalPenaltyId"
+                ],
+                "properties": {
+                  "originalPenaltyId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "type": {
+                    "const": "FEE"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "amount": {
+                    "$ref": "#/$defs/Money"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "amount": {
+                    "type": "object",
+                    "properties": {
+                      "currency": {
+                        "const": "KRW",
+                        "type": "string"
+                      },
+                      "amount": {
+                        "type": "integer",
+                        "const": 0
+                      }
+                    },
+                    "required": [
+                      "currency",
+                      "amount"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.commerce.seller-financial.v1",
+      "x-consumer-groups": [
+        "settlement-ledger-v1"
+      ]
+    },
+    "EventPaymentApproved": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "PaymentApproved"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "payment-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "PAYMENT_FLOW"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "resultVersion": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "orderId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "attemptId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "paymentId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "provider": {
+              "type": "string",
+              "enum": [
+                "KAKAO",
+                "NAVER"
+              ]
+            },
+            "merchantTxId": {
+              "type": "string",
+              "pattern": "^mp-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            },
+            "providerPaymentKey": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "amount": {
+              "$ref": "#/$defs/Money"
+            },
+            "approvedAt": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "Z$"
+            },
+            "snapshotHash": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/HttpCheckoutPaymentItem"
+              },
+              "minItems": 1,
+              "maxItems": 100
+            },
+            "charges": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/HttpCheckoutPaymentCharge"
+              },
+              "minItems": 0,
+              "maxItems": 100
+            }
+          },
+          "required": [
+            "operationId",
+            "resultVersion",
+            "orderId",
+            "attemptId",
+            "paymentId",
+            "provider",
+            "merchantTxId",
+            "providerPaymentKey",
+            "amount",
+            "approvedAt",
+            "snapshotHash",
+            "items",
+            "charges"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.payment.lifecycle.v1",
+      "x-consumer-groups": [
+        "commerce-payment-v1",
+        "settlement-payment-audit-v1"
+      ]
+    },
+    "EventPaymentFailed": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "PaymentFailed"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "payment-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "PAYMENT_FLOW"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "resultVersion": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "orderId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "attemptId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "reasonCode": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Z][A-Z0-9_]*$"
+            },
+            "noEffectEvidenceId": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "operationId",
+            "resultVersion",
+            "orderId",
+            "attemptId",
+            "reasonCode",
+            "noEffectEvidenceId"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.payment.lifecycle.v1",
+      "x-consumer-groups": [
+        "commerce-payment-v1",
+        "settlement-payment-audit-v1"
+      ]
+    },
+    "EventPaymentUnknown": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "PaymentUnknown"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "payment-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "PAYMENT_FLOW"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "resultVersion": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "orderId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "attemptId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "paymentId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "APPROVE",
+                "CANCEL",
+                "REFUND"
+              ]
+            },
+            "firstUnknownAt": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "Z$"
+            },
+            "reasonCode": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Z][A-Z0-9_]*$"
+            }
+          },
+          "required": [
+            "operationId",
+            "resultVersion",
+            "orderId",
+            "kind",
+            "firstUnknownAt",
+            "reasonCode"
+          ],
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "const": "APPROVE"
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "attemptId"
+                ],
+                "properties": {
+                  "attemptId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              },
+              "else": {
+                "required": [
+                  "paymentId"
+                ],
+                "properties": {
+                  "paymentId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.payment.lifecycle.v1",
+      "x-consumer-groups": [
+        "commerce-payment-v1",
+        "settlement-payment-audit-v1"
+      ]
+    },
+    "EventPaymentVoided": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "PaymentVoided"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "payment-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "PAYMENT_FLOW"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "resultVersion": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "orderId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "paymentId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "transactionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "amount": {
+              "$ref": "#/$defs/Money"
+            },
+            "reasonCode": {
+              "type": "string",
+              "enum": [
+                "CUSTOMER_CANCEL",
+                "ORDER_COMPENSATION"
+              ]
+            },
+            "voidedAt": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "Z$"
+            }
+          },
+          "required": [
+            "operationId",
+            "resultVersion",
+            "orderId",
+            "paymentId",
+            "transactionId",
+            "amount",
+            "reasonCode",
+            "voidedAt"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.payment.lifecycle.v1",
+      "x-consumer-groups": [
+        "commerce-payment-v1",
+        "settlement-payment-audit-v1"
+      ]
+    },
+    "EventRefundSucceeded": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "RefundSucceeded"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "payment-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "PAYMENT_FLOW"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "resultVersion": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "orderId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "paymentId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "refundId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "claimId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "transactionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "amount": {
+              "$ref": "#/$defs/Money"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/HttpRefundItemAllocation"
+              },
+              "minItems": 0,
+              "maxItems": 100
+            },
+            "charges": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/HttpRefundChargeAllocation"
+              },
+              "minItems": 0,
+              "maxItems": 100
+            },
+            "completedAt": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "Z$"
+            }
+          },
+          "required": [
+            "operationId",
+            "resultVersion",
+            "orderId",
+            "paymentId",
+            "refundId",
+            "transactionId",
+            "amount",
+            "items",
+            "charges",
+            "completedAt"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.payment.lifecycle.v1",
+      "x-consumer-groups": [
+        "commerce-payment-v1",
+        "settlement-payment-audit-v1"
+      ]
+    },
+    "EventRefundFailed": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "RefundFailed"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "payment-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "PAYMENT_FLOW"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "resultVersion": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "orderId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "paymentId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "refundId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "reasonCode": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Z][A-Z0-9_]*$"
+            },
+            "noEffectEvidenceId": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "operationId",
+            "resultVersion",
+            "orderId",
+            "paymentId",
+            "refundId",
+            "reasonCode",
+            "noEffectEvidenceId"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.payment.lifecycle.v1",
+      "x-consumer-groups": [
+        "commerce-payment-v1",
+        "settlement-payment-audit-v1"
+      ]
+    },
+    "EventSettlementPaid": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "SettlementPaid"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "settlement-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "SETTLEMENT"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "settlementId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "sellerId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "payoutAttemptId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "bankReceiptId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "amount": {
+              "$ref": "#/$defs/SettlementMoney"
+            },
+            "paidAt": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "Z$"
+            }
+          },
+          "required": [
+            "settlementId",
+            "sellerId",
+            "payoutAttemptId",
+            "bankReceiptId",
+            "amount",
+            "paidAt"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.settlement.lifecycle.v1",
+      "x-consumer-groups": [
+        "commerce-settlement-v1"
+      ]
+    },
+    "EventPayoutUnknown": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "PayoutUnknown"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "settlement-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "SETTLEMENT"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "settlementId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "sellerId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "payoutAttemptId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "amount": {
+              "$ref": "#/$defs/SettlementMoney"
+            },
+            "firstUnknownAt": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "Z$"
+            }
+          },
+          "required": [
+            "settlementId",
+            "sellerId",
+            "payoutAttemptId",
+            "amount",
+            "firstUnknownAt"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.settlement.lifecycle.v1",
+      "x-consumer-groups": [
+        "commerce-settlement-v1"
+      ]
+    },
+    "EventProductAnalysisCompleted": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "const": "ProductAnalysisCompleted"
+        },
+        "eventVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "producer": {
+          "type": "string",
+          "const": "discovery-data-service"
+        },
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "PRODUCT_ANALYSIS"
+          ]
+        },
+        "aggregateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "productId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "revisionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "runId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "taxonomyVersion": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "modelVersion": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "promptVersion": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "concepts": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Concept"
+              },
+              "minItems": 0,
+              "maxItems": 1000
+            },
+            "completedAt": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "Z$"
+            }
+          },
+          "required": [
+            "productId",
+            "revisionId",
+            "runId",
+            "taxonomyVersion",
+            "modelVersion",
+            "promptVersion",
+            "concepts",
+            "completedAt"
+          ],
+          "additionalProperties": false
+        },
+        "simulated": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "producer",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "correlationId",
+        "causationId",
+        "traceId",
+        "payload",
+        "simulated"
+      ],
+      "additionalProperties": false,
+      "x-topic": "marketplace.discovery.analysis.v1",
+      "x-consumer-groups": [
+        "commerce-analysis-v1"
+      ]
+    }
+  }
+}

@@ -1,0 +1,166 @@
+Project marketplace {
+  database_type: 'PostgreSQL'
+  Note: 'Documentation namespaces stand for separate service databases. No cross-service physical FK. CURRENT is migration-derived; PLANNED requires future migrations.'
+}
+
+Table discovery.concept_taxonomy_version {
+  taxonomy_version_id "uuid" [not null, pk, note: 'taxonomy_version_id uuid DEFAULT gen_random_uuid() NOT NULL']
+  version "text" [not null, unique, note: 'version text NOT NULL']
+  status "text" [not null, note: 'status text DEFAULT \'DRAFT\' NOT NULL']
+  definition_snapshot "jsonb" [not null, note: 'definition_snapshot jsonb DEFAULT \'{}\'::jsonb NOT NULL']
+  effective_from "timestamptz" [null, note: 'effective_from timestamptz']
+  effective_to "timestamptz" [null, note: 'effective_to timestamptz']
+  created_at "timestamptz" [not null, note: 'created_at timestamptz DEFAULT now() NOT NULL']
+}
+
+Table discovery.concept {
+  concept_id "uuid" [not null, pk, note: 'concept_id uuid DEFAULT gen_random_uuid() NOT NULL']
+  taxonomy_version_id "uuid" [not null, note: 'taxonomy_version_id uuid NOT NULL']
+  concept_code "text" [not null, note: 'concept_code text NOT NULL']
+  display_name "text" [not null, note: 'display_name text NOT NULL']
+  definition "text" [null, note: 'definition text']
+  status "text" [not null, note: 'status text DEFAULT \'ACTIVE\' NOT NULL']
+  created_at "timestamptz" [not null, note: 'created_at timestamptz DEFAULT now() NOT NULL']
+  indexes {
+    (taxonomy_version_id, concept_code) [unique]
+    (taxonomy_version_id, concept_id) [unique]
+  }
+}
+
+Table discovery.concept_alias {
+  alias_id "uuid" [not null, pk, note: 'alias_id uuid DEFAULT gen_random_uuid() NOT NULL']
+  concept_id "uuid" [not null, note: 'concept_id uuid NOT NULL']
+  locale "text" [not null, note: 'locale text DEFAULT \'ko-KR\' NOT NULL']
+  alias_text "text" [not null, note: 'alias_text text NOT NULL']
+  alias_text_normalized "text" [not null, note: 'alias_text_normalized text NOT NULL']
+  created_at "timestamptz" [not null, note: 'created_at timestamptz DEFAULT now() NOT NULL']
+  indexes {
+    (concept_id, locale, alias_text_normalized) [unique]
+  }
+}
+
+Table discovery.product_analysis_run {
+  analysis_run_id "uuid" [not null, pk, note: 'analysis_run_id uuid DEFAULT gen_random_uuid() NOT NULL']
+  product_revision_id "uuid" [not null, note: 'product_revision_id uuid NOT NULL']
+  taxonomy_version_id "uuid" [not null, note: 'taxonomy_version_id uuid NOT NULL']
+  idempotency_key "text" [not null, unique, note: 'idempotency_key text NOT NULL']
+  model_provider "text" [not null, note: 'model_provider text NOT NULL']
+  model_version "text" [not null, note: 'model_version text NOT NULL']
+  prompt_version "text" [not null, note: 'prompt_version text NOT NULL']
+  input_hash "text" [not null, note: 'input_hash text NOT NULL']
+  parameters_snapshot "jsonb" [not null, note: 'parameters_snapshot jsonb DEFAULT \'{}\'::jsonb NOT NULL']
+  status "text" [not null, note: 'status text DEFAULT \'QUEUED\' NOT NULL']
+  error_code "text" [null, note: 'error_code text']
+  created_at "timestamptz" [not null, note: 'created_at timestamptz DEFAULT now() NOT NULL']
+  started_at "timestamptz" [null, note: 'started_at timestamptz']
+  completed_at "timestamptz" [null, note: 'completed_at timestamptz']
+  indexes {
+    (taxonomy_version_id, analysis_run_id) [unique]
+  }
+}
+
+Table discovery.product_concept {
+  product_concept_id "uuid" [not null, pk, note: 'product_concept_id uuid DEFAULT gen_random_uuid() NOT NULL']
+  analysis_run_id "uuid" [not null, note: 'analysis_run_id uuid NOT NULL']
+  concept_id "uuid" [not null, note: 'concept_id uuid NOT NULL']
+  taxonomy_version_id "uuid" [not null, note: 'taxonomy_version_id uuid NOT NULL']
+  relevance_score "numeric(7,6)" [not null, note: 'relevance_score numeric(7,6) NOT NULL']
+  confidence "numeric(7,6)" [not null, note: 'confidence numeric(7,6) NOT NULL']
+  assignment_source "text" [not null, note: 'assignment_source text DEFAULT \'MODEL\' NOT NULL']
+  review_status "text" [not null, note: 'review_status text DEFAULT \'UNREVIEWED\' NOT NULL']
+  created_at "timestamptz" [not null, note: 'created_at timestamptz DEFAULT now() NOT NULL']
+  reviewed_at "timestamptz" [null, note: 'reviewed_at timestamptz']
+  indexes {
+    (analysis_run_id, concept_id) [unique]
+  }
+}
+
+Table discovery.product_concept_evidence {
+  evidence_id "uuid" [not null, pk, note: 'evidence_id uuid DEFAULT gen_random_uuid() NOT NULL']
+  product_concept_id "uuid" [not null, note: 'product_concept_id uuid NOT NULL']
+  source_product_image_id "uuid" [null, note: 'source_product_image_id uuid']
+  source_product_feature_id "uuid" [null, note: 'source_product_feature_id uuid']
+  evidence_type "text" [not null, note: 'evidence_type text NOT NULL']
+  evidence_ref "text" [not null, note: 'evidence_ref text NOT NULL']
+  excerpt_hash "text" [null, note: 'excerpt_hash text']
+  evidence_snapshot "jsonb" [not null, note: 'evidence_snapshot jsonb DEFAULT \'{}\'::jsonb NOT NULL']
+  evidence_order "integer" [not null, note: 'evidence_order integer DEFAULT 0 NOT NULL']
+  created_at "timestamptz" [not null, note: 'created_at timestamptz DEFAULT now() NOT NULL']
+}
+
+Table discovery.search_request {
+  search_request_id "uuid" [not null, pk, note: 'search_request_id uuid PRIMARY KEY DEFAULT gen_random_uuid()']
+  member_id "uuid" [null, note: 'member_id uuid']
+  anonymous_id "text" [null, note: 'anonymous_id text']
+  session_id "text" [not null, note: 'session_id text NOT NULL']
+  normalized_query "text" [not null, note: 'normalized_query text NOT NULL DEFAULT \'\'']
+  filters "jsonb" [not null, note: 'filters jsonb NOT NULL DEFAULT \'{}\'::jsonb']
+  sort_code "text" [not null, note: 'sort_code text NOT NULL DEFAULT \'RELEVANCE\'']
+  algorithm_version "text" [not null, note: 'algorithm_version text NOT NULL']
+  locale "text" [null, note: 'locale text']
+  requested_at "timestamptz" [not null, note: 'requested_at timestamptz NOT NULL DEFAULT now()']
+}
+
+Table discovery.search_impression {
+  search_impression_id "uuid" [not null, pk, note: 'search_impression_id uuid PRIMARY KEY DEFAULT gen_random_uuid()']
+  search_request_id "uuid" [not null, note: 'search_request_id uuid NOT NULL']
+  product_revision_id "uuid" [not null, note: 'product_revision_id uuid NOT NULL']
+  image_id "uuid" [null, note: 'image_id uuid']
+  impression_token "text" [not null, unique, note: 'impression_token text NOT NULL']
+  position "integer" [not null, note: 'position integer NOT NULL']
+  score "numeric(20,10)" [null, note: 'score numeric(20,10)']
+  placement_type "text" [not null, note: 'placement_type text NOT NULL DEFAULT \'ORGANIC\'']
+  rendered_product_name "text" [not null, note: 'rendered_product_name text NOT NULL']
+  rendered_price_amount "bigint" [not null, note: 'rendered_price_amount bigint NOT NULL']
+  currency "text" [not null, note: 'currency text NOT NULL']
+  impressed_at "timestamptz" [not null, note: 'impressed_at timestamptz NOT NULL DEFAULT now()']
+  indexes {
+    (search_request_id, position) [unique]
+    (search_request_id, product_revision_id) [unique]
+  }
+}
+
+Table discovery.user_behavior_event {
+  event_id "uuid" [not null, pk, note: 'event_id uuid PRIMARY KEY DEFAULT gen_random_uuid()']
+  event_type "text" [not null, note: 'event_type text NOT NULL']
+  schema_version "integer" [not null, note: 'schema_version integer NOT NULL']
+  member_id "uuid" [null, note: 'member_id uuid']
+  anonymous_id "text" [null, note: 'anonymous_id text']
+  session_id "text" [not null, note: 'session_id text NOT NULL']
+  product_id "uuid" [null, note: 'product_id uuid']
+  search_request_id "uuid" [null, note: 'search_request_id uuid']
+  order_item_id "uuid" [null, note: 'order_item_id uuid']
+  dedupe_key "text" [not null, unique, note: 'dedupe_key text NOT NULL']
+  event_payload "jsonb" [not null, note: 'event_payload jsonb NOT NULL DEFAULT \'{}\'::jsonb']
+  occurred_at "timestamptz" [not null, note: 'occurred_at timestamptz NOT NULL']
+  received_at "timestamptz" [not null, note: 'received_at timestamptz NOT NULL DEFAULT now()']
+}
+
+Table discovery.outbox_event {
+  outbox_event_id "uuid" [not null, pk, note: 'outbox_event_id uuid PRIMARY KEY DEFAULT gen_random_uuid()']
+  event_key "text" [not null, unique, note: 'event_key text NOT NULL']
+  aggregate_type "text" [not null, note: 'aggregate_type text NOT NULL']
+  aggregate_id "uuid" [not null, note: 'aggregate_id uuid NOT NULL']
+  aggregate_version "bigint" [null, note: 'aggregate_version bigint']
+  event_type "text" [not null, note: 'event_type text NOT NULL']
+  payload "jsonb" [not null, note: 'payload jsonb NOT NULL']
+  status "text" [not null, note: 'status text NOT NULL DEFAULT \'PENDING\'']
+  attempt_count "integer" [not null, note: 'attempt_count integer NOT NULL DEFAULT 0']
+  occurred_at "timestamptz" [not null, note: 'occurred_at timestamptz NOT NULL DEFAULT now()']
+  available_at "timestamptz" [not null, note: 'available_at timestamptz NOT NULL DEFAULT now()']
+  published_at "timestamptz" [null, note: 'published_at timestamptz']
+  locked_at "timestamptz" [null, note: 'locked_at timestamptz']
+  lock_token "uuid" [null, note: 'lock_token uuid']
+  last_error "text" [null, note: 'last_error text']
+  indexes {
+    (aggregate_type, aggregate_id, aggregate_version) [unique]
+  }
+}
+
+Ref discovery_fk_concept_taxonomy_version: discovery.concept.taxonomy_version_id > discovery.concept_taxonomy_version.taxonomy_version_id
+Ref discovery_fk_concept_alias_concept: discovery.concept_alias.concept_id > discovery.concept.concept_id
+Ref discovery_fk_product_analysis_run_taxonomy: discovery.product_analysis_run.taxonomy_version_id > discovery.concept_taxonomy_version.taxonomy_version_id
+Ref discovery_fk_product_concept_analysis_run: discovery.product_concept.(taxonomy_version_id, analysis_run_id) > discovery.product_analysis_run.(taxonomy_version_id, analysis_run_id)
+Ref discovery_fk_product_concept_concept: discovery.product_concept.(taxonomy_version_id, concept_id) > discovery.concept.(taxonomy_version_id, concept_id)
+Ref discovery_fk_product_concept_evidence_concept: discovery.product_concept_evidence.product_concept_id > discovery.product_concept.product_concept_id
+Ref discovery_fk_search_impression_request: discovery.search_impression.search_request_id > discovery.search_request.search_request_id

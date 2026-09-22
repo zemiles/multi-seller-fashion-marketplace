@@ -1,0 +1,122 @@
+[
+  {
+    "path": "docs/ddl/current/commerce-service.sql",
+    "model": "current",
+    "service": "commerce-service",
+    "tables": 76,
+    "foreignKeys": 136,
+    "sha256": "eea437146a41b12c8fbbf79a9a10551faa0e841f0222904370e658e4d5d6983a",
+    "purpose": "EMPTY_ISOLATED_DB_ONLY",
+    "applied": false
+  },
+  {
+    "path": "docs/ddl/current/payment-service.sql",
+    "model": "current",
+    "service": "payment-service",
+    "tables": 11,
+    "foreignKeys": 14,
+    "sha256": "10b91b4dee08c6402251b949a77446c29fa731f5fbec28d930c88ff1b54b22eb",
+    "purpose": "EMPTY_ISOLATED_DB_ONLY",
+    "applied": false
+  },
+  {
+    "path": "docs/ddl/current/settlement-service.sql",
+    "model": "current",
+    "service": "settlement-service",
+    "tables": 12,
+    "foreignKeys": 14,
+    "sha256": "21b93dbb7e015f2e3a7d5305ede666cd652a2d164b7446ee83473f2c799fbcc1",
+    "purpose": "EMPTY_ISOLATED_DB_ONLY",
+    "applied": false
+  },
+  {
+    "path": "docs/ddl/current/discovery-data-service.sql",
+    "model": "current",
+    "service": "discovery-data-service",
+    "tables": 10,
+    "foreignKeys": 7,
+    "sha256": "3871f3fd9b00634e49f265dc3aa6b45c5131d048147c18057fef356e082a234f",
+    "purpose": "EMPTY_ISOLATED_DB_ONLY",
+    "applied": false
+  },
+  {
+    "path": "docs/ddl/current/pg-kakao-simulator.sql",
+    "model": "current",
+    "service": "pg-kakao-simulator",
+    "tables": 2,
+    "foreignKeys": 1,
+    "sha256": "07f086afc0fdff48ee97b3a29965df898735642160b21be773bf1acc4486c740",
+    "purpose": "EMPTY_ISOLATED_DB_ONLY",
+    "applied": false
+  },
+  {
+    "path": "docs/ddl/current/pg-naver-simulator.sql",
+    "model": "current",
+    "service": "pg-naver-simulator",
+    "tables": 2,
+    "foreignKeys": 1,
+    "sha256": "b75abf64f339bdba9fa4453cc79bdfb78489f10fc510e7faa211a440ad6dd980",
+    "purpose": "EMPTY_ISOLATED_DB_ONLY",
+    "applied": false
+  },
+  {
+    "path": "docs/ddl/target/commerce-service.sql",
+    "model": "target",
+    "service": "commerce-service",
+    "tables": 95,
+    "foreignKeys": 154,
+    "sha256": "298e6fb03efa7afdfef01decf40f283443b4d529670e3671b5a5fa214691cd07",
+    "purpose": "EMPTY_ISOLATED_DB_ONLY",
+    "applied": false
+  },
+  {
+    "path": "docs/ddl/target/payment-service.sql",
+    "model": "target",
+    "service": "payment-service",
+    "tables": 22,
+    "foreignKeys": 23,
+    "sha256": "349ac2577a58b811b11e9b7763beeaa347052aac2470901adf58ff8702881bdc",
+    "purpose": "EMPTY_ISOLATED_DB_ONLY",
+    "applied": false
+  },
+  {
+    "path": "docs/ddl/target/settlement-service.sql",
+    "model": "target",
+    "service": "settlement-service",
+    "tables": 22,
+    "foreignKeys": 20,
+    "sha256": "e8bae2f074cd743fe0c0944ae79f397acf7f95305cb9e09a673425203a8f0eff",
+    "purpose": "EMPTY_ISOLATED_DB_ONLY",
+    "applied": false
+  },
+  {
+    "path": "docs/ddl/target/discovery-data-service.sql",
+    "model": "target",
+    "service": "discovery-data-service",
+    "tables": 16,
+    "foreignKeys": 8,
+    "sha256": "14ebedd0b02aecafae18169c018a0ace88cdbd96c2ca7ca1b0677ec214cfe9b2",
+    "purpose": "EMPTY_ISOLATED_DB_ONLY",
+    "applied": false
+  },
+  {
+    "path": "docs/ddl/target/pg-kakao-simulator.sql",
+    "model": "target",
+    "service": "pg-kakao-simulator",
+    "tables": 4,
+    "foreignKeys": 2,
+    "sha256": "188e45c010d66a9eb5cf099f0a11469a95e4d8a27bc247fbe1b6e995fce37a93",
+    "purpose": "EMPTY_ISOLATED_DB_ONLY",
+    "applied": false
+  },
+  {
+    "path": "docs/ddl/target/pg-naver-simulator.sql",
+    "model": "target",
+    "service": "pg-naver-simulator",
+    "tables": 4,
+    "foreignKeys": 2,
+    "sha256": "82cefbcfda43377d905caf216ce55b1acceb1600535e85dc5f09161b8d862afc",
+    "purpose": "EMPTY_ISOLATED_DB_ONLY",
+    "applied": false
+  }
+]

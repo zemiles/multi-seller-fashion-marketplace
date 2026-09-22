@@ -1,0 +1,1285 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "업무 서비스 공통 운영 내부 API",
+    "version": "1.0.0",
+    "description": "Commerce/Payment/Settlement/Discovery 각각의 로컬 queue/recovery port 계약. 별도 서비스를 추가하지 않습니다. 각 서버 aud는 실제 서비스 ID이며 Commerce만 사용자 대리를 허용합니다."
+  },
+  "x-owner-service": "business-service",
+  "servers": [
+    {
+      "url": "http://localhost:8081",
+      "description": "commerce-service own DB only",
+      "x-jwt-audience": "commerce-service"
+    },
+    {
+      "url": "http://localhost:8082",
+      "description": "payment-service own DB only",
+      "x-jwt-audience": "payment-service"
+    },
+    {
+      "url": "http://localhost:8083",
+      "description": "settlement-service own DB only",
+      "x-jwt-audience": "settlement-service"
+    },
+    {
+      "url": "http://localhost:8084",
+      "description": "discovery-data-service own DB only",
+      "x-jwt-audience": "discovery-data-service"
+    }
+  ],
+  "paths": {
+    "/internal/v1/event-queues": {
+      "get": {
+        "operationId": "queryLocalEventQueues",
+        "tags": [
+          "보완 X-07"
+        ],
+        "summary": "queryLocalEventQueues",
+        "description": "동일 계약을 각 owner DB 안에서만 구현하는 내부 port입니다. aud는 실제 대상 service ID, owner 입력은 자기 서비스와 일치해야 합니다. Commerce의 actorContext와 금융 승인의 action/hash/actor를 재검증합니다. consumer+eventId를 포함한 대상을 식별하고 원 이벤트 불변·checkpoint 순서·dedup을 유지합니다. 타 서비스 DB 접근 금지.",
+        "security": [
+          {
+            "serviceJWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "queueType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "OUTBOX",
+                "INBOX"
+              ]
+            }
+          },
+          {
+            "name": "consumer",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "queryLocalEventQueues",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventQueueEntryPage"
+                },
+                "example": {
+                  "items": [],
+                  "nextCursor": "sample"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "형식 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한/CSRF 거부",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "없음 또는 다른 소유자",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "상태/멱등/버전 충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "만료된 자원",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "업무 정책/금액 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "요청 제한",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "일시적 인프라 장애",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation": "planned",
+        "x-requirements": [
+          "EVT-03",
+          "OPS-01"
+        ],
+        "x-authorized-roles": [
+          "commerce-service"
+        ],
+        "x-idempotency": "not-applicable",
+        "x-service-scope": "operations:read",
+        "x-contract-extension": "X-07",
+        "x-error-codes": {
+          "400": [
+            "UNKNOWN_FIELD",
+            "INVALID_INPUT"
+          ],
+          "403": [
+            "FORBIDDEN",
+            "APPROVAL_SELF_DECISION"
+          ],
+          "404": [
+            "RESOURCE_NOT_FOUND"
+          ],
+          "409": [
+            "VERSION_CONFLICT",
+            "IDEMPOTENCY_CONFLICT",
+            "APPROVAL_PAYLOAD_MISMATCH",
+            "INVALID_STATE"
+          ],
+          "410": [
+            "RESOURCE_EXPIRED"
+          ],
+          "422": [
+            "POLICY_VIOLATION"
+          ],
+          "503": [
+            "DEPENDENCY_UNAVAILABLE"
+          ]
+        }
+      }
+    },
+    "/internal/v1/event-queues/{entryId}/replays": {
+      "post": {
+        "operationId": "replayLocalEventQueue",
+        "tags": [
+          "보완 X-07"
+        ],
+        "summary": "replayLocalEventQueue",
+        "description": "동일 계약을 각 owner DB 안에서만 구현하는 내부 port입니다. aud는 실제 대상 service ID, owner 입력은 자기 서비스와 일치해야 합니다. Commerce의 actorContext와 금융 승인의 action/hash/actor를 재검증합니다. consumer+eventId를 포함한 대상을 식별하고 원 이벤트 불변·checkpoint 순서·dedup을 유지합니다. 타 서비스 DB 접근 금지. actorContext는 인증된 Commerce가 세션·권한 검사 후 생성합니다. 브라우저가 보낸 actor를 신뢰하지 않습니다.",
+        "security": [
+          {
+            "serviceJWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "^[A-Za-z0-9._:-]+$"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "replayLocalEventQueue — 동일 멱등 요청은 같은 리소스의 현재 상태.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryJob"
+                },
+                "example": {
+                  "jobId": "11111111-1111-4111-8111-111111111111",
+                  "owner": "COMMERCE",
+                  "entryId": "11111111-1111-4111-8111-111111111111",
+                  "eventId": "11111111-1111-4111-8111-111111111111",
+                  "queueType": "OUTBOX",
+                  "status": "QUEUED",
+                  "failureCode": null,
+                  "statusUrl": "/api/v1/admin/recovery-jobs/11111111-1111-4111-8111-111111111111",
+                  "createdAt": "2026-09-21T00:00:00Z",
+                  "completedAt": null,
+                  "version": 0
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "형식 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한/CSRF 거부",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "없음 또는 다른 소유자",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "상태/멱등/버전 충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "만료된 자원",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "업무 정책/금액 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "요청 제한",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "일시적 인프라 장애",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation": "planned",
+        "x-requirements": [
+          "EVT-03",
+          "OPS-01"
+        ],
+        "x-authorized-roles": [
+          "commerce-service"
+        ],
+        "x-idempotency": "principal + operation + targetId + key; compare normalized payload hash",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventReplayCreateWithActorContext"
+              },
+              "example": {
+                "owner": "COMMERCE",
+                "queueType": "OUTBOX",
+                "expectedHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "reason": "sample",
+                "evidenceIds": [],
+                "expectedVersion": 0,
+                "actorContext": {
+                  "actor": {
+                    "type": "MEMBER",
+                    "id": "11111111-1111-4111-8111-111111111111"
+                  },
+                  "correlationId": "11111111-1111-4111-8111-111111111111"
+                }
+              }
+            }
+          }
+        },
+        "x-service-scope": "operations:replay",
+        "x-contract-extension": "X-07",
+        "x-error-codes": {
+          "400": [
+            "UNKNOWN_FIELD",
+            "INVALID_INPUT"
+          ],
+          "403": [
+            "FORBIDDEN",
+            "APPROVAL_SELF_DECISION"
+          ],
+          "404": [
+            "RESOURCE_NOT_FOUND"
+          ],
+          "409": [
+            "VERSION_CONFLICT",
+            "IDEMPOTENCY_CONFLICT",
+            "APPROVAL_PAYLOAD_MISMATCH",
+            "INVALID_STATE"
+          ],
+          "410": [
+            "RESOURCE_EXPIRED"
+          ],
+          "422": [
+            "POLICY_VIOLATION"
+          ],
+          "503": [
+            "DEPENDENCY_UNAVAILABLE"
+          ]
+        }
+      }
+    },
+    "/internal/v1/recovery-jobs/{jobId}": {
+      "get": {
+        "operationId": "queryLocalRecoveryJob",
+        "tags": [
+          "보완 X-07"
+        ],
+        "summary": "queryLocalRecoveryJob",
+        "description": "동일 계약을 각 owner DB 안에서만 구현하는 내부 port입니다. aud는 실제 대상 service ID, owner 입력은 자기 서비스와 일치해야 합니다. Commerce의 actorContext와 금융 승인의 action/hash/actor를 재검증합니다. consumer+eventId를 포함한 대상을 식별하고 원 이벤트 불변·checkpoint 순서·dedup을 유지합니다. 타 서비스 DB 접근 금지.",
+        "security": [
+          {
+            "serviceJWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "queryLocalRecoveryJob",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryJob"
+                },
+                "example": {
+                  "jobId": "11111111-1111-4111-8111-111111111111",
+                  "owner": "COMMERCE",
+                  "entryId": "11111111-1111-4111-8111-111111111111",
+                  "eventId": "11111111-1111-4111-8111-111111111111",
+                  "queueType": "OUTBOX",
+                  "status": "QUEUED",
+                  "failureCode": null,
+                  "statusUrl": "/api/v1/admin/recovery-jobs/11111111-1111-4111-8111-111111111111",
+                  "createdAt": "2026-09-21T00:00:00Z",
+                  "completedAt": null,
+                  "version": 0
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "형식 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한/CSRF 거부",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "없음 또는 다른 소유자",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "상태/멱등/버전 충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "만료된 자원",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "업무 정책/금액 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "요청 제한",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "일시적 인프라 장애",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "sample",
+                  "message": "sample",
+                  "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation": "planned",
+        "x-requirements": [
+          "EVT-03",
+          "OPS-01"
+        ],
+        "x-authorized-roles": [
+          "commerce-service"
+        ],
+        "x-idempotency": "not-applicable",
+        "x-service-scope": "operations:read",
+        "x-contract-extension": "X-07",
+        "x-error-codes": {
+          "400": [
+            "UNKNOWN_FIELD",
+            "INVALID_INPUT"
+          ],
+          "403": [
+            "FORBIDDEN",
+            "APPROVAL_SELF_DECISION"
+          ],
+          "404": [
+            "RESOURCE_NOT_FOUND"
+          ],
+          "409": [
+            "VERSION_CONFLICT",
+            "IDEMPOTENCY_CONFLICT",
+            "APPROVAL_PAYLOAD_MISMATCH",
+            "INVALID_STATE"
+          ],
+          "410": [
+            "RESOURCE_EXPIRED"
+          ],
+          "422": [
+            "POLICY_VIOLATION"
+          ],
+          "503": [
+            "DEPENDENCY_UNAVAILABLE"
+          ]
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "__Host-marketplace-session",
+        "description": "HttpOnly, Secure, SameSite=Lax; localhost uses marketplace-session."
+      },
+      "adminCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "__Host-marketplace-admin-session",
+        "description": "Separate admin session, TOTP required."
+      },
+      "preAuthSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "__Host-marketplace-session",
+        "description": "Pre-auth opaque session issued by GET /session; not a logged-in principal."
+      },
+      "csrfToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-CSRF-Token",
+        "description": "Session-bound synchronizer token; Origin must also be verified."
+      },
+      "serviceJWT": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "RS256, allowlisted iss/sub, service audience, 60-second exp, operation scopes. Never browser credentials."
+      }
+    },
+    "schemas": {
+      "Actor": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "MEMBER",
+              "SELLER_MEMBER",
+              "ADMIN",
+              "SYSTEM"
+            ]
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "ActorContext": {
+        "type": "object",
+        "properties": {
+          "actor": {
+            "$ref": "#/components/schemas/Actor"
+          },
+          "correlationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "approvalId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "actor",
+          "correlationId"
+        ],
+        "additionalProperties": false
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "traceId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "traceId"
+        ],
+        "additionalProperties": false
+      },
+      "EventQueueEntry": {
+        "type": "object",
+        "properties": {
+          "entryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "owner": {
+            "type": "string",
+            "enum": [
+              "COMMERCE",
+              "PAYMENT",
+              "SETTLEMENT",
+              "DISCOVERY"
+            ]
+          },
+          "queueType": {
+            "type": "string",
+            "enum": [
+              "OUTBOX",
+              "INBOX"
+            ]
+          },
+          "consumer": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventType": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "topic": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 150
+          },
+          "aggregateType": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "aggregateId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 150
+          },
+          "aggregateVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "lastSequence": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "payloadHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PUBLISHING",
+              "PUBLISHED",
+              "FAILED",
+              "DEAD",
+              "RECEIVED",
+              "WAITING_GAP",
+              "PROCESSING",
+              "PROCESSED",
+              "IGNORED",
+              "QUARANTINED"
+            ]
+          },
+          "attemptCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "nextRetryAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "leaseExpiresAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "financial": {
+            "type": "boolean"
+          },
+          "lastErrorCode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "entryId",
+          "owner",
+          "queueType",
+          "consumer",
+          "eventId",
+          "eventType",
+          "topic",
+          "aggregateType",
+          "aggregateId",
+          "aggregateVersion",
+          "lastSequence",
+          "payloadHash",
+          "status",
+          "attemptCount",
+          "nextRetryAt",
+          "leaseExpiresAt",
+          "financial",
+          "lastErrorCode",
+          "version",
+          "occurredAt"
+        ],
+        "additionalProperties": false
+      },
+      "EventQueueEntryPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventQueueEntry"
+            },
+            "minItems": 0,
+            "maxItems": 100
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "additionalProperties": false
+      },
+      "EventReplayCreateWithActorContext": {
+        "type": "object",
+        "properties": {
+          "owner": {
+            "type": "string",
+            "enum": [
+              "COMMERCE",
+              "PAYMENT",
+              "SETTLEMENT",
+              "DISCOVERY"
+            ]
+          },
+          "queueType": {
+            "type": "string",
+            "enum": [
+              "OUTBOX",
+              "INBOX"
+            ]
+          },
+          "consumer": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "expectedHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "approvalId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "evidenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 0,
+            "maxItems": 20,
+            "uniqueItems": true
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "actorContext": {
+            "$ref": "#/components/schemas/ActorContext"
+          }
+        },
+        "required": [
+          "owner",
+          "queueType",
+          "expectedHash",
+          "reason",
+          "evidenceIds",
+          "expectedVersion",
+          "actorContext"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "queueType": {
+                  "const": "INBOX"
+                }
+              },
+              "required": [
+                "queueType"
+              ]
+            },
+            "then": {
+              "required": [
+                "consumer"
+              ]
+            },
+            "else": {
+              "not": {
+                "required": [
+                  "consumer"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "RecoveryJob": {
+        "type": "object",
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "owner": {
+            "type": "string",
+            "enum": [
+              "COMMERCE",
+              "PAYMENT",
+              "SETTLEMENT",
+              "DISCOVERY"
+            ]
+          },
+          "entryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "queueType": {
+            "type": "string",
+            "enum": [
+              "OUTBOX",
+              "INBOX"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "QUEUED",
+              "RUNNING",
+              "SUCCEEDED",
+              "FAILED"
+            ]
+          },
+          "failureCode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "statusUrl": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "jobId",
+          "owner",
+          "entryId",
+          "eventId",
+          "queueType",
+          "status",
+          "failureCode",
+          "statusUrl",
+          "createdAt",
+          "completedAt",
+          "version"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}

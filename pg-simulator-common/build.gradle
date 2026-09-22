@@ -1,0 +1,9 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'PG 시뮬레이터 공통 API 계약'
+
+java {
+    toolchain { languageVersion = JavaLanguageVersion.of(17) }
+}

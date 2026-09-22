@@ -1,0 +1,202 @@
+# commerce / 운영·금융협력 1 — current
+
+주요 키/컬럼 최대10개 표시. 전체 컬럼/제약은 [서비스 데이터 사전](commerce-service.md), 영역 밖 FK는 서비스 DBML을 확인합니다.
+
+```mermaid
+erDiagram
+    direction LR
+    commerceSellerBrandRelation["commerce.seller_brand_relation"] {
+        uuid seller_brand_relation_id PK "required"
+        uuid seller_id FK "required"
+        uuid brand_id FK "required"
+        text relation_type "required"
+        text verification_status "required"
+        jsonb evidence_snapshot "required"
+        timestamptz valid_from "nullable"
+        timestamptz valid_to "nullable"
+        timestamptz approved_at "nullable"
+        timestamptz revoked_at "nullable"
+    }
+    commerceAdminUser["commerce.admin_user"] {
+        uuid admin_user_id PK "required"
+        text identity_subject UK "required"
+        text email UK "nullable"
+        text display_name "required"
+        text status "required"
+        timestamptz last_login_at "nullable"
+        timestamptz created_at "required"
+        timestamptz updated_at "required"
+        timestamptz disabled_at "nullable"
+    }
+    commerceAdminRole["commerce.admin_role"] {
+        uuid admin_role_id PK "required"
+        text role_code UK "required"
+        text name "required"
+        text description "nullable"
+        text status "required"
+        timestamptz created_at "required"
+        timestamptz updated_at "required"
+    }
+    commerceAdminUserRole["commerce.admin_user_role"] {
+        uuid admin_user_role_id PK "required"
+        uuid admin_user_id FK "required"
+        uuid admin_role_id FK "required"
+        uuid granted_by_admin_user_id FK "nullable"
+        uuid revoked_by_admin_user_id FK "nullable"
+        timestamptz granted_at "required"
+        timestamptz revoked_at "nullable"
+        text revocation_reason "nullable"
+    }
+    commerceAdminPermission["commerce.admin_permission"] {
+        uuid permission_id PK "required"
+        text permission_code UK "required"
+        text name "required"
+        text description "nullable"
+        text risk_level "required"
+        timestamptz created_at "required"
+    }
+    commerceAdminRolePermission["commerce.admin_role_permission"] {
+        uuid admin_role_id PK, FK "required"
+        uuid permission_id PK, FK "required"
+        uuid granted_by_admin_user_id FK "nullable"
+        timestamptz granted_at "required"
+    }
+    commerceAdminApprovalRequest["commerce.admin_approval_request"] {
+        uuid approval_request_id PK "required"
+        uuid requested_by_admin_user_id FK "required"
+        text action_type "required"
+        text target_type "required"
+        uuid target_id "nullable"
+        text risk_level "required"
+        jsonb request_payload "required"
+        text justification "required"
+        integer required_approvals "required"
+        text idempotency_key UK "required"
+    }
+    commerceAdminApprovalStep["commerce.admin_approval_step"] {
+        uuid approval_step_id PK "required"
+        uuid approval_request_id FK "required"
+        uuid requester_admin_user_id FK "required"
+        uuid approver_admin_user_id FK "required"
+        integer step_no "required"
+        text decision "required"
+        text decision_reason "nullable"
+        timestamptz assigned_at "required"
+        timestamptz decided_at "nullable"
+    }
+    commerceAdminAuditLog["commerce.admin_audit_log"] {
+        uuid audit_log_id PK "required"
+        uuid admin_user_id FK "nullable"
+        uuid approval_request_id FK "nullable"
+        text action "required"
+        text target_type "required"
+        uuid target_id "nullable"
+        text request_id "required"
+        text correlation_id "nullable"
+        inet source_ip "nullable"
+        text user_agent "nullable"
+    }
+    commerceSellerIncident["commerce.seller_incident"] {
+        uuid incident_id PK "required"
+        uuid seller_id FK "required"
+        uuid finding_id FK "nullable"
+        text incident_type "required"
+        text source_type "required"
+        uuid source_id "nullable"
+        text source_key UK "required"
+        text severity "required"
+        text responsibility "required"
+        text status "required"
+    }
+    commerceSellerPenalty["commerce.seller_penalty"] {
+        uuid penalty_id PK "required"
+        uuid incident_id FK "required"
+        uuid rule_version_id FK "nullable"
+        uuid approved_by_admin_user_id FK "required"
+        text penalty_type "required"
+        text status "required"
+        bigint amount "nullable"
+        text currency "nullable"
+        jsonb restrictions "required"
+        timestamptz effective_from "required"
+    }
+    commerceSellerHealthMetric["commerce.seller_health_metric"] {
+        uuid metric_snapshot_id PK "required"
+        uuid seller_id FK "required"
+        text metric_code "required"
+        text dimension_key "required"
+        timestamptz window_start "required"
+        timestamptz window_end "required"
+        bigint numerator "required"
+        bigint denominator "required"
+        numeric_24_8_ calculated_value "required"
+        text calc_version "required"
+    }
+    commerceSellerAppeal["commerce.seller_appeal"] {
+        uuid appeal_id PK "required"
+        uuid seller_id FK "required"
+        uuid incident_id FK "required"
+        uuid penalty_id FK "nullable"
+        uuid submitted_by_seller_member_id FK "required"
+        uuid decided_by_admin_user_id FK "nullable"
+        integer appeal_no "required"
+        text status "required"
+        text statement "required"
+        jsonb evidence "required"
+    }
+    commerceComplianceRule["commerce.compliance_rule"] {
+        uuid compliance_rule_id PK "required"
+        text rule_code UK "required"
+        text rule_name "required"
+        text scope "required"
+        text jurisdiction "required"
+        text status "required"
+        text owner_team "required"
+        timestamptz created_at "required"
+        timestamptz retired_at "nullable"
+    }
+    commerceComplianceRuleVersion["commerce.compliance_rule_version"] {
+        uuid rule_version_id PK "required"
+        uuid compliance_rule_id FK "required"
+        uuid published_by_admin_user_id FK "nullable"
+        integer version_no "required"
+        timestamptz effective_from "required"
+        timestamptz effective_to "nullable"
+        jsonb rule_definition "required"
+        text definition_hash "required"
+        timestamptz published_at "required"
+    }
+    commerceSellerComplianceTask["commerce.seller_compliance_task"] {
+        uuid task_id PK "required"
+        uuid seller_id FK "required"
+        uuid assigned_admin_user_id FK "nullable"
+        text task_type "required"
+        text policy_version "required"
+        text priority "required"
+        text status "required"
+        timestamptz due_at "required"
+        timestamptz created_at "required"
+        timestamptz updated_at "required"
+    }
+    commerceComplianceRule ||..o{ commerceComplianceRuleVersion : "compliance_rule_id"
+    commerceAdminUser |o..o{ commerceComplianceRuleVersion : "published_by_admin_user_id"
+    commerceAdminUser |o..o{ commerceSellerComplianceTask : "assigned_admin_user_id"
+    commerceAdminUser ||..o{ commerceAdminUserRole : "admin_user_id"
+    commerceAdminRole ||..o{ commerceAdminUserRole : "admin_role_id"
+    commerceAdminUser |o..o{ commerceAdminUserRole : "granted_by_admin_user_id"
+    commerceAdminUser |o..o{ commerceAdminUserRole : "revoked_by_admin_user_id"
+    commerceAdminRole ||--o{ commerceAdminRolePermission : "admin_role_id"
+    commerceAdminPermission ||--o{ commerceAdminRolePermission : "permission_id"
+    commerceAdminUser |o..o{ commerceAdminRolePermission : "granted_by_admin_user_id"
+    commerceAdminUser ||..o{ commerceAdminApprovalRequest : "requested_by_admin_user_id"
+    commerceAdminApprovalRequest ||..o{ commerceAdminApprovalStep : "approval_request_id+requester_admin_user_id"
+    commerceAdminUser ||..o{ commerceAdminApprovalStep : "approver_admin_user_id"
+    commerceAdminUser |o..o{ commerceAdminAuditLog : "admin_user_id"
+    commerceAdminApprovalRequest |o..o{ commerceAdminAuditLog : "approval_request_id"
+    commerceSellerIncident ||..o{ commerceSellerPenalty : "incident_id"
+    commerceComplianceRuleVersion |o..o{ commerceSellerPenalty : "rule_version_id"
+    commerceAdminUser ||..o{ commerceSellerPenalty : "approved_by_admin_user_id"
+    commerceSellerIncident ||..o{ commerceSellerAppeal : "incident_id"
+    commerceSellerPenalty |o..o{ commerceSellerAppeal : "penalty_id"
+    commerceAdminUser |o..o{ commerceSellerAppeal : "decided_by_admin_user_id"
+```

@@ -1,0 +1,26 @@
+{
+  "eventId": "00000000-0000-4000-8000-000000000109",
+  "eventType": "SellerPenaltyApplied",
+  "eventVersion": 1,
+  "producer": "commerce-service",
+  "aggregateType": "SELLER_CONTROL",
+  "aggregateId": "00000000-0000-4000-8000-000000000002",
+  "aggregateVersion": 1,
+  "occurredAt": "2026-09-22T00:00:00Z",
+  "correlationId": "00000000-0000-4000-8000-000000000040",
+  "causationId": "00000000-0000-4000-8000-000000000010",
+  "traceId": "cccccccccccccccccccccccccccccccc",
+  "payload": {
+    "sellerId": "00000000-0000-4000-8000-000000000002",
+    "penaltyId": "00000000-0000-4000-8000-000000000022",
+    "approvalId": "00000000-0000-4000-8000-000000000023",
+    "type": "FEE",
+    "amount": {
+      "currency": "KRW",
+      "amount": 1000
+    },
+    "currency": "KRW",
+    "action": "APPLY"
+  },
+  "simulated": true
+}

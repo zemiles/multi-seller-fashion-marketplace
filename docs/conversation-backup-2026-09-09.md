@@ -1,5 +1,7 @@
 # 작업 대화 백업
 
+> 역사적 기록입니다. 현재 구조·구현·명령은 [BACKEND_DESIGN](BACKEND_DESIGN.md)과 [MSA](../MSA.md)를 따릅니다. 아래 단일 pg-simulator 및 구현 순서는 당시 기록이며, 현재는 Kakao/Naver 두 모듈입니다. PG에는 Actuator가 없으므로 아래 과거 health 명령을 현재 실행 지침으로 사용하지 않습니다.
+
 백업일: 2026-09-09
 프로젝트: `multi-seller-fashtion-marketplace`
 

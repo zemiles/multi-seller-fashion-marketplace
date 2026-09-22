@@ -1,0 +1,412 @@
+Project marketplace {
+  database_type: 'PostgreSQL'
+  Note: 'Documentation namespaces stand for separate service databases. No cross-service physical FK. CURRENT is migration-derived; PLANNED requires future migrations.'
+}
+
+Table payment.payment_attempt {
+  payment_attempt_id "uuid" [not null, pk, note: 'payment_attempt_id uuid PRIMARY KEY DEFAULT gen_random_uuid()']
+  checkout_id "uuid" [not null, note: 'checkout_id uuid NOT NULL']
+  order_id "uuid" [not null, note: 'order_id uuid NOT NULL']
+  provider "text" [not null, note: 'provider text NOT NULL']
+  merchant_tx_id "text" [not null, note: 'merchant_tx_id text NOT NULL']
+  idempotency_key "text" [not null, note: 'idempotency_key text NOT NULL']
+  payment_method "text" [not null, note: 'payment_method text NOT NULL']
+  status "text" [not null, note: 'status text NOT NULL DEFAULT \'CREATED\'']
+  currency "varchar(3)" [not null, note: 'currency varchar(3) NOT NULL']
+  requested_amount "bigint" [not null, note: 'requested_amount bigint NOT NULL']
+  request_payload "jsonb" [not null, note: 'request_payload jsonb NOT NULL DEFAULT \'{}\'::jsonb']
+  provider_response "jsonb" [null, note: 'provider_response jsonb']
+  error_code "text" [null, note: 'error_code text']
+  error_message "text" [null, note: 'error_message text']
+  requested_at "timestamptz" [null, note: 'requested_at timestamptz']
+  resolved_at "timestamptz" [null, note: 'resolved_at timestamptz']
+  created_at "timestamptz" [not null, note: 'created_at timestamptz NOT NULL DEFAULT now()']
+  updated_at "timestamptz" [not null, note: 'updated_at timestamptz NOT NULL DEFAULT now()']
+  payment_request_id "uuid" [not null, note: 'PLANNED payment_request_id uuid NOT NULL']
+  request_hash "text" [not null, note: 'PLANNED request_hash text NOT NULL']
+  expires_at "timestamptz" [not null, note: 'PLANNED expires_at timestamptz NOT NULL']
+  pricing_policy_version "text" [not null, note: 'PLANNED pricing_policy_version text NOT NULL']
+  indexes {
+    (provider, merchant_tx_id) [unique]
+    (provider, idempotency_key) [unique]
+  }
+}
+
+Table payment.payment {
+  payment_id "uuid" [not null, pk, note: 'payment_id uuid PRIMARY KEY DEFAULT gen_random_uuid()']
+  payment_attempt_id "uuid" [not null, unique, note: 'payment_attempt_id uuid NOT NULL']
+  order_id "uuid" [not null, note: 'order_id uuid NOT NULL']
+  provider "text" [not null, note: 'provider text NOT NULL']
+  provider_payment_key "text" [not null, note: 'provider_payment_key text NOT NULL']
+  payment_method "text" [not null, note: 'payment_method text NOT NULL']
+  status "text" [not null, note: 'status text NOT NULL DEFAULT \'APPROVED\'']
+  currency "varchar(3)" [not null, note: 'currency varchar(3) NOT NULL']
+  total_payment_amount "bigint" [not null, note: 'total_payment_amount bigint NOT NULL']
+  refunded_amount "bigint" [not null, note: 'refunded_amount bigint NOT NULL DEFAULT 0']
+  approved_at "timestamptz" [not null, note: 'approved_at timestamptz NOT NULL']
+  version "bigint" [not null, note: 'PLANNED version bigint NOT NULL']
+  created_at "timestamptz" [not null, note: 'created_at timestamptz NOT NULL DEFAULT now()']
+  updated_at "timestamptz" [not null, note: 'updated_at timestamptz NOT NULL DEFAULT now()']
+  voided_amount "bigint" [not null, note: 'PLANNED voided_amount bigint NOT NULL']
+  indexes {
+    (provider, provider_payment_key) [unique]
+  }
+}
+
+Table payment.payment_item {
+  payment_item_id "uuid" [not null, pk, note: 'payment_item_id uuid PRIMARY KEY DEFAULT gen_random_uuid()']
+  payment_id "uuid" [not null, note: 'payment_id uuid NOT NULL']
+  order_item_id "uuid" [not null, note: 'order_item_id uuid NOT NULL']
+  quantity "integer" [not null, note: 'quantity integer NOT NULL']
+  product_amount "bigint" [not null, note: 'product_amount bigint NOT NULL']
+  discount_amount "bigint" [not null, note: 'discount_amount bigint NOT NULL DEFAULT 0']
+  tax_amount "bigint" [not null, note: 'tax_amount bigint NOT NULL DEFAULT 0']
+  paid_amount "bigint" [not null, note: 'paid_amount bigint NOT NULL']
+  created_at "timestamptz" [not null, note: 'created_at timestamptz NOT NULL DEFAULT now()']
+  indexes {
+    (payment_id, order_item_id) [unique]
+  }
+}
+
+Table payment.payment_charge_allocation {
+  payment_charge_allocation_id "uuid" [not null, pk, note: 'payment_charge_allocation_id uuid PRIMARY KEY DEFAULT gen_random_uuid()']
+  payment_id "uuid" [not null, note: 'payment_id uuid NOT NULL']
+  order_charge_id "uuid" [not null, note: 'order_charge_id uuid NOT NULL']
+  amount "bigint" [not null, note: 'amount bigint NOT NULL']
+  created_at "timestamptz" [not null, note: 'created_at timestamptz NOT NULL DEFAULT now()']
+  indexes {
+    (payment_id, order_charge_id) [unique]
+  }
+}
+
+Table payment.payment_transaction {
+  payment_transaction_id "uuid" [not null, pk, note: 'payment_transaction_id uuid PRIMARY KEY DEFAULT gen_random_uuid()']
+  payment_id "uuid" [not null, note: 'payment_id uuid NOT NULL']
+  original_transaction_id "uuid" [null, note: 'original_transaction_id uuid']
+  provider "text" [not null, note: 'provider text NOT NULL']
+  provider_tx_id "text" [not null, note: 'provider_tx_id text NOT NULL']
+  idempotency_key "text" [not null, note: 'idempotency_key text NOT NULL']
+  transaction_type "text" [not null, note: 'transaction_type text NOT NULL']
+  status "text" [not null, note: 'status text NOT NULL DEFAULT \'PENDING\'']
+  currency "varchar(3)" [not null, note: 'currency varchar(3) NOT NULL']
+  amount "bigint" [not null, note: 'amount bigint NOT NULL']
+  provider_payload "jsonb" [not null, note: 'provider_payload jsonb NOT NULL DEFAULT \'{}\'::jsonb']
+  occurred_at "timestamptz" [null, note: 'occurred_at timestamptz']
+  completed_at "timestamptz" [null, note: 'completed_at timestamptz']
+  created_at "timestamptz" [not null, note: 'created_at timestamptz NOT NULL DEFAULT now()']
+  indexes {
+    (provider, provider_tx_id) [unique]
+    (payment_id, idempotency_key) [unique]
+  }
+}
+
+Table payment.payment_transaction_allocation {
+  transaction_allocation_id "uuid" [not null, pk, note: 'transaction_allocation_id uuid PRIMARY KEY DEFAULT gen_random_uuid()']
+  payment_transaction_id "uuid" [not null, note: 'payment_transaction_id uuid NOT NULL']
+  payment_item_id "uuid" [null, note: 'payment_item_id uuid']
+  payment_charge_allocation_id "uuid" [null, note: 'payment_charge_allocation_id uuid']
+  claim_item_id "uuid" [null, note: 'claim_item_id uuid']
+  amount "bigint" [not null, note: 'amount bigint NOT NULL']
+  created_at "timestamptz" [not null, note: 'created_at timestamptz NOT NULL DEFAULT now()']
+  indexes {
+    (payment_transaction_id, payment_item_id) [unique]
+    (payment_transaction_id, payment_charge_allocation_id) [unique]
+  }
+}
+
+Table payment.refund {
+  refund_id "uuid" [not null, pk, note: 'refund_id uuid PRIMARY KEY DEFAULT gen_random_uuid()']
+  payment_id "uuid" [not null, note: 'payment_id uuid NOT NULL']
+  claim_id "uuid" [null, note: 'claim_id uuid']
+  idempotency_key "text" [not null, note: 'idempotency_key text NOT NULL']
+  status "text" [not null, note: 'status text NOT NULL DEFAULT \'REQUESTED\'']
+  currency "varchar(3)" [not null, note: 'currency varchar(3) NOT NULL']
+  requested_amount "bigint" [not null, note: 'requested_amount bigint NOT NULL']
+  actual_refunded_amount "bigint" [not null, note: 'actual_refunded_amount bigint NOT NULL DEFAULT 0']
+  reason_code "text" [not null, note: 'reason_code text NOT NULL']
+  reason_detail "text" [null, note: 'reason_detail text']
+  requested_by_type "text" [not null, note: 'requested_by_type text NOT NULL']
+  requested_by_id "uuid" [null, note: 'requested_by_id uuid']
+  requested_at "timestamptz" [not null, note: 'requested_at timestamptz NOT NULL DEFAULT now()']
+  completed_at "timestamptz" [null, note: 'completed_at timestamptz']
+  created_at "timestamptz" [not null, note: 'created_at timestamptz NOT NULL DEFAULT now()']
+  updated_at "timestamptz" [not null, note: 'updated_at timestamptz NOT NULL DEFAULT now()']
+  compensation_id "uuid" [null, note: 'PLANNED compensation_id uuid NULL']
+  approval_id "uuid" [null, note: 'PLANNED approval_id uuid NULL']
+  request_hash "text" [not null, note: 'PLANNED request_hash text NOT NULL']
+  indexes {
+    (payment_id, idempotency_key) [unique]
+  }
+}
+
+Table payment.refund_item {
+  refund_item_id "uuid" [not null, pk, note: 'refund_item_id uuid PRIMARY KEY DEFAULT gen_random_uuid()']
+  refund_id "uuid" [not null, note: 'refund_id uuid NOT NULL']
+  payment_item_id "uuid" [not null, note: 'payment_item_id uuid NOT NULL']
+  order_item_id "uuid" [not null, note: 'order_item_id uuid NOT NULL']
+  claim_item_id "uuid" [null, note: 'claim_item_id uuid']
+  quantity "integer" [not null, note: 'quantity integer NOT NULL']
+  product_refund_amount "bigint" [not null, note: 'product_refund_amount bigint NOT NULL']
+  discount_reversal_amount "bigint" [not null, note: 'discount_reversal_amount bigint NOT NULL DEFAULT 0']
+  tax_refund_amount "bigint" [not null, note: 'tax_refund_amount bigint NOT NULL DEFAULT 0']
+  refund_amount "bigint" [not null, note: 'refund_amount bigint NOT NULL']
+  created_at "timestamptz" [not null, note: 'created_at timestamptz NOT NULL DEFAULT now()']
+  indexes {
+    (refund_id, payment_item_id) [unique]
+  }
+}
+
+Table payment.refund_charge_adjustment {
+  adjustment_id "uuid" [not null, pk, note: 'adjustment_id uuid PRIMARY KEY DEFAULT gen_random_uuid()']
+  refund_id "uuid" [not null, note: 'refund_id uuid NOT NULL']
+  order_charge_id "uuid" [not null, note: 'order_charge_id uuid NOT NULL']
+  payment_charge_allocation_id "uuid" [null, note: 'payment_charge_allocation_id uuid']
+  adjustment_type "text" [not null, note: 'adjustment_type text NOT NULL']
+  amount "bigint" [not null, note: 'amount bigint NOT NULL']
+  reason_code "text" [null, note: 'reason_code text']
+  created_at "timestamptz" [not null, note: 'created_at timestamptz NOT NULL DEFAULT now()']
+  indexes {
+    (refund_id, order_charge_id, adjustment_type) [unique]
+  }
+}
+
+Table payment.pg_webhook_inbox {
+  inbox_id "uuid" [not null, pk, note: 'inbox_id uuid PRIMARY KEY DEFAULT gen_random_uuid()']
+  payment_attempt_id "uuid" [null, note: 'payment_attempt_id uuid']
+  provider "text" [not null, note: 'provider text NOT NULL']
+  provider_event_id "text" [not null, note: 'provider_event_id text NOT NULL']
+  event_type "text" [not null, note: 'event_type text NOT NULL']
+  merchant_tx_id "text" [null, note: 'merchant_tx_id text']
+  payload_hash "text" [not null, note: 'payload_hash text NOT NULL']
+  headers "jsonb" [not null, note: 'headers jsonb NOT NULL DEFAULT \'{}\'::jsonb']
+  payload "jsonb" [not null, note: 'payload jsonb NOT NULL']
+  raw_body "text" [not null, note: 'raw_body text NOT NULL']
+  status "text" [not null, note: 'status text NOT NULL DEFAULT \'RECEIVED\'']
+  attempt_count "integer" [not null, note: 'attempt_count integer NOT NULL DEFAULT 0']
+  received_at "timestamptz" [not null, note: 'received_at timestamptz NOT NULL DEFAULT now()']
+  processing_started_at "timestamptz" [null, note: 'processing_started_at timestamptz']
+  processed_at "timestamptz" [null, note: 'processed_at timestamptz']
+  next_attempt_at "timestamptz" [null, note: 'next_attempt_at timestamptz']
+  last_error "text" [null, note: 'last_error text']
+  indexes {
+    (provider, provider_event_id) [unique]
+  }
+}
+
+Table payment.outbox_event {
+  outbox_event_id "uuid" [not null, pk, note: 'outbox_event_id uuid PRIMARY KEY DEFAULT gen_random_uuid()']
+  event_key "text" [not null, unique, note: 'event_key text NOT NULL']
+  aggregate_type "text" [not null, note: 'aggregate_type text NOT NULL']
+  aggregate_id "text" [not null, note: 'PLANNED aggregate_id text NOT NULL']
+  aggregate_version "bigint" [not null, note: 'PLANNED aggregate_version bigint NOT NULL']
+  event_type "text" [not null, note: 'event_type text NOT NULL']
+  payload "jsonb" [not null, note: 'payload jsonb NOT NULL']
+  status "text" [not null, note: 'status text NOT NULL DEFAULT \'PENDING\'']
+  attempt_count "integer" [not null, note: 'attempt_count integer NOT NULL DEFAULT 0']
+  occurred_at "timestamptz" [not null, note: 'occurred_at timestamptz NOT NULL DEFAULT now()']
+  available_at "timestamptz" [not null, note: 'available_at timestamptz NOT NULL DEFAULT now()']
+  published_at "timestamptz" [null, note: 'published_at timestamptz']
+  locked_at "timestamptz" [null, note: 'locked_at timestamptz']
+  lock_token "uuid" [null, note: 'lock_token uuid']
+  last_error "text" [null, note: 'last_error text']
+  version "bigint" [not null, note: 'PLANNED version bigint NOT NULL']
+  payload_hash "text" [not null, note: 'PLANNED payload_hash text NOT NULL']
+  serialized_body "bytea" [not null, note: 'PLANNED serialized_body bytea NOT NULL']
+  lease_expires_at "timestamptz" [null, note: 'PLANNED lease_expires_at timestamptz NULL']
+  event_version "integer" [not null, note: 'PLANNED event_version integer NOT NULL']
+  producer "text" [not null, note: 'PLANNED producer text NOT NULL']
+  correlation_id "uuid" [not null, note: 'PLANNED correlation_id uuid NOT NULL']
+  causation_id "uuid" [not null, note: 'PLANNED causation_id uuid NOT NULL']
+  trace_id "text" [not null, note: 'PLANNED trace_id text NOT NULL']
+  indexes {
+    (aggregate_type, aggregate_id, aggregate_version) [unique]
+  }
+}
+
+Table payment.consumer_inbox {
+  consumer_name "text" [not null, note: 'PLANNED consumer_name text NOT NULL']
+  event_id "uuid" [not null, note: 'PLANNED event_id uuid NOT NULL']
+  entry_id "uuid" [not null, unique, note: 'PLANNED entry_id uuid NOT NULL']
+  version "bigint" [not null, note: 'PLANNED version bigint NOT NULL']
+  aggregate_type "text" [not null, note: 'PLANNED aggregate_type text NOT NULL']
+  aggregate_id "text" [not null, note: 'PLANNED aggregate_id text NOT NULL']
+  aggregate_version "bigint" [not null, note: 'PLANNED aggregate_version bigint NOT NULL']
+  payload "jsonb" [not null, note: 'PLANNED payload jsonb NOT NULL']
+  payload_hash "text" [not null, note: 'PLANNED payload_hash text NOT NULL']
+  status "text" [not null, note: 'PLANNED status text NOT NULL']
+  attempt_count "integer" [not null, note: 'PLANNED attempt_count integer NOT NULL']
+  next_retry_at "timestamptz" [not null, note: 'PLANNED next_retry_at timestamptz NOT NULL']
+  lease_token "uuid" [null, note: 'PLANNED lease_token uuid NULL']
+  lease_expires_at "timestamptz" [null, note: 'PLANNED lease_expires_at timestamptz NULL']
+  received_at "timestamptz" [not null, note: 'PLANNED received_at timestamptz NOT NULL']
+  processed_at "timestamptz" [null, note: 'PLANNED processed_at timestamptz NULL']
+  indexes {
+    (consumer_name, event_id) [pk]
+    (consumer_name, aggregate_type, aggregate_id, aggregate_version) [unique]
+  }
+}
+
+Table payment.consumer_stream_checkpoint {
+  consumer_name "text" [not null, note: 'PLANNED consumer_name text NOT NULL']
+  aggregate_type "text" [not null, note: 'PLANNED aggregate_type text NOT NULL']
+  aggregate_id "text" [not null, note: 'PLANNED aggregate_id text NOT NULL']
+  last_sequence "bigint" [not null, note: 'PLANNED last_sequence bigint NOT NULL']
+  blocked_reason "text" [null, note: 'PLANNED blocked_reason text NULL']
+  updated_at "timestamptz" [not null, note: 'PLANNED updated_at timestamptz NOT NULL']
+  indexes {
+    (consumer_name, aggregate_type, aggregate_id) [pk]
+  }
+}
+
+Table payment.event_stream_sequence {
+  aggregate_type "text" [not null, note: 'PLANNED aggregate_type text NOT NULL']
+  aggregate_id "text" [not null, note: 'PLANNED aggregate_id text NOT NULL']
+  last_sequence "bigint" [not null, note: 'PLANNED last_sequence bigint NOT NULL']
+  version "bigint" [not null, note: 'PLANNED version bigint NOT NULL']
+  indexes {
+    (aggregate_type, aggregate_id) [pk]
+  }
+}
+
+Table payment.event_recovery_job {
+  job_id "uuid" [not null, pk, note: 'PLANNED job_id uuid NOT NULL']
+  entry_id "uuid" [not null, note: 'PLANNED entry_id uuid NOT NULL']
+  queue_type "text" [not null, note: 'PLANNED queue_type text NOT NULL']
+  consumer_name "text" [null, note: 'PLANNED consumer_name text NULL']
+  event_id "uuid" [not null, note: 'PLANNED event_id uuid NOT NULL']
+  expected_hash "text" [not null, note: 'PLANNED expected_hash text NOT NULL']
+  source_version "bigint" [not null, note: 'PLANNED source_version bigint NOT NULL']
+  status "text" [not null, note: 'PLANNED status text NOT NULL']
+  request_hash "text" [not null, note: 'PLANNED request_hash text NOT NULL']
+  idempotency_key "text" [not null, note: 'PLANNED idempotency_key text NOT NULL']
+  requested_by_admin_id "uuid" [not null, note: 'PLANNED requested_by_admin_id uuid NOT NULL']
+  approval_id "uuid" [null, note: 'PLANNED approval_id uuid NULL']
+  lease_token "uuid" [null, note: 'PLANNED lease_token uuid NULL']
+  lease_expires_at "timestamptz" [null, note: 'PLANNED lease_expires_at timestamptz NULL']
+  attempt_count "integer" [not null, note: 'PLANNED attempt_count integer NOT NULL']
+  next_retry_at "timestamptz" [not null, note: 'PLANNED next_retry_at timestamptz NOT NULL']
+  created_at "timestamptz" [not null, note: 'PLANNED created_at timestamptz NOT NULL']
+  completed_at "timestamptz" [null, note: 'PLANNED completed_at timestamptz NULL']
+  version "bigint" [not null, note: 'PLANNED version bigint NOT NULL']
+  last_error_code "text" [null, note: 'PLANNED last_error_code text NULL']
+  indexes {
+    (requested_by_admin_id, entry_id, idempotency_key) [unique]
+  }
+}
+
+Table payment.order_payment_guard {
+  order_id "uuid" [not null, pk, note: 'PLANNED order_id uuid NOT NULL']
+  gate "text" [not null, note: 'PLANNED gate text NOT NULL']
+  active_attempt_id "uuid" [null, note: 'PLANNED active_attempt_id uuid NULL']
+  successful_payment_id "uuid" [null, note: 'PLANNED successful_payment_id uuid NULL']
+  version "bigint" [not null, note: 'PLANNED version bigint NOT NULL']
+  closed_reason "text" [null, note: 'PLANNED closed_reason text NULL']
+  updated_at "timestamptz" [not null, note: 'PLANNED updated_at timestamptz NOT NULL']
+}
+
+Table payment.payment_operation {
+  operation_id "uuid" [not null, pk, note: 'PLANNED operation_id uuid NOT NULL']
+  order_id "uuid" [not null, note: 'PLANNED order_id uuid NOT NULL']
+  payment_attempt_id "uuid" [null, note: 'PLANNED payment_attempt_id uuid NULL']
+  payment_id "uuid" [null, note: 'PLANNED payment_id uuid NULL']
+  refund_id "uuid" [null, note: 'PLANNED refund_id uuid NULL']
+  kind "text" [not null, note: 'PLANNED kind text NOT NULL']
+  status "text" [not null, note: 'PLANNED status text NOT NULL']
+  idempotency_key "text" [not null, note: 'PLANNED idempotency_key text NOT NULL']
+  request_hash "text" [not null, note: 'PLANNED request_hash text NOT NULL']
+  request_payload "jsonb" [not null, note: 'PLANNED request_payload jsonb NOT NULL']
+  result_version "bigint" [not null, note: 'PLANNED result_version bigint NOT NULL']
+  result_payload "jsonb" [not null, note: 'PLANNED result_payload jsonb NOT NULL']
+  provider "text" [not null, note: 'PLANNED provider text NOT NULL']
+  merchant_tx_id "text" [not null, note: 'PLANNED merchant_tx_id text NOT NULL']
+  lease_token "uuid" [null, note: 'PLANNED lease_token uuid NULL']
+  lease_version "bigint" [not null, note: 'PLANNED lease_version bigint NOT NULL']
+  lease_expires_at "timestamptz" [null, note: 'PLANNED lease_expires_at timestamptz NULL']
+  next_retry_at "timestamptz" [not null, note: 'PLANNED next_retry_at timestamptz NOT NULL']
+  first_unknown_at "timestamptz" [null, note: 'PLANNED first_unknown_at timestamptz NULL']
+  created_at "timestamptz" [not null, note: 'PLANNED created_at timestamptz NOT NULL']
+  indexes {
+    (provider, kind, merchant_tx_id, idempotency_key) [unique]
+  }
+}
+
+Table payment.payment_operation_result {
+  operation_id "uuid" [not null, note: 'PLANNED operation_id uuid NOT NULL']
+  result_version "bigint" [not null, note: 'PLANNED result_version bigint NOT NULL']
+  immutable_result "jsonb" [not null, note: 'PLANNED immutable_result jsonb NOT NULL']
+  evidence_hash "text" [not null, note: 'PLANNED evidence_hash text NOT NULL']
+  occurred_at "timestamptz" [not null, note: 'PLANNED occurred_at timestamptz NOT NULL']
+  indexes {
+    (operation_id, result_version) [pk]
+  }
+}
+
+Table payment.refund_unit_allocation {
+  refund_id "uuid" [not null, note: 'PLANNED refund_id uuid NOT NULL']
+  order_item_id "uuid" [not null, note: 'PLANNED order_item_id uuid NOT NULL']
+  unit_ordinal "integer" [not null, note: 'PLANNED unit_ordinal integer NOT NULL']
+  amount "bigint" [not null, note: 'PLANNED amount bigint NOT NULL']
+  indexes {
+    (refund_id, order_item_id, unit_ordinal) [pk]
+  }
+}
+
+Table payment.pg_reconciliation_run {
+  run_id "uuid" [not null, pk, note: 'PLANNED run_id uuid NOT NULL']
+  provider "text" [not null, note: 'PLANNED provider text NOT NULL']
+  business_date "date" [not null, note: 'PLANNED business_date date NOT NULL']
+  source_as_of "timestamptz" [not null, note: 'PLANNED source_as_of timestamptz NOT NULL']
+  algorithm_version "text" [not null, note: 'PLANNED algorithm_version text NOT NULL']
+  status "text" [not null, note: 'PLANNED status text NOT NULL']
+  created_at "timestamptz" [not null, note: 'PLANNED created_at timestamptz NOT NULL']
+  indexes {
+    (provider, business_date, source_as_of, algorithm_version) [unique]
+  }
+}
+
+Table payment.pg_reconciliation_receipt {
+  provider "text" [not null, note: 'PLANNED provider text NOT NULL']
+  provider_transaction_id "uuid" [not null, note: 'PLANNED provider_transaction_id uuid NOT NULL']
+  run_id "uuid" [not null, note: 'PLANNED run_id uuid NOT NULL']
+  receipt "jsonb" [not null, note: 'PLANNED receipt jsonb NOT NULL']
+  receipt_hash "text" [not null, note: 'PLANNED receipt_hash text NOT NULL']
+  indexes {
+    (provider, provider_transaction_id) [pk]
+  }
+}
+
+Table payment.pg_reconciliation_discrepancy {
+  discrepancy_id "uuid" [not null, pk, note: 'PLANNED discrepancy_id uuid NOT NULL']
+  run_id "uuid" [not null, note: 'PLANNED run_id uuid NOT NULL']
+  identity_key "text" [not null, unique, note: 'PLANNED identity_key text NOT NULL']
+  kind "text" [not null, note: 'PLANNED kind text NOT NULL']
+  status "text" [not null, note: 'PLANNED status text NOT NULL']
+  expected_payload "jsonb" [not null, note: 'PLANNED expected_payload jsonb NOT NULL']
+  actual_payload "jsonb" [not null, note: 'PLANNED actual_payload jsonb NOT NULL']
+  approval_id "uuid" [null, note: 'PLANNED approval_id uuid NULL']
+  resolved_at "timestamptz" [null, note: 'PLANNED resolved_at timestamptz NULL']
+}
+
+Ref payment_payment_transaction_payment_fk: payment.payment_transaction.payment_id > payment.payment.payment_id
+Ref payment_payment_transaction_original_fk: payment.payment_transaction.original_transaction_id > payment.payment_transaction.payment_transaction_id
+Ref payment_pg_webhook_inbox_payment_attempt_fk: payment.pg_webhook_inbox.payment_attempt_id > payment.payment_attempt.payment_attempt_id
+Ref payment_payment_attempt_fk: payment.payment.payment_attempt_id - payment.payment_attempt.payment_attempt_id
+Ref payment_payment_item_payment_fk: payment.payment_item.payment_id > payment.payment.payment_id
+Ref payment_payment_charge_allocation_payment_fk: payment.payment_charge_allocation.payment_id > payment.payment.payment_id
+Ref payment_payment_transaction_allocation_transaction_fk: payment.payment_transaction_allocation.payment_transaction_id > payment.payment_transaction.payment_transaction_id
+Ref payment_payment_transaction_allocation_item_fk: payment.payment_transaction_allocation.payment_item_id > payment.payment_item.payment_item_id
+Ref payment_payment_transaction_allocation_charge_fk: payment.payment_transaction_allocation.payment_charge_allocation_id > payment.payment_charge_allocation.payment_charge_allocation_id
+Ref payment_refund_payment_fk: payment.refund.payment_id > payment.payment.payment_id
+Ref payment_refund_item_refund_fk: payment.refund_item.refund_id > payment.refund.refund_id
+Ref payment_refund_item_payment_item_fk: payment.refund_item.payment_item_id > payment.payment_item.payment_item_id
+Ref payment_refund_charge_adjustment_refund_fk: payment.refund_charge_adjustment.refund_id > payment.refund.refund_id
+Ref payment_refund_charge_adjustment_payment_charge_fk: payment.refund_charge_adjustment.payment_charge_allocation_id > payment.payment_charge_allocation.payment_charge_allocation_id
+Ref payment_order_payment_guard_active_attempt_id_planned_fk: payment.order_payment_guard.active_attempt_id > payment.payment_attempt.payment_attempt_id
+Ref payment_order_payment_guard_successful_payment_id_planned_fk: payment.order_payment_guard.successful_payment_id > payment.payment.payment_id
+Ref payment_payment_operation_payment_attempt_id_planned_fk: payment.payment_operation.payment_attempt_id > payment.payment_attempt.payment_attempt_id
+Ref payment_payment_operation_payment_id_planned_fk: payment.payment_operation.payment_id > payment.payment.payment_id
+Ref payment_payment_operation_refund_id_planned_fk: payment.payment_operation.refund_id > payment.refund.refund_id
+Ref payment_payment_operation_result_operation_id_planned_fk: payment.payment_operation_result.operation_id > payment.payment_operation.operation_id
+Ref payment_refund_unit_allocation_refund_id_planned_fk: payment.refund_unit_allocation.refund_id > payment.refund.refund_id
+Ref payment_pg_reconciliation_receipt_run_id_planned_fk: payment.pg_reconciliation_receipt.run_id > payment.pg_reconciliation_run.run_id
+Ref payment_pg_reconciliation_discrepancy_run_id_planned_fk: payment.pg_reconciliation_discrepancy.run_id > payment.pg_reconciliation_run.run_id

@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-marketplace}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
     ports:
-      - '${COMMERCE_POSTGRES_PORT:-5432}:5432'
+      - '127.0.0.1:${COMMERCE_POSTGRES_PORT:-5432}:5432'
     volumes:
       - commerce-postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -24,7 +24,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-marketplace}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
     ports:
-      - '${PAYMENT_POSTGRES_PORT:-5433}:5432'
+      - '127.0.0.1:${PAYMENT_POSTGRES_PORT:-5433}:5432'
     volumes:
       - payment-postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -40,7 +40,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-marketplace}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
     ports:
-      - '${SETTLEMENT_POSTGRES_PORT:-5434}:5432'
+      - '127.0.0.1:${SETTLEMENT_POSTGRES_PORT:-5434}:5432'
     volumes:
       - settlement-postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -56,7 +56,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-marketplace}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
     ports:
-      - '${DISCOVERY_POSTGRES_PORT:-5435}:5432'
+      - '127.0.0.1:${DISCOVERY_POSTGRES_PORT:-5435}:5432'
     volumes:
       - discovery-postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -69,7 +69,7 @@ services:
     image: redis:7.4.11-alpine
     command: ['redis-server', '--appendonly', 'yes']
     ports:
-      - '${REDIS_PORT:-6379}:6379'
+      - '127.0.0.1:${REDIS_PORT:-6379}:6379'
     volumes:
       - redis-data:/data
     healthcheck:
@@ -82,7 +82,7 @@ services:
     image: apache/kafka:4.1.2
     hostname: kafka
     ports:
-      - '${KAFKA_PORT:-9092}:9092'
+      - '127.0.0.1:${KAFKA_PORT:-9092}:9092'
     environment:
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
       KAFKA_NODE_ID: 1
@@ -120,7 +120,7 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
-      - '8081:8081'
+      - '127.0.0.1:8081:8081'
     depends_on:
       commerce-postgres:
         condition: service_healthy
@@ -141,39 +141,71 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
-      - '8082:8082'
+      - '127.0.0.1:8082:8082'
     depends_on:
       payment-postgres:
         condition: service_healthy
       kafka:
         condition: service_healthy
 
-  pg-simulator:
+  pg-kakao-simulator:
     build:
       context: .
       args:
-        SERVICE: pg-simulator
+        SERVICE: pg-kakao-simulator
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:postgresql://pg-simulator-postgres:5432/pgsim
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pg-kakao-simulator-postgres:5432/pgkakao
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-marketplace}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
     ports:
-      - '8090:8090'
+      - '127.0.0.1:${KAKAO_PG_SIMULATOR_PORT:-8090}:8090'
     depends_on:
-      pg-simulator-postgres:
+      pg-kakao-simulator-postgres:
         condition: service_healthy
 
-  pg-simulator-postgres:
+  pg-kakao-simulator-postgres:
     image: postgres:17.11-alpine
     environment:
-      POSTGRES_DB: pgsim
+      POSTGRES_DB: pgkakao
       POSTGRES_USER: ${POSTGRES_USER:-marketplace}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
     ports:
-      - '${PG_SIMULATOR_POSTGRES_PORT:-5436}:5432'
+      - '127.0.0.1:${KAKAO_PG_SIMULATOR_POSTGRES_PORT:-5436}:5432'
     volumes:
-      - pg-simulator-postgres-data:/var/lib/postgresql/data
+      - pg-kakao-simulator-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  pg-naver-simulator:
+    build:
+      context: .
+      args:
+        SERVICE: pg-naver-simulator
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pg-naver-simulator-postgres:5432/pgnaver
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-marketplace}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
+    ports:
+      - '127.0.0.1:${NAVER_PG_SIMULATOR_PORT:-8091}:8091'
+    depends_on:
+      pg-naver-simulator-postgres:
+        condition: service_healthy
+
+  pg-naver-simulator-postgres:
+    image: postgres:17.11-alpine
+    environment:
+      POSTGRES_DB: pgnaver
+      POSTGRES_USER: ${POSTGRES_USER:-marketplace}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
+    ports:
+      - '127.0.0.1:${NAVER_PG_SIMULATOR_POSTGRES_PORT:-5437}:5432'
+    volumes:
+      - pg-naver-simulator-postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
       interval: 5s
@@ -192,7 +224,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-marketplace-local-password}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
-      - '8083:8083'
+      - '127.0.0.1:8083:8083'
     depends_on:
       settlement-postgres:
         condition: service_healthy
@@ -212,7 +244,7 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
-      - '8084:8084'
+      - '127.0.0.1:8084:8084'
     depends_on:
       discovery-postgres:
         condition: service_healthy
@@ -228,4 +260,5 @@ volumes:
   discovery-postgres-data:
   redis-data:
   kafka-data:
-  pg-simulator-postgres-data:
+  pg-kakao-simulator-postgres-data:
+  pg-naver-simulator-postgres-data:

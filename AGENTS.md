@@ -1,36 +1,40 @@
-# 프로젝트 작업 맥락
+# 백엔드 작업 지침
 
-## 현재 작업 기준 (2026-09-09 사용자 지시)
+## 현재 기준 (2026-09-21)
 
-- 환경 설정 이후 사용자는 2026-09-09 서비스 내부 뼈대 구성을 요청했다. 현재 범위는 기존 4개 서비스 안의 도메인별 패키지와 계층 구성이다. 업무 기능 구현이나 서비스 경계 재설계로 범위를 임의로 넓히지 않는다.
-- 이후 결제 쪽 구성을 요청하여 payment-service에 PG와 무관한 핵심 도메인과 내부 유스케이스 인터페이스를 추가했다. 최신 결제 범위와 미구현 항목은 `payment-service/README.md`를 먼저 확인한다. 실제 PG 및 공개 API 계약은 아직 정해지지 않았다.
-- 관련 프로젝트 문서의 수정 시각을 확인하고 가장 최근에 수정된 문서를 우선 참고한다. 오래된 문서의 설명을 현재 요구사항으로 적용하지 않는다.
-- 확인 시점의 루트 아키텍처·환경 문서 중 `MSA.md` (2026-09-01 17:08:10)가 `README.md` (2026-09-01 17:07:32)보다 최신이다. 현재 환경 설정은 `MSA.md`와 실제 Gradle·프로필·Docker 설정을 기준으로 진행한다.
-- 이 지침 파일의 갱신 시각은 아키텍처 문서의 최신 여부를 판단하는 기준에서 제외한다. 이후 관련 문서가 수정되면 우선순위를 다시 확인한다.
-- 2026-09-09 환경 설정 완료: `.env`에 Compose 프로젝트 이름 `marketplace-four-services-local`을 저장했고 기존 환경 데이터는 유지했다. 네 서비스에 Flyway starter를 적용하여 V1 migration을 검증했다. 전체 빌드·테스트와 8081~8084 health `UP` 확인 완료. 최신 실행 절차와 검증 결과는 같은 날 갱신한 `MSA.md`를 참고한다.
+- 새 작업 전에 [docs/BACKEND_DESIGN.md](docs/BACKEND_DESIGN.md)를 읽습니다. 요구사항·서비스 소유권·현재 구현·계약·다음 작업의 기준입니다.
+- 구현할 정책은 [docs/requirements/README.md](docs/requirements/README.md)와 해당 도메인 상세 문서를 읽습니다. DEC/요구사항/AT ID를 작업·테스트에 연결합니다. v1로 결정한 사항을 다시 미정으로 취급하지 않습니다.
+- 기능 구현 전에 [구현 상세 문서](docs/implementation/README.md)의 해당 workflow/lock 순서·이벤트 schema·migration wave·화면·운영 복구를 읽습니다. 추적표의 X-01~11과 정식 OpenAPI의 연결을 확인하고, DT/AT는 실제 실행 증거 없이 통과 처리하지 않습니다.
+- PG1=기존 KAKAO simulator, PG2=기존 NAVER simulator입니다. 실 카카오/네이버·은행 연결이나 새 PG 도입은 범위가 아닙니다. 목표 계약의 미구현 상태를 완료로 보고하지 않습니다.
+- 실행·검증은 [MSA.md](MSA.md), HTTP 계약은 [contracts/README.md](contracts/README.md)를 따릅니다.
+- 테이블 탐색은 [docs/erd](docs/erd/README.md), 빈 격리 DB용 SQL은 [docs/ddl](docs/ddl/README.md), API 필드·예시는 [docs/api](docs/api/README.md)를 읽습니다. 생성본을 직접 편집하지 말고 [문서 도구](scripts/docs/README.md)의 원본을 수정·재생성·검증합니다. 현재와 목표 모델을 혼동하지 않습니다.
+- 파일 수정 시각으로 우선순위를 결정하지 않습니다. 과거 대화 백업·분석은 역사적 맥락이며 현재 설계를 덮어쓰지 않습니다. 최신 사용자 지시가 우선합니다.
+- 4개 업무 서비스 Commerce/Payment/Settlement/Discovery 경계를 유지합니다. 구매확정은 Commerce, 지급 대상 원장은 Settlement, PG 결제 대사는 Payment가 소유합니다.
+- 기존 “패키지 뼈대만 수정” 범위는 당시 요청의 기록입니다. 현재 사용자 요청에 맞게 코드·문서 문제를 수정하고 검증합니다.
 
-## 이전 논의 참고
+## 구현 규칙
 
-- 사용자가 이 프로젝트 작업의 기준으로 지정한 이전 대화: https://chatgpt.com/s/cx_6aa0ba4831648191b29569c4069edbef
-- 사용자가 제공한 전체 공유 대화 재확인 링크: https://chatgpt.com/share/6a94ed7b-1184-83e8-88fe-b0a3fd22cc8f
-- 사용자는 매번 같은 URL을 다시 전달하지 않도록 이 저장소에 기록해 달라고 요청했다 (2026-09-09).
-- 관련 작업을 시작할 때 아래 요약과 최신 문서를 우선 확인한다. 사용자에게 같은 URL을 다시 요청하지 않는다.
+- 기존 미커밋 변경을 보존하고 작업 범위를 넘어 되돌리지 않습니다.
+- 타 서비스 DB 직접 접근, 서비스 간 JPA Entity 관계, shared domain/entity jar를 만들지 않습니다. PG simulator의 HTTP DTO 라이브러리는 현재 명시된 예외입니다.
+- PaymentLifecycleService는 메모리 reference implementation입니다. 영속 구현과 복구 없이 Spring Bean/공개 API로 노출하지 않습니다.
+- PG 요청 전 입력·권한·금액·멱등성을 검증하고 요청 정보를 commit합니다. timeout·UNKNOWN을 실패로 단정해 재결제/재환불하지 않습니다.
+- domain 변경·금융 거래 이력·outbox는 같은 DB transaction으로 저장합니다. 외부 HTTP 호출 동안 DB lock을 유지하지 않습니다.
+- 기존 Flyway V1은 수정하지 않고 새 버전 migration을 추가합니다. 생성기는 build/schema-preview에 비교 후보만 만듭니다.
+- 단일 앱이나 과거 10개 서비스 설계로 되돌리지 않습니다. 서비스 추가 분리는 별도 요구와 데이터 경계 근거가 있을 때 설계 문서를 함께 변경합니다.
 
-### 공유 대화에서 확정된 데이터·ERD 기준
+## 검증과 기록
 
-- 106개 테이블, 196개 외래 키, 191개 명시적 인덱스의 논리 ERD와 PostgreSQL DDL을 개발 착수용 완성본으로 확정했다.
-- 결제는 `Payment`(전체 금액), `PaymentItem`(상품별 수량·가격·할인·배송비·귀속 금액), `PaymentTransaction`(PG 승인·전체취소·부분취소 이력)으로 분리한다.
-- PG 호출 전에 `PENDING_PAYMENT` 주문을 생성하고, 웹훅 멱등성·복구 구조를 사용한다.
-- Redis만으로 재고를 보관하지 않고 DB `inventory_reservation` 원장을 진실의 원천으로 사용한다.
-- 부분취소·환불은 상품·수량·배송비별 배분으로 추적한다.
-- 주문 당시 상품명·옵션·가격은 불변 snapshot으로 저장한다.
-- 분할 배송과 부분 반품을 수량 기반으로 처리하고, 구매확정·Claim 흐름을 별도로 둔다.
-- 판매자 정산은 불변 원장·배분·지급·은행 대사 구조로 처리한다.
-- 판매자 다중 계정, 브랜드 판매 권한, SKU 조합 중복, AI 근거·버전 제약을 포함한다.
-- 인덱스는 상품 목록, 재고 예약, 판매자 주문 큐, PG callback, 미발행 outbox, 배송 추적, 자동 구매확정, Claim, 판매자 원장·정산, 대사, 이미지 CTR, 알림·감사 영역을 우선한다.
-- 논리 ERD·DDL은 개발 착수 기준으로 확정했지만, 운영 전에는 상태 전이표, 동시성·멱등성 테스트, 할인·세금 정책과 여러 행 합계의 트랜잭션/지연 제약 검증을 추가한다.
-- 외부 산출물은 `../../database/marketplace.dbml`, `../../database/marketplace-erd.html`, `../../database/postgresql/marketplace_schema.sql`, `../../database/INDEX_REVIEW.md`에 있다.
+- 코드/설정 변경은 JDK 17로 `.\gradlew.bat clean build --no-daemon`을 실행합니다.
+- schema는 `.\scripts\verify-service-schema.ps1`, 문서는 `.\scripts\verify-doc-links.ps1`로 검사합니다.
+- 문서 계약 변경은 `node scripts/docs/build-implementation-docs.mjs --check`, `python scripts/docs/verify-implementation.py`, `python scripts/docs/verify-contract-closure.py`도 실행합니다. ERD/API/DDL 원본을 변경했다면 [문서 도구](scripts/docs/README.md)의 전체 생성·검증 순서를 따릅니다. SQL 검증은 기존 DB가 아닌 도구가 생성하는 메모리 DB에서만 수행합니다.
+- DB lock·migration 변경은 기존 데이터와 분리된 PostgreSQL에서도 확인합니다. H2 통과를 PostgreSQL 검증으로 보고하지 않습니다.
+- 실행하지 못한 검증과 미구현 범위를 명시하고 구현·계약·설계 문서를 함께 갱신합니다.
+- 운영/기존 Compose DB 삭제나 배포는 검토 작업의 자동 후속 단계가 아닙니다.
 
-- 현재 저장소에서는 위 논의를 기준으로 4개 서비스 MSA와 서비스별 Flyway migration을 구성했다. 이후 구현은 이 기준을 유지하며, 사용자 지시가 우선한다.
-- 현재 대화의 상세 백업은 `docs/conversation-backup-2026-09-09.md`에 있다. 재부팅 후 먼저 이 파일과 최신 `MSA.md`를 읽는다.
-- 개발 PG가 필요할 때 실제 결제사 대신 `pg-simulator`를 사용한다. 이 모듈은 승인·취소·부분/전체 환불·중복 merchant transaction·조회만 제공하며 실제 운영 PG로 간주하지 않는다.
+## 참고 대화
+
+- 최초 참고: https://chatgpt.com/s/cx_6aa0ba4831648191b29569c4069edbef
+- 전체 공유: https://chatgpt.com/share/6a94ed7b-1184-83e8-88fe-b0a3fd22cc8f
+- 과거 백업: [docs/conversation-backup-2026-09-09.md](docs/conversation-backup-2026-09-09.md)
+
+사용자에게 같은 링크를 다시 요청하지 않습니다. 현재 개발에는 설계 문서를 먼저 사용하고 원문은 결정 출처를 확인할 필요가 있을 때만 참조합니다.

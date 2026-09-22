@@ -1,0 +1,307 @@
+[
+  {
+    "id": "X-01",
+    "status": "SPECIFIED",
+    "operations": [
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "quoteClaim",
+        "method": "POST",
+        "path": "/api/v1/orders/{orderId}/claim-quotes"
+      }
+    ],
+    "runtimeStatus": "NOT_IMPLEMENTED"
+  },
+  {
+    "id": "X-02",
+    "status": "SPECIFIED",
+    "operations": [
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "requestClaimReasonChange",
+        "method": "POST",
+        "path": "/api/v1/claims/{claimId}/reason-change-requests"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "listMyClaimReasonChanges",
+        "method": "GET",
+        "path": "/api/v1/claims/{claimId}/reason-change-requests"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "getSellerClaim",
+        "method": "GET",
+        "path": "/api/v1/sellers/{sellerId}/claims/{claimId}"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "listSellerClaimReasonChanges",
+        "method": "GET",
+        "path": "/api/v1/sellers/{sellerId}/claims/{claimId}/reason-change-requests"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "decideClaimReasonChange",
+        "method": "POST",
+        "path": "/api/v1/sellers/{sellerId}/claims/{claimId}/reason-change-requests/{requestId}/decisions"
+      }
+    ],
+    "runtimeStatus": "NOT_IMPLEMENTED"
+  },
+  {
+    "id": "X-03",
+    "status": "SPECIFIED",
+    "operations": [
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "recordReturnTracking",
+        "method": "POST",
+        "path": "/api/v1/admin/claims/{claimId}/return-tracking-events"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "correctShipment",
+        "method": "POST",
+        "path": "/api/v1/admin/shipments/{shipmentId}/corrections"
+      }
+    ],
+    "runtimeStatus": "NOT_IMPLEMENTED"
+  },
+  {
+    "id": "X-04",
+    "status": "SPECIFIED",
+    "operations": [
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "listConceptTaxonomies",
+        "method": "GET",
+        "path": "/api/v1/admin/concept-taxonomies"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "listSellerVerificationReviews",
+        "method": "GET",
+        "path": "/api/v1/admin/seller-verifications"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "listProductReviewRequests",
+        "method": "GET",
+        "path": "/api/v1/admin/product-review-requests"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "listReviewModerationRequests",
+        "method": "GET",
+        "path": "/api/v1/admin/review-moderation-requests"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "listAccountChangeReviews",
+        "method": "GET",
+        "path": "/api/v1/admin/settlement-account-change-requests"
+      },
+      {
+        "contract": "discovery-internal.openapi.json",
+        "operationId": "queryTaxonomies",
+        "method": "GET",
+        "path": "/internal/v1/concept-taxonomies"
+      }
+    ],
+    "runtimeStatus": "NOT_IMPLEMENTED"
+  },
+  {
+    "id": "X-05",
+    "status": "SPECIFIED",
+    "operations": [
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "listSellerAppeals",
+        "method": "GET",
+        "path": "/api/v1/sellers/{sellerId}/appeals"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "getSellerSettlementAccount",
+        "method": "GET",
+        "path": "/api/v1/sellers/{sellerId}/settlement-account"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "getSellerAppeal",
+        "method": "GET",
+        "path": "/api/v1/sellers/{sellerId}/appeals/{appealId}"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "getUploadStatus",
+        "method": "GET",
+        "path": "/api/v1/uploads/{uploadId}"
+      }
+    ],
+    "runtimeStatus": "NOT_IMPLEMENTED"
+  },
+  {
+    "id": "X-06",
+    "status": "SPECIFIED",
+    "operations": [
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "listAdministrators",
+        "method": "GET",
+        "path": "/api/v1/admin/administrators"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "getAdministrator",
+        "method": "GET",
+        "path": "/api/v1/admin/administrators/{adminId}"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "requestAdminRoleChange",
+        "method": "POST",
+        "path": "/api/v1/admin/administrators/{adminId}/role-change-requests"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "executeAdminRoleChange",
+        "method": "POST",
+        "path": "/api/v1/admin/administrators/{adminId}/role-change-requests/{requestId}/execute"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "requestAdminMfaRecovery",
+        "method": "POST",
+        "path": "/api/v1/admin/administrators/{adminId}/mfa-recovery-requests"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "executeAdminMfaRecovery",
+        "method": "POST",
+        "path": "/api/v1/admin/administrators/{adminId}/mfa-recovery-requests/{requestId}/execute"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "getApproval",
+        "method": "GET",
+        "path": "/api/v1/admin/approval-requests/{approvalId}"
+      }
+    ],
+    "runtimeStatus": "NOT_IMPLEMENTED"
+  },
+  {
+    "id": "X-07",
+    "status": "SPECIFIED",
+    "operations": [
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "listEventQueues",
+        "method": "GET",
+        "path": "/api/v1/admin/event-queues"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "replayEventQueue",
+        "method": "POST",
+        "path": "/api/v1/admin/event-queues/{entryId}/replays"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "getRecoveryJob",
+        "method": "GET",
+        "path": "/api/v1/admin/recovery-jobs/{jobId}"
+      },
+      {
+        "contract": "operations-internal.openapi.json",
+        "operationId": "queryLocalEventQueues",
+        "method": "GET",
+        "path": "/internal/v1/event-queues"
+      },
+      {
+        "contract": "operations-internal.openapi.json",
+        "operationId": "replayLocalEventQueue",
+        "method": "POST",
+        "path": "/internal/v1/event-queues/{entryId}/replays"
+      },
+      {
+        "contract": "operations-internal.openapi.json",
+        "operationId": "queryLocalRecoveryJob",
+        "method": "GET",
+        "path": "/internal/v1/recovery-jobs/{jobId}"
+      }
+    ],
+    "runtimeStatus": "NOT_IMPLEMENTED"
+  },
+  {
+    "id": "X-08",
+    "status": "SPECIFIED",
+    "operations": [
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "convertExchange",
+        "method": "POST",
+        "path": "/api/v1/claims/{claimId}/exchange-conversions"
+      }
+    ],
+    "runtimeStatus": "NOT_IMPLEMENTED"
+  },
+  {
+    "id": "X-09",
+    "status": "SPECIFIED",
+    "operations": [
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "getOrderForSupport",
+        "method": "GET",
+        "path": "/api/v1/admin/orders/{orderId}"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "getClaimForSupport",
+        "method": "GET",
+        "path": "/api/v1/admin/claims/{claimId}"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "createClaimException",
+        "method": "POST",
+        "path": "/api/v1/admin/orders/{orderId}/claim-exceptions"
+      }
+    ],
+    "runtimeStatus": "NOT_IMPLEMENTED"
+  },
+  {
+    "id": "X-10",
+    "status": "SPECIFIED",
+    "operations": [
+      {
+        "contract": "discovery-internal.openapi.json",
+        "operationId": "ingestServerBehavior",
+        "method": "POST",
+        "path": "/internal/v1/server-behavior-events"
+      }
+    ],
+    "runtimeStatus": "NOT_IMPLEMENTED"
+  },
+  {
+    "id": "X-11",
+    "status": "SPECIFIED",
+    "operations": [
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "createSearchRebuild",
+        "method": "POST",
+        "path": "/api/v1/admin/search-rebuilds"
+      },
+      {
+        "contract": "commerce-public.openapi.json",
+        "operationId": "getSearchRebuild",
+        "method": "GET",
+        "path": "/api/v1/admin/search-rebuilds/{generationId}"
+      }
+    ],
+    "runtimeStatus": "NOT_IMPLEMENTED"
+  }
+]

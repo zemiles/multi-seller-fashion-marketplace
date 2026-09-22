@@ -6,7 +6,7 @@ import multi.com.marketplace.payment.refund.domain.Refund;
 import multi.com.marketplace.payment.refund.domain.RefundRequesterType;
 import multi.com.marketplace.payment.transaction.domain.PaymentAmount;
 
-/** Internal contract only; authorization and execution are not implemented. */
+/** Internal contract; authorization and a durable production implementation are not provided. */
 public interface RefundUseCase {
     /**
      * Register a refund request, not a completed PG refund. Implementations must

@@ -10,7 +10,9 @@ public interface PaymentProviderPort {
     RefundResult refund(RefundRequest request);
 
     record Approval(String providerPaymentKey, PaymentAmount amount) {}
-    record ApprovalRequest(UUID attemptId, String merchantTxId, PaymentAmount amount) {}
+    record ApprovalRequest(UUID attemptId, String provider, String merchantTxId,
+                           String idempotencyKey, PaymentAmount amount) {}
     record RefundResult(long refundedAmount) {}
-    record RefundRequest(UUID paymentId, PaymentAmount amount) {}
+    record RefundRequest(UUID paymentId, String provider, String providerPaymentKey,
+                         String idempotencyKey, PaymentAmount amount) {}
 }

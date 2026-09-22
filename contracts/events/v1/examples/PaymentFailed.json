@@ -1,0 +1,22 @@
+{
+  "eventId": "00000000-0000-4000-8000-000000000111",
+  "eventType": "PaymentFailed",
+  "eventVersion": 1,
+  "producer": "payment-service",
+  "aggregateType": "PAYMENT_FLOW",
+  "aggregateId": "00000000-0000-4000-8000-000000000001",
+  "aggregateVersion": 1,
+  "occurredAt": "2026-09-22T00:00:00Z",
+  "correlationId": "00000000-0000-4000-8000-000000000040",
+  "causationId": "00000000-0000-4000-8000-000000000010",
+  "traceId": "cccccccccccccccccccccccccccccccc",
+  "payload": {
+    "operationId": "00000000-0000-4000-8000-000000000010",
+    "resultVersion": 1,
+    "orderId": "00000000-0000-4000-8000-000000000001",
+    "attemptId": "00000000-0000-4000-8000-000000000008",
+    "reasonCode": "PROVIDER_DECLINED",
+    "noEffectEvidenceId": "00000000-0000-4000-8000-000000000025"
+  },
+  "simulated": true
+}

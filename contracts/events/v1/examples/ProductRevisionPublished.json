@@ -1,0 +1,39 @@
+{
+  "eventId": "00000000-0000-4000-8000-000000000100",
+  "eventType": "ProductRevisionPublished",
+  "eventVersion": 1,
+  "producer": "commerce-service",
+  "aggregateType": "PRODUCT",
+  "aggregateId": "00000000-0000-4000-8000-000000000003",
+  "aggregateVersion": 1,
+  "occurredAt": "2026-09-22T00:00:00Z",
+  "correlationId": "00000000-0000-4000-8000-000000000040",
+  "causationId": "00000000-0000-4000-8000-000000000010",
+  "traceId": "cccccccccccccccccccccccccccccccc",
+  "payload": {
+    "productId": "00000000-0000-4000-8000-000000000003",
+    "revisionId": "00000000-0000-4000-8000-000000000004",
+    "revisionNumber": 1,
+    "sellerId": "00000000-0000-4000-8000-000000000002",
+    "title": "모의 상품",
+    "categoryId": "00000000-0000-4000-8000-000000000012",
+    "brandId": null,
+    "imageUrl": "https://example.test/product.png",
+    "features": [
+      {
+        "key": "material",
+        "value": "cotton",
+        "source": "SELLER"
+      }
+    ],
+    "skuSummaries": [
+      {
+        "skuId": "00000000-0000-4000-8000-000000000013",
+        "price": 10000,
+        "available": true
+      }
+    ],
+    "publishedAt": "2026-09-22T00:00:00Z"
+  },
+  "simulated": true
+}

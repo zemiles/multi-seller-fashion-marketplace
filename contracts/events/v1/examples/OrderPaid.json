@@ -1,0 +1,27 @@
+{
+  "eventId": "00000000-0000-4000-8000-000000000102",
+  "eventType": "OrderPaid",
+  "eventVersion": 1,
+  "producer": "commerce-service",
+  "aggregateType": "ORDER",
+  "aggregateId": "00000000-0000-4000-8000-000000000001",
+  "aggregateVersion": 1,
+  "occurredAt": "2026-09-22T00:00:00Z",
+  "correlationId": "00000000-0000-4000-8000-000000000040",
+  "causationId": "00000000-0000-4000-8000-000000000010",
+  "traceId": "cccccccccccccccccccccccccccccccc",
+  "payload": {
+    "orderId": "00000000-0000-4000-8000-000000000001",
+    "memberPseudonym": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "paymentId": "00000000-0000-4000-8000-000000000007",
+    "totalAmount": 13000,
+    "items": [
+      {
+        "productId": "00000000-0000-4000-8000-000000000003",
+        "revisionId": "00000000-0000-4000-8000-000000000004",
+        "quantity": 1
+      }
+    ]
+  },
+  "simulated": true
+}

@@ -1,0 +1,24 @@
+{
+  "eventId": "00000000-0000-4000-8000-000000000117",
+  "eventType": "PayoutUnknown",
+  "eventVersion": 1,
+  "producer": "settlement-service",
+  "aggregateType": "SETTLEMENT",
+  "aggregateId": "00000000-0000-4000-8000-000000000011",
+  "aggregateVersion": 1,
+  "occurredAt": "2026-09-22T00:00:00Z",
+  "correlationId": "00000000-0000-4000-8000-000000000040",
+  "causationId": "00000000-0000-4000-8000-000000000010",
+  "traceId": "cccccccccccccccccccccccccccccccc",
+  "payload": {
+    "settlementId": "00000000-0000-4000-8000-000000000011",
+    "sellerId": "00000000-0000-4000-8000-000000000002",
+    "payoutAttemptId": "00000000-0000-4000-8000-000000000029",
+    "amount": {
+      "currency": "KRW",
+      "amount": 12000
+    },
+    "firstUnknownAt": "2026-09-22T00:00:00Z"
+  },
+  "simulated": true
+}

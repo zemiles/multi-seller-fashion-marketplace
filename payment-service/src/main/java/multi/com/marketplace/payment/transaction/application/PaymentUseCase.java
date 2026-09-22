@@ -6,7 +6,7 @@ import multi.com.marketplace.payment.transaction.domain.Payment;
 import multi.com.marketplace.payment.transaction.domain.PaymentAmount;
 import multi.com.marketplace.payment.transaction.domain.PaymentAttempt;
 
-/** Internal contract only; no implementation or HTTP endpoint is registered. */
+/** Internal contract; no HTTP endpoint or Spring Bean is registered. */
 public interface PaymentUseCase {
     /**
      * Prepare a CREATED attempt after verifying the order and amount with Commerce.

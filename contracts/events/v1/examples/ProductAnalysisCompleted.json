@@ -1,0 +1,32 @@
+{
+  "eventId": "00000000-0000-4000-8000-000000000118",
+  "eventType": "ProductAnalysisCompleted",
+  "eventVersion": 1,
+  "producer": "discovery-data-service",
+  "aggregateType": "PRODUCT_ANALYSIS",
+  "aggregateId": "00000000-0000-4000-8000-000000000003",
+  "aggregateVersion": 1,
+  "occurredAt": "2026-09-22T00:00:00Z",
+  "correlationId": "00000000-0000-4000-8000-000000000040",
+  "causationId": "00000000-0000-4000-8000-000000000010",
+  "traceId": "cccccccccccccccccccccccccccccccc",
+  "payload": {
+    "productId": "00000000-0000-4000-8000-000000000003",
+    "revisionId": "00000000-0000-4000-8000-000000000004",
+    "runId": "00000000-0000-4000-8000-000000000031",
+    "taxonomyVersion": "taxonomy-v1",
+    "modelVersion": "rules-v1",
+    "promptVersion": "none-v1",
+    "concepts": [
+      {
+        "conceptId": "00000000-0000-4000-8000-000000000032",
+        "score": 0.8,
+        "evidenceRefs": [
+          "FEATURE:material"
+        ]
+      }
+    ],
+    "completedAt": "2026-09-22T00:00:00Z"
+  },
+  "simulated": true
+}

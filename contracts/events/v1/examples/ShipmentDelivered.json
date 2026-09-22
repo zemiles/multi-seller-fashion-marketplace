@@ -1,0 +1,28 @@
+{
+  "eventId": "00000000-0000-4000-8000-000000000103",
+  "eventType": "ShipmentDelivered",
+  "eventVersion": 1,
+  "producer": "commerce-service",
+  "aggregateType": "ORDER",
+  "aggregateId": "00000000-0000-4000-8000-000000000001",
+  "aggregateVersion": 1,
+  "occurredAt": "2026-09-22T00:00:00Z",
+  "correlationId": "00000000-0000-4000-8000-000000000040",
+  "causationId": "00000000-0000-4000-8000-000000000010",
+  "traceId": "cccccccccccccccccccccccccccccccc",
+  "payload": {
+    "orderId": "00000000-0000-4000-8000-000000000001",
+    "shipmentId": "00000000-0000-4000-8000-000000000014",
+    "items": [
+      {
+        "shipmentItemId": "00000000-0000-4000-8000-000000000015",
+        "orderItemId": "00000000-0000-4000-8000-000000000005",
+        "unitOrdinals": [
+          1
+        ]
+      }
+    ],
+    "deliveredAt": "2026-09-22T00:00:00Z"
+  },
+  "simulated": true
+}

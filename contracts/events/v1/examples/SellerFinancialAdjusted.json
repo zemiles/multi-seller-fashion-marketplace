@@ -1,0 +1,31 @@
+{
+  "eventId": "00000000-0000-4000-8000-000000000107",
+  "eventType": "SellerFinancialAdjusted",
+  "eventVersion": 1,
+  "producer": "commerce-service",
+  "aggregateType": "ORDER_SELLER",
+  "aggregateId": "00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002",
+  "aggregateVersion": 1,
+  "occurredAt": "2026-09-22T00:00:00Z",
+  "correlationId": "00000000-0000-4000-8000-000000000040",
+  "causationId": "00000000-0000-4000-8000-000000000010",
+  "traceId": "cccccccccccccccccccccccccccccccc",
+  "payload": {
+    "orderId": "00000000-0000-4000-8000-000000000001",
+    "sellerId": "00000000-0000-4000-8000-000000000002",
+    "adjustmentId": "00000000-0000-4000-8000-000000000018",
+    "refundId": "00000000-0000-4000-8000-000000000019",
+    "reasonCode": "APPROVED_RETURN",
+    "priorFinancialVersion": 0,
+    "adjustments": [
+      {
+        "sourceUnitOrChargeId": "UNIT:00000000-0000-4000-8000-000000000005:1",
+        "originalRecognitionId": "00000000-0000-4000-8000-000000000020",
+        "signedRevenueAmount": -10000,
+        "signedFeeAmount": 1000
+      }
+    ],
+    "currency": "KRW"
+  },
+  "simulated": true
+}
